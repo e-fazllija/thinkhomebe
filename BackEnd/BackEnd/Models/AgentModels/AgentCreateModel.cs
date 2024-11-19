@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BackEnd.Entities
+namespace BackEnd.Models.AgentModels
 {
-    public class Customer : EntityBase
+    public class AgentCreateModel
     {
         [Required]
         public string Code { get; set; } = string.Empty;
@@ -13,11 +13,12 @@ namespace BackEnd.Entities
         [Required]
         public string Email { get; set; } = string.Empty;
         [Required]
-        public long Phone { get; set; } 
-        public string? Description { get; set; } 
-        public string? AdressLine { get; set; } 
-        public string? Town { get; set; } 
-        public string? State { get; set; } 
-                 
+        public long Phone { get; set; }
+        public string? Description { get; set; }
+        public string? AdressLine { get; set; }
+        public string? Town { get; set; }
+        public string? State { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.Now;
+
     }
 }

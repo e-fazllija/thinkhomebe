@@ -6,11 +6,34 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BackEnd.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreateMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Agents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<long>(type: "bigint", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdressLine = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Town = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Agents", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -60,43 +83,81 @@ namespace BackEnd.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CustomerTypeId = table.Column<int>(type: "int", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Province = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AdministrativeOfficeAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AdministrativeOfficeZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AdministrativeOfficeCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AdministrativeOfficeCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AdministrativeOfficeProvince = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OperatingOfficeAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OperatingOfficeZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OperatingOfficeCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OperatingOfficeCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OperatingOfficeProvince = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VATNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FiscalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ContactPerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Mobile = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PEC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UniqueCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReferenceAgent = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentTypeId = table.Column<int>(type: "int", nullable: true),
-                    BankCoordinates = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Fax = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Bank = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeliveryTypeId = table.Column<int>(type: "int", nullable: true),
+                    Phone = table.Column<long>(type: "bigint", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdressLine = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Town = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RealEstatePropertyPhotos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RealEstatePropertyPhotoId = table.Column<int>(type: "int", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RealEstatePropertyPhotos", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RealEstatePropertys",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Typology = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InHome = table.Column<bool>(type: "bit", nullable: false),
+                    Highlighted = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddressLine = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Town = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PostCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CommercialSurfaceate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Floor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TotalBuildingfloors = table.Column<int>(type: "int", nullable: false),
+                    Elevators = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MoreDetails = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Bedrooms = table.Column<int>(type: "int", nullable: false),
+                    WarehouseRooms = table.Column<int>(type: "int", nullable: false),
+                    Kitchens = table.Column<int>(type: "int", nullable: false),
+                    Bathrooms = table.Column<int>(type: "int", nullable: false),
+                    Furniture = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OtherFeatures = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ParkingSpaces = table.Column<int>(type: "int", nullable: false),
+                    Heating = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EnergyClass = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeOfProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StateOfTheProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    YearOfConstruction = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false),
+                    CondominiumExpenses = table.Column<double>(type: "float", nullable: false),
+                    Svailability = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RealEstatePropertys", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -249,6 +310,9 @@ namespace BackEnd.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Agents");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -265,6 +329,12 @@ namespace BackEnd.Migrations
 
             migrationBuilder.DropTable(
                 name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "RealEstatePropertyPhotos");
+
+            migrationBuilder.DropTable(
+                name: "RealEstatePropertys");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

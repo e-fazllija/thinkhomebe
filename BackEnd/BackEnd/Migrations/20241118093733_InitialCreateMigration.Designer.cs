@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241112140858_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241118093733_InitialCreateMigration")]
+    partial class InitialCreateMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,56 @@ namespace BackEnd.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BackEnd.Entities.Agent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdressLine")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Phone")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Town")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Agents");
+                });
 
             modelBuilder.Entity("BackEnd.Entities.ApplicationUser", b =>
                 {
@@ -106,117 +156,199 @@ namespace BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdministrativeOfficeAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdministrativeOfficeCity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdministrativeOfficeCountry")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdministrativeOfficeProvince")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdministrativeOfficeZipCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Bank")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BankCoordinates")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
+                    b.Property<string>("AdressLine")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactPerson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("CustomerTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DeliveryTypeId")
-                        .HasColumnType("int");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Fax")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FiscalCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Mobile")
+                    b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Notes")
+                    b.Property<long>("Phone")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OperatingOfficeAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OperatingOfficeCity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OperatingOfficeCountry")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OperatingOfficeProvince")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OperatingOfficeZipCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PEC")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PaymentTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Province")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReferenceAgent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UniqueCode")
+                    b.Property<string>("Town")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("VATNumber")
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AddressLine")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ZipCode")
+                    b.Property<int>("Bathrooms")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Bedrooms")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CommercialSurfaceate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("CondominiumExpenses")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Elevators")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EnergyClass")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Floor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Furniture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Heating")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Highlighted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("InHome")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Kitchens")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MoreDetails")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OtherFeatures")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ParkingSpaces")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PostCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StateOfTheProperty")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Svailability")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalBuildingfloors")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Town")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TypeOfProperty")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Typology")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WarehouseRooms")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearOfConstruction")
+                        .HasColumnType("int");
+
+                    b.Property<string>("description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("RealEstatePropertys");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.RealEstatePropertyPhoto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RealEstatePropertyPhotoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RealEstatePropertyPhotos");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BackEnd.Models.CustomerModels
+namespace BackEnd.Models.AgentModels
 {
-    public class CustomerUpdateModel
+    public class AgentSelectModel
     {
         public int Id { get; set; }
         [Required]
@@ -19,6 +19,9 @@ namespace BackEnd.Models.CustomerModels
         public string? AdressLine { get; set; }
         public string? Town { get; set; }
         public string? State { get; set; }
-        public DateTime UpdateDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
+        //public virtual CustomerType CustomerType { get; set; } = new CustomerType();
+
     }
 }

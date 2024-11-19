@@ -15,10 +15,28 @@ namespace BackEnd.Services
             this.dbContext = context;
 
             CustomerRepository = new CustomerRepository(this._context);
+            RealEstatePropertyRepository = new RealEstatePropertyRepository(this._context);
+            RealEstatePropertyPhotoRepository = new RealEstatePropertyPhotoRepository(this._context);
+            AgentRepository = new AgentRepository(this._context);
         }
 
       
         public ICustomerRepository CustomerRepository
+        {
+            get;
+            private set;
+        }
+        public IRealEstatePropertyRepository RealEstatePropertyRepository
+        {
+            get;
+            private set;
+        }
+        public IRealEstatePropertyPhotoRepository RealEstatePropertyPhotoRepository
+        {
+            get;
+            private set;
+        }
+        public IAgentRepository AgentRepository
         {
             get;
             private set;

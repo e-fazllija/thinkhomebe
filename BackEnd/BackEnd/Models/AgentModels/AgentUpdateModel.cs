@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BackEnd.Models.CustomerModels
+namespace BackEnd.Models.AgentModels
 {
-    public class CustomerUpdateModel
+    public class AgentUpdateModel
     {
         public int Id { get; set; }
         [Required]
