@@ -47,7 +47,7 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? Availability { get; set; }
         public string? Description { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
-        public IFormFile? Photo { get; set; }
+        public List<IFormFile>? Photos { get; set; }
 
     }
 }

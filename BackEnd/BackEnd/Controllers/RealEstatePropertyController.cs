@@ -8,6 +8,7 @@ using BackEnd.Models.ResponseModel;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
 using BackEnd.Services.BusinessServices;
+using BackEnd.Interfaces;
 
 namespace BackEnd.Controllers
 {
@@ -17,15 +18,18 @@ namespace BackEnd.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IRealEstatePropertyServices _realEstatePropertyServices;
+        private readonly IStorageServices _storageServices;
         private readonly ILogger<RealEstatePropertyController> _logger;
 
         public RealEstatePropertyController(
            IConfiguration configuration,
            IRealEstatePropertyServices realEstatePropertyServices,
+           IStorageServices storageServices,
             ILogger<RealEstatePropertyController> logger)
         {
             _configuration = configuration;
             _realEstatePropertyServices = realEstatePropertyServices;
+            _storageServices = storageServices;
             _logger = logger;
         }
         [HttpPost]

@@ -17,18 +17,30 @@ namespace BackEnd.Services.BusinessServices
         private readonly IMapper _mapper;
         private readonly ILogger<RealEstatePropertyServices> _logger;
         private readonly IOptionsMonitor<PaginationOptions> options;
-        public RealEstatePropertyServices(IUnitOfWork unitOfWork, IMapper mapper, ILogger<RealEstatePropertyServices> logger, IOptionsMonitor<PaginationOptions> options)
+        private readonly IStorageServices _storageServices;
+        public RealEstatePropertyServices(
+            IUnitOfWork unitOfWork, 
+            IMapper mapper, 
+            ILogger<RealEstatePropertyServices> logger, 
+            IOptionsMonitor<PaginationOptions> options,
+            IStorageServices storageServices)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             this.options = options;
+            _storageServices = storageServices;
 
         }
         public async Task<RealEstatePropertySelectModel> Create(RealEstatePropertyCreateModel dto)
         {
             try
             {
+                if (dto.Photos?.Count > 0)
+                {
+
+                }
+
                 var entityClass = _mapper.Map<RealEstateProperty>(dto);
                 await _unitOfWork.RealEstatePropertyRepository.InsertAsync(entityClass);
                 _unitOfWork.Save();
