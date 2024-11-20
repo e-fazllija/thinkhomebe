@@ -38,7 +38,6 @@ namespace BackEnd.Entities
         public int ParkingSpaces { get; set; }
         public string? Heating { get; set; }
         public string? Exposure { get; set; }
-
         public string? EnergyClass { get; set; }
         public string? TypeOfProperty { get; set; }
         public string? StateOfTheProperty { get; set; }
@@ -48,7 +47,10 @@ namespace BackEnd.Entities
         public double CondominiumExpenses { get; set; }
         public string? Availability { get; set; }
         public string? Description { get; set; }
-     
-      
+        public virtual ICollection<RealEstatePropertyPhoto> Photos { get; set; } = new List<RealEstatePropertyPhoto>();
+        public int CustomerId { get; set; }
+        public virtual Customer Customer { get; set; } = new Customer();
+        public int AgentId { get; set; }
+        public virtual Agent Agents { get; set; } = new Agent();
     }
 }

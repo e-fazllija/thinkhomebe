@@ -1,4 +1,6 @@
-﻿using System.Reflection.Metadata;
+﻿using System.Reflection.Emit;
+using System.Reflection.Metadata;
+using BackEnd.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +11,15 @@ namespace BackEnd.Services
 
         public static ModelBuilder ConfigureEntities(this ModelBuilder builder)
         {
+            builder.Entity<RealEstateProperty>()
+                .HasOne(c => c.Customer).WithMany(c => c.RealEstateProperties);
+
+            builder.Entity<RealEstateProperty>()
+                .HasOne(c => c.Agents).WithMany(e => e.RealEstateProperties);
+
+            builder.Entity<RealEstateProperty>()
+                .HasMany(c => c.Photos).WithOne(e => e.RealEstateProperty);
+
             return builder;
         }
 

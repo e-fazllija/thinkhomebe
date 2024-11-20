@@ -18,6 +18,8 @@ namespace BackEnd.Entities
         public string? AdressLine { get; set; } 
         public string? Town { get; set; } 
         public string? State { get; set; } 
-                 
+        public bool Buyer { get; set; } 
+        public bool Seller { get; set; }
+        public virtual ICollection<RealEstateProperty> RealEstateProperties { get; set; } = new List<RealEstateProperty>();
     }
 }
