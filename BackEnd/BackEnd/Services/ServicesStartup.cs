@@ -13,6 +13,7 @@ namespace BackEnd.Services
 
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
             builder.Services.AddTransient<IStorageServices, StorageServices>();
+            builder.Services.AddTransient<IMailService, MailService>();
             builder.Services.AddTransient<ICustomerServices, CustomerServices>();
             builder.Services.AddTransient<IRealEstatePropertyServices, RealEstatePropertyServices>();
             builder.Services.AddTransient<IRealEstatePropertyPhotoServices, RealEstatePropertyPhotoServices>();

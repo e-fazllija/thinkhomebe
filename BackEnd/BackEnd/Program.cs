@@ -20,6 +20,7 @@ builder.Services.AddSwaggerGen();
 builder.ConfigureDatabase();
 builder.ConfigureServices();
 builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("PaginationOptions"));
+builder.Services.Configure<MailOptions>(builder.Configuration.GetSection("MailOptions"));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddCors();
 
