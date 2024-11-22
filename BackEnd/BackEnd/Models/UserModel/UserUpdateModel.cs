@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BackEnd.Models.AuthModels
+namespace BackEnd.Models.UserModel
 {
-    public class RegisterModel
+    public class UserUpdateModel
     {
+        [Required(ErrorMessage = "Id is required")]
+        public string Id { get; set; }
         [Required(ErrorMessage = "Code is required")]
         public string Code { get; set; }
         [Required(ErrorMessage = "Username is required")]
@@ -12,13 +14,6 @@ namespace BackEnd.Models.AuthModels
         public string Name { get; set; }
         [Required(ErrorMessage = "Lastname is required")]
         public string LastName { get; set; }
-        [EmailAddress]
-        [Required(ErrorMessage = "Email is required")]
-        public string Email { get; set; }
-        [Required(ErrorMessage = "Password is required")]
-        public string Password { get; set; }
-        [Required(ErrorMessage = "Role is required")]
-        public string Role { get; set; } = string.Empty;
         [Required(ErrorMessage = "Phone number is required")]
         public string PhoneNumber { get; set; } = string.Empty;
         public string? MobilePhone { get; set; }
@@ -28,5 +23,6 @@ namespace BackEnd.Models.AuthModels
         [Required(ErrorMessage = "Town is required")]
         public string Town { get; set; } = string.Empty;
         public string? Region { get; set; }
+        public DateTime UpdateDate { get; set; } = DateTime.Now;
     }
 }

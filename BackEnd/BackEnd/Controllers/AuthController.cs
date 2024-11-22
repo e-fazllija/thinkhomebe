@@ -53,21 +53,15 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var userEmailExists = await userManager.FindByEmailAsync(model.Email);
-            var userNameExists = await userManager.FindByNameAsync(model.Username);
+            var userNameExists = await userManager.FindByNameAsync(model.UserName);
             if (userEmailExists != null || userNameExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Utente già registrato!" });
 
 
-            model.Username = model.Username.Replace(" ", "_");
+            model.UserName = model.UserName.Replace(" ", "_");
 
-            ApplicationUser user = new ApplicationUser()
-            {
-                Name = model.Name,
-                LastName = model.Lastname,
-                UserName = model.Username,
-                Email = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString()
-            };
+            ApplicationUser user = _mapper.Map<ApplicationUser>(model);
+            user.SecurityStamp = Guid.NewGuid().ToString();
 
             var result = await userManager.CreateAsync(user, model.Password);
 
@@ -103,19 +97,15 @@ namespace BackEnd.Controllers
         [Route(nameof(RegisterAdmin))]
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
         {
-            model.Username = model.Username.Replace(" ", "_");
+            model.UserName = model.UserName.Replace(" ", "_");
 
-            var userExists = await userManager.FindByNameAsync(model.Username);
+            var userExists = await userManager.FindByNameAsync(model.UserName);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "User already exists!" });
-            ApplicationUser user = new ApplicationUser()
-            {
-                Email = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username,
-                Name = "",
-                LastName = ""
-            };
+
+            ApplicationUser user = _mapper.Map<ApplicationUser>(model);
+            user.SecurityStamp = Guid.NewGuid().ToString();
+
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel { Status = "Error", Message = "User creation failed! Please check user details and try again." });
