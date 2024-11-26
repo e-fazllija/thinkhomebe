@@ -8,6 +8,9 @@ using BackEnd.Models.ResponseModel;
 using BackEnd.Models.OutputModels;
 using BackEnd.Services.BusinessServices;
 using BackEnd.Models.AgentModels;
+using AutoMapper;
+using BackEnd.Models.UserModel;
+using Microsoft.AspNetCore.Identity;
 
 namespace BackEnd.Controllers
 {
@@ -15,43 +18,44 @@ namespace BackEnd.Controllers
     [Route("/api/[controller]/")]
     public class AgentsController : ControllerBase
     {
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
         private readonly IAgentServices _agentServices;
-        private readonly ILogger <AgentsController> _logger;
+        private readonly ILogger<AgenciesController> _logger;
+        private readonly IMapper _mapper;
 
         public AgentsController(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
            IConfiguration configuration,
            IAgentServices agentServices,
-            ILogger<AgentsController> logger)
+            ILogger<AgenciesController> logger,
+            IMapper mapper)
         {
+            this.userManager = userManager;
+            this.roleManager = roleManager;
             _configuration = configuration;
             _agentServices = agentServices;
             _logger = logger;
+            _mapper = mapper;
         }
-        [HttpPost]
-        [Route(nameof(Create))]
-        public async Task<IActionResult> Create(AgentCreateModel request)
-        {
-            try
-            {
-                AgentSelectModel Result = await _agentServices.Create(request);
-                return Ok(Result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
+
         [HttpPost]
         [Route(nameof(Update))]
-        public async Task<IActionResult> Update(AgentUpdateModel request)
+        public async Task<IActionResult> Update(UserUpdateModel request)
         {
             try
             {
-                AgentSelectModel Result = await _agentServices.Update(request);
+                ApplicationUser user = await userManager.FindByIdAsync(request.Id) ?? throw new NullReferenceException("Agente non trovato");
+                _mapper.Map(request, user);
 
-                return Ok(Result);
+                IdentityResult Result = await userManager.UpdateAsync(user);
+
+                if (Result.Succeeded)
+                    return Ok(user);
+                else
+                    return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = Result.Errors.ToString() ?? "Si è verificato un errore" });
             }
             catch (Exception ex)
             {
@@ -59,6 +63,7 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
         [HttpGet]
         [Route(nameof(Get))]
         public async Task<IActionResult> Get(int currentPage, string? filterRequest)
@@ -66,9 +71,17 @@ namespace BackEnd.Controllers
             try
             {
                 //currentPage = currentPage > 0 ? currentPage : 1;
-                ListViewModel<AgentSelectModel> res = await _agentServices.Get(currentPage, filterRequest, null, null);
+                var usersList = await userManager.GetUsersInRoleAsync("Agent");
+                if (!string.IsNullOrEmpty(filterRequest))
+                    usersList = usersList.Where(x => x.Email.Contains(filterRequest)).ToList();
 
-                return Ok(res);
+                List<ApplicationUser> users = usersList.ToList();
+                ListViewModel<UserSelectModel> result = new ListViewModel<UserSelectModel>();
+
+                result.Total = users.Count();
+                result.Data = _mapper.Map<List<UserSelectModel>>(users);
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -78,12 +91,12 @@ namespace BackEnd.Controllers
         }
         [HttpGet]
         [Route(nameof(GetById))]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(string id)
         {
             try
             {
-                AgentSelectModel result = new AgentSelectModel();
-                result = await _agentServices.GetById(id);
+                var user = await userManager.FindByIdAsync(id);
+                UserSelectModel result = _mapper.Map<UserSelectModel>(user);
 
                 return Ok(result);
             }
@@ -93,14 +106,24 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
-        [HttpPost]
+
+        [HttpDelete]
         [Route(nameof(Delete))]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
             try
             {
-                Agent result = await _agentServices.Delete(id);
-                return Ok(result);
+                ApplicationUser? user = await userManager.FindByIdAsync(id);
+                if (user != null)
+                {
+                    await userManager.DeleteAsync(user);
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Utente non trovato" });
+                }
+
             }
             catch (Exception ex)
             {
@@ -108,6 +131,7 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
         [HttpGet]
         [Route(nameof(ExportExcel))]
         public async Task<IActionResult> ExportExcel(char? fromName, char? toName)
