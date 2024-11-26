@@ -6,8 +6,8 @@ namespace BackEnd.Models.UserModel
     {
         [Required(ErrorMessage = "Id is required")]
         public string Id { get; set; }
-        [Required(ErrorMessage = "Code is required")]
-        public string Code { get; set; }
+        [Required(ErrorMessage = "Email is required")]
+        public string Email { get; set; }
         [Required(ErrorMessage = "Username is required")]
         public string UserName { get; set; }
         [Required(ErrorMessage = "Name is required")]

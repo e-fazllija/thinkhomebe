@@ -14,6 +14,9 @@ namespace BackEnd.Profiles
 
             CreateMap<ApplicationUser, UserUpdateModel>();
             CreateMap<UserUpdateModel, ApplicationUser>();
+
+            CreateMap<ApplicationUser, UserSelectModel>();
+            CreateMap<UserSelectModel, ApplicationUser>();
         }
     }
 }

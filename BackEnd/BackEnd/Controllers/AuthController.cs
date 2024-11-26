@@ -81,7 +81,7 @@ namespace BackEnd.Controllers
 
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
             var confirmationLink = $"http://localhost:5173/metronic8/vue/demo1/#/email-confirmation/{user.Email}/{token}";
-                //Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
+            //Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
             MailRequest mailRequest = new MailRequest()
             {
                 ToEmail = user.Email,
@@ -223,10 +223,18 @@ namespace BackEnd.Controllers
 
             var result = await userManager.ConfirmEmailAsync(user, credentials.Token);
 
-            if(result.Succeeded)
-                return Ok();
-            else
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Si è verificato un errore" });
+            if (result.Succeeded)
+            {
+                user.EmailConfirmed = true;
+                var updateResult = await userManager.UpdateAsync(user);
+
+                if (updateResult.Succeeded)
+                    return Ok();
+                else
+                    return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Non è stato possibile confermare le credenziali" });
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Token non valido" });
         }
 
         [HttpGet]
@@ -262,7 +270,7 @@ namespace BackEnd.Controllers
             {
                 throw new Exception(ex.Message);
             }
-            
+
         }
 
         //[HttpGet]

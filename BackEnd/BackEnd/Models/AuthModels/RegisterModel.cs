@@ -4,8 +4,6 @@ namespace BackEnd.Models.AuthModels
 {
     public class RegisterModel
     {
-        [Required(ErrorMessage = "Code is required")]
-        public string Code { get; set; }
         [Required(ErrorMessage = "Username is required")]
         public string UserName { get; set; }
         [Required(ErrorMessage = "Name is required")]
