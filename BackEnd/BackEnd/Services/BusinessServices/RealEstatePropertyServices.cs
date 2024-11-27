@@ -23,7 +23,8 @@ namespace BackEnd.Services.BusinessServices
             IMapper mapper, 
             ILogger<RealEstatePropertyServices> logger, 
             IOptionsMonitor<PaginationOptions> options,
-            IStorageServices storageServices)
+            IStorageServices storageServices
+            )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -36,14 +37,31 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
+                var entityClass = _mapper.Map<RealEstateProperty>(dto);
+                var propertyAdded = await _unitOfWork.RealEstatePropertyRepository.InsertAsync(entityClass);
+                _unitOfWork.Save();
+
                 if (dto.Photos?.Count > 0)
                 {
+                    foreach (var file in dto.Photos)
+                    {
+                        Stream stream = file.OpenReadStream();
+                        string fileName = file.Name.Replace(" ", "-");
+                        string fileUrl = await _storageServices.UploadFile(stream, fileName);
+
+                        RealEstatePropertyPhoto photo = new RealEstatePropertyPhoto()
+                        {
+                            RealEstatePropertyId = propertyAdded.Entity.Id,
+                            FileName = fileName,
+                            Url = fileUrl,
+                            Type = 1
+                        };
+
+                        await _unitOfWork.RealEstatePropertyPhotoRepository.InsertAsync(photo);
+                        _unitOfWork.Save();
+                    }
 
                 }
-
-                var entityClass = _mapper.Map<RealEstateProperty>(dto);
-                await _unitOfWork.RealEstatePropertyRepository.InsertAsync(entityClass);
-                _unitOfWork.Save();
 
                 RealEstatePropertySelectModel response = new RealEstatePropertySelectModel();
                 _mapper.Map(entityClass, response);

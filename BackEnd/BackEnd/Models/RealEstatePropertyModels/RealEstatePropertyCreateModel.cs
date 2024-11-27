@@ -21,12 +21,11 @@ namespace BackEnd.Models.RealEstatePropertyModels
         [Required]
         public string PostCode { get; set; } = string.Empty;
         [Required]
-        public string CommercialSurfaceate { get; set; } = string.Empty;
-        [Required]
-        public string Floor { get; set; } = string.Empty;
+        public int CommercialSurfaceate { get; set; }
+        public string? Floor { get; set; }
         [Required]
         public int TotalBuildingfloors { get; set; }
-        public string? Elevators { get; set; }
+        public int Elevators { get; set; }
         public string? MoreDetails { get; set; }
         public int Bedrooms { get; set; }
         public int WarehouseRooms { get; set; }
@@ -48,6 +47,8 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? Description { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
         public List<IFormFile>? Photos { get; set; }
+        public int CustomerId { get; set; }
+        public int AgentId { get; set; }
 
     }
 }

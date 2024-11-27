@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BackEnd.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Models.RealEstatePropertyModels
 {
@@ -23,12 +24,11 @@ namespace BackEnd.Models.RealEstatePropertyModels
         [Required]
         public string PostCode { get; set; } = string.Empty;
         [Required]
-        public string CommercialSurfaceate { get; set; } = string.Empty;
-        [Required]
-        public string Floor { get; set; } = string.Empty;
+        public int CommercialSurfaceate { get; set; }
+        public string? Floor { get; set; }
         [Required]
         public int TotalBuildingfloors { get; set; }
-        public string? Elevators { get; set; }
+        public int Elevators { get; set; }
         public string? MoreDetails { get; set; }
         public int Bedrooms { get; set; }
         public int WarehouseRooms { get; set; }
@@ -50,6 +50,10 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? Description { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
-
+        public virtual ICollection<RealEstatePropertyPhoto> Photos { get; set; } = new List<RealEstatePropertyPhoto>();
+        public int CustomerId { get; set; }
+        public virtual Customer Customer { get; set; } = new Customer();
+        public string AgentId { get; set; }
+        public virtual ApplicationUser Agent { get; set; } = new ApplicationUser();
     }
 }

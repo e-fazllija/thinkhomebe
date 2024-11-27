@@ -18,18 +18,18 @@ namespace BackEnd.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IRealEstatePropertyServices _realEstatePropertyServices;
-        private readonly IStorageServices _storageServices;
+        //private readonly IStorageServices _storageServices;
         private readonly ILogger<RealEstatePropertyController> _logger;
 
         public RealEstatePropertyController(
            IConfiguration configuration,
            IRealEstatePropertyServices realEstatePropertyServices,
-           IStorageServices storageServices,
+           //IStorageServices storageServices,
             ILogger<RealEstatePropertyController> logger)
         {
             _configuration = configuration;
             _realEstatePropertyServices = realEstatePropertyServices;
-            _storageServices = storageServices;
+            //_storageServices = storageServices;
             _logger = logger;
         }
         [HttpPost]

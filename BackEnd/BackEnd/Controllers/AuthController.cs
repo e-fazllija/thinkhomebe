@@ -34,21 +34,6 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost]
-        [Route(nameof(SendEmail))]
-        public async Task<IActionResult> SendEmail()
-        {
-            MailRequest mailRequest = new MailRequest()
-            {
-                ToEmail = "elsad3631@gmail.com",
-                Subject = "test",
-                Body = "test"
-            };
-            await _mailService.SendEmailAsync(mailRequest);
-            return Ok();
-        }
-
-
-        [HttpPost]
         [Route(nameof(Register))]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
@@ -144,7 +129,7 @@ namespace BackEnd.Controllers
                 var token = new JwtSecurityToken(
                         issuer: _configuration["Authentication:Issuer"],
                     audience: _configuration["Authentication:Audience"],
-                expires: DateTime.Now.AddHours(3),
+                expires: DateTime.Now.AddDays(1),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
