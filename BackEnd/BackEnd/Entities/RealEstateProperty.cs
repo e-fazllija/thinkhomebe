@@ -49,7 +49,7 @@ namespace BackEnd.Entities
         public virtual ICollection<RealEstatePropertyPhoto> Photos { get; set; } = new List<RealEstatePropertyPhoto>();
         public int CustomerId { get; set; }
         public virtual Customer Customer { get; set; } = new Customer();
-        public int AgentId { get; set; }
+        public string AgentId { get; set; } = string.Empty;
         public virtual Agent Agents { get; set; } = new Agent();
     }
 }

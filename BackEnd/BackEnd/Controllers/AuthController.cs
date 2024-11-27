@@ -135,6 +135,7 @@ namespace BackEnd.Controllers
                     );
                 LoginResponse result = new LoginResponse()
                 {
+                    Id = user.Id,
                     Name = user.Name,
                     Lastname = user.LastName,
                     Email = user.Email,
@@ -179,6 +180,7 @@ namespace BackEnd.Controllers
                     var userRoles = await userManager.GetRolesAsync(user);
                     LoginResponse result = new LoginResponse()
                     {
+                        Id = user.Id,
                         Name = user.Name,
                         Lastname = user.LastName,
                         Email = user.Email,

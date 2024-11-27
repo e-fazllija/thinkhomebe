@@ -41,12 +41,12 @@ namespace BackEnd.Services.BusinessServices
                 var propertyAdded = await _unitOfWork.RealEstatePropertyRepository.InsertAsync(entityClass);
                 _unitOfWork.Save();
 
-                if (dto.Photos?.Count > 0)
+                if (dto.Files?.Count > 0)
                 {
-                    foreach (var file in dto.Photos)
+                    foreach (var file in dto.Files)
                     {
                         Stream stream = file.OpenReadStream();
-                        string fileName = file.Name.Replace(" ", "-");
+                        string fileName = file.FileName.Replace(" ", "-");
                         string fileUrl = await _storageServices.UploadFile(stream, fileName);
 
                         RealEstatePropertyPhoto photo = new RealEstatePropertyPhoto()

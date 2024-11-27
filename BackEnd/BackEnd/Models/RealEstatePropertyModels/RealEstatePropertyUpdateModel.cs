@@ -49,6 +49,6 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? Description { get; set; }
         public DateTime UpdateDate { get; set; } = DateTime.Now;
         public int CustomerId { get; set; }
-        public int AgentId { get; set; }
+        public string AgentId { get; set; } = string.Empty;
     }
 }
