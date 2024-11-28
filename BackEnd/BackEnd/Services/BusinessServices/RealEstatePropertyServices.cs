@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using BackEnd.Entities;
 using BackEnd.Interfaces;
 using BackEnd.Interfaces.IBusinessServices;
-using BackEnd.Models.CustomerModels;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
@@ -80,7 +79,7 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys;
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys.Include(x => x.Photos);
 
                 if (id == 0)
                     throw new NullReferenceException("L'id non può essere 0");
@@ -94,6 +93,14 @@ namespace BackEnd.Services.BusinessServices
 
                 _unitOfWork.RealEstatePropertyRepository.Delete(EntityClasses);
                 await _unitOfWork.SaveAsync();
+
+                foreach(var photo in EntityClasses.Photos)
+                {
+                    await _storageServices.DeleteFile(photo.FileName);
+                }
+
+                _unitOfWork.dbContext.RealEstatePropertyPhotos.RemoveRange(EntityClasses.Photos);
+
                 _logger.LogInformation(nameof(Delete));
 
                 return EntityClasses;
@@ -120,7 +127,7 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys;
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys.Include(x => x.Photos);
 
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.Category.Contains(filterRequest));
