@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.SymbolStore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.Entities
 {
@@ -7,8 +7,7 @@ namespace BackEnd.Entities
     {
         [Required]
         public string Category { get; set; } = string.Empty;
-        [Required]
-        public string Typology { get; set; } = string.Empty;
+        public string? Typology { get; set; }
         public bool InHome { get; set; }
         public bool Highlighted { get; set; }
         [Required]
@@ -48,8 +47,8 @@ namespace BackEnd.Entities
         public string? Description { get; set; }
         public virtual ICollection<RealEstatePropertyPhoto> Photos { get; set; } = new List<RealEstatePropertyPhoto>();
         public int CustomerId { get; set; }
-        public virtual Customer Customer { get; set; } = new Customer();
+        public virtual Customer Customer { get; set; }
         public string AgentId { get; set; } = string.Empty;
-        public virtual Agent Agents { get; set; } = new Agent();
+        public virtual ApplicationUser Agent { get; set; }
     }
 }

@@ -6,8 +6,6 @@ using BackEnd.Services;
 using System.Data;
 using BackEnd.Models.ResponseModel;
 using BackEnd.Models.OutputModels;
-using BackEnd.Services.BusinessServices;
-using BackEnd.Models.AgentModels;
 using AutoMapper;
 using BackEnd.Models.UserModel;
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +19,6 @@ namespace BackEnd.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
-        private readonly IAgentServices _agentServices;
         private readonly ILogger<AgenciesController> _logger;
         private readonly IMapper _mapper;
 
@@ -29,14 +26,12 @@ namespace BackEnd.Controllers
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
            IConfiguration configuration,
-           IAgentServices agentServices,
             ILogger<AgenciesController> logger,
             IMapper mapper)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             _configuration = configuration;
-            _agentServices = agentServices;
             _logger = logger;
             _mapper = mapper;
         }
@@ -132,41 +127,41 @@ namespace BackEnd.Controllers
             }
         }
 
-        [HttpGet]
-        [Route(nameof(ExportExcel))]
-        public async Task<IActionResult> ExportExcel(char? fromName, char? toName)
-        {
-            try
-            {
-                var result = await _agentServices.Get(0, null, fromName, toName);
-                DataTable table = Export.ToDataTable<AgentSelectModel>(result.Data);
-                byte[] fileBytes = Export.GenerateExcelContent(table);
+        //[HttpGet]
+        //[Route(nameof(ExportExcel))]
+        //public async Task<IActionResult> ExportExcel(char? fromName, char? toName)
+        //{
+        //    try
+        //    {
+        //        var result = await _agentServices.Get(0, null, fromName, toName);
+        //        DataTable table = Export.ToDataTable<AgentSelectModel>(result.Data);
+        //        byte[] fileBytes = Export.GenerateExcelContent(table);
 
-                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Output.xlsx");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
-        [HttpGet]
-        [Route(nameof(ExportCsv))]
-        public async Task<IActionResult> ExportCsv(char? fromName, char? toName)
-        {
-            try
-            {
-                var result = await _agentServices.Get(0, null, fromName, toName);
-                DataTable table = Export.ToDataTable<AgentSelectModel>(result.Data);
-                byte[] fileBytes = Export.GenerateCsvContent(table);
+        //        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Output.xlsx");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex.Message);
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+        //    }
+        //}
+        //[HttpGet]
+        //[Route(nameof(ExportCsv))]
+        //public async Task<IActionResult> ExportCsv(char? fromName, char? toName)
+        //{
+        //    try
+        //    {
+        //        var result = await _agentServices.Get(0, null, fromName, toName);
+        //        DataTable table = Export.ToDataTable<AgentSelectModel>(result.Data);
+        //        byte[] fileBytes = Export.GenerateCsvContent(table);
 
-                return File(fileBytes, "text/csv", "Output.csv");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
+        //        return File(fileBytes, "text/csv", "Output.csv");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex.Message);
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+        //    }
+        //}
     }
 }

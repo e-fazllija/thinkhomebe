@@ -26,5 +26,6 @@ namespace BackEnd.Models.AuthModels
         [Required(ErrorMessage = "Town is required")]
         public string Town { get; set; } = string.Empty;
         public string? Region { get; set; }
+        public string? AgencyId { get; set; }
     }
 }

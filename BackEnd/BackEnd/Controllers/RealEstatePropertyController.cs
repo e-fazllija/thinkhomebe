@@ -18,20 +18,21 @@ namespace BackEnd.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IRealEstatePropertyServices _realEstatePropertyServices;
-        //private readonly IStorageServices _storageServices;
+        private readonly IRealEstatePropertyPhotoServices _realEstatePropertyPhotoServices;
         private readonly ILogger<RealEstatePropertyController> _logger;
 
         public RealEstatePropertyController(
            IConfiguration configuration,
            IRealEstatePropertyServices realEstatePropertyServices,
-           //IStorageServices storageServices,
+           IRealEstatePropertyPhotoServices realEstatePropertyPhotoServices,
             ILogger<RealEstatePropertyController> logger)
         {
             _configuration = configuration;
             _realEstatePropertyServices = realEstatePropertyServices;
-            //_storageServices = storageServices;
+            _realEstatePropertyPhotoServices = realEstatePropertyPhotoServices;
             _logger = logger;
         }
+
         [HttpPost]
         [Route(nameof(Create))]
         public async Task<IActionResult> Create(RealEstatePropertyCreateModel request)
@@ -47,6 +48,23 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route(nameof(UploadFiles))]
+        public async Task<IActionResult> UploadFiles(UploadFilesModel request)
+        {
+            try
+            {
+                await _realEstatePropertyServices.InsertFiles(request);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
         [HttpPost]
         [Route(nameof(Update))]
         public async Task<IActionResult> Update(RealEstatePropertyUpdateModel request)
@@ -119,7 +137,23 @@ namespace BackEnd.Controllers
         {
             try
             {
-                RealEstateProperty result = await _realEstatePropertyServices.Delete(id);
+                await _realEstatePropertyServices.Delete(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+        
+        [HttpDelete]
+        [Route(nameof(DeletePhoto))]
+        public async Task<IActionResult> DeletePhoto(int id)
+        {
+            try
+            {
+                await _realEstatePropertyPhotoServices.Delete(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -136,6 +170,23 @@ namespace BackEnd.Controllers
             try
             {
                 await _realEstatePropertyServices.SetHighlighted(realEstatePropertyId);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route(nameof(SetRealEstatePropertyPhotoHighlighted))]
+        public async Task<IActionResult> SetRealEstatePropertyPhotoHighlighted([FromForm] int realEstatePropertyPhotoId)
+        {
+            try
+            {
+                await _realEstatePropertyPhotoServices.SetHighlighted(realEstatePropertyPhotoId);
 
                 return Ok();
             }

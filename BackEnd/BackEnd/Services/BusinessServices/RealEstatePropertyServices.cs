@@ -10,7 +10,6 @@ using BackEnd.Models.RealEstatePropertyModels;
 using BackEnd.Models.CustomerModels;
 using Microsoft.AspNetCore.Identity;
 using BackEnd.Models.UserModel;
-using Microsoft.WindowsAzure.Storage.File.Protocol;
 
 namespace BackEnd.Services.BusinessServices
 {
@@ -23,9 +22,9 @@ namespace BackEnd.Services.BusinessServices
         private readonly IStorageServices _storageServices;
         private readonly UserManager<ApplicationUser> userManager;
         public RealEstatePropertyServices(
-            IUnitOfWork unitOfWork, 
-            IMapper mapper, 
-            ILogger<RealEstatePropertyServices> logger, 
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ILogger<RealEstatePropertyServices> logger,
             IOptionsMonitor<PaginationOptions> options,
             IStorageServices storageServices,
             UserManager<ApplicationUser> userManager
@@ -81,11 +80,42 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<RealEstateProperty> Delete(int id)
+        public async Task InsertFiles(UploadFilesModel dto)
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys.Include(x => x.Photos);
+                foreach (var file in dto.Files)
+                {
+                    Stream stream = file.OpenReadStream();
+                    string fileName = file.FileName.Replace(" ", "-");
+                    string fileUrl = await _storageServices.UploadFile(stream, fileName);
+
+                    RealEstatePropertyPhoto photo = new RealEstatePropertyPhoto()
+                    {
+                        RealEstatePropertyId = dto.PropertyId,
+                        FileName = fileName,
+                        Url = fileUrl,
+                        Type = 1
+                    };
+
+                    await _unitOfWork.RealEstatePropertyPhotoRepository.InsertAsync(photo);
+                    _unitOfWork.Save();
+                }
+
+                _logger.LogInformation(nameof(Create));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore in fase creazione");
+            }
+        }
+
+        public async Task Delete(int id)
+        {
+            try
+            {
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos);
 
                 if (id == 0)
                     throw new NullReferenceException("L'id non può essere 0");
@@ -100,7 +130,7 @@ namespace BackEnd.Services.BusinessServices
                 _unitOfWork.RealEstatePropertyRepository.Delete(EntityClasses);
                 await _unitOfWork.SaveAsync();
 
-                foreach(var photo in EntityClasses.Photos)
+                foreach (var photo in EntityClasses.Photos)
                 {
                     await _storageServices.DeleteFile(photo.FileName);
                 }
@@ -108,8 +138,6 @@ namespace BackEnd.Services.BusinessServices
                 _unitOfWork.dbContext.RealEstatePropertyPhotos.RemoveRange(EntityClasses.Photos);
 
                 _logger.LogInformation(nameof(Delete));
-
-                return EntityClasses;
             }
             catch (Exception ex)
             {
@@ -133,7 +161,7 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys.Include(x => x.Photos);
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos);
 
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.Category.Contains(filterRequest));
@@ -186,7 +214,7 @@ namespace BackEnd.Services.BusinessServices
                 var usersList = await userManager.GetUsersInRoleAsync("Agent");
 
                 List<ApplicationUser> users = usersList.ToList();
-               
+
                 RealEstatePropertyCreateViewModel result = new RealEstatePropertyCreateViewModel();
                 List<Customer> customers = await customerQuery.ToListAsync();
                 result.Customers = _mapper.Map<List<CustomerSelectModel>>(customers);
@@ -202,22 +230,22 @@ namespace BackEnd.Services.BusinessServices
                 throw new Exception("Si è verificato un errore");
             }
         }
-        
+
         public async Task SetHighlighted(int realEstatePropertyId)
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys.Where(x => x.Id == realEstatePropertyId);
-                IQueryable<RealEstateProperty> queryHighlighted = _unitOfWork.dbContext.RealEstatePropertys.Where(x => x.Highlighted == true);
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Where(x => x.Id == realEstatePropertyId);
+                IQueryable<RealEstateProperty> queryHighlighted = _unitOfWork.dbContext.RealEstateProperties.Where(x => x.Highlighted == true);
 
                 RealEstateProperty propertyHighlighted = await query.FirstAsync();
                 propertyHighlighted.Highlighted = false;
-                _unitOfWork.dbContext.RealEstatePropertys.Update(propertyHighlighted);
+                _unitOfWork.dbContext.RealEstateProperties.Update(propertyHighlighted);
                 await _unitOfWork.SaveAsync();
 
                 RealEstateProperty property = await query.FirstAsync();
                 property.Highlighted = true;
-                _unitOfWork.dbContext.RealEstatePropertys.Update(property);
+                _unitOfWork.dbContext.RealEstateProperties.Update(property);
                 await _unitOfWork.SaveAsync();
 
                 _logger.LogInformation(nameof(SetHighlighted));
@@ -233,11 +261,11 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys.Where(x => x.Id == realEstatePropertyId);
-                
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Where(x => x.Id == realEstatePropertyId);
+
                 RealEstateProperty property = await query.FirstAsync();
                 property.InHome = true;
-                _unitOfWork.dbContext.RealEstatePropertys.Update(property);
+                _unitOfWork.dbContext.RealEstateProperties.Update(property);
                 await _unitOfWork.SaveAsync();
 
                 _logger.LogInformation(nameof(SetInHome));
@@ -256,7 +284,7 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var query = await _unitOfWork.dbContext.RealEstatePropertys
+                var query = await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos)
                     //.Include(x => x.RealEstatePropertyType)
                     .FirstOrDefaultAsync(x => x.Id == id);
 

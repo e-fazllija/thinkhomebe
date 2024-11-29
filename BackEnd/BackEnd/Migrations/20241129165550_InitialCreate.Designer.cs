@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241127160820_AgentIdString")]
-    partial class AgentIdString
+    [Migration("20241129165550_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,56 +25,6 @@ namespace BackEnd.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BackEnd.Entities.Agent", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AdressLine")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("Phone")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("State")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Town")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Agents");
-                });
-
             modelBuilder.Entity("BackEnd.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -85,6 +35,9 @@ namespace BackEnd.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AgencyId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -235,10 +188,7 @@ namespace BackEnd.Migrations
 
                     b.Property<string>("AgentId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AgentsId")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Availability")
                         .HasColumnType("nvarchar(max)");
@@ -333,7 +283,6 @@ namespace BackEnd.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Typology")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdateDate")
@@ -347,11 +296,11 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AgentsId");
+                    b.HasIndex("AgentId");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("RealEstatePropertys");
+                    b.ToTable("RealEstateProperties");
                 });
 
             modelBuilder.Entity("BackEnd.Entities.RealEstatePropertyPhoto", b =>
@@ -368,6 +317,9 @@ namespace BackEnd.Migrations
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Highlighted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("RealEstatePropertyId")
                         .HasColumnType("int");
@@ -524,9 +476,9 @@ namespace BackEnd.Migrations
 
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
                 {
-                    b.HasOne("BackEnd.Entities.Agent", "Agents")
+                    b.HasOne("BackEnd.Entities.ApplicationUser", "Agent")
                         .WithMany("RealEstateProperties")
-                        .HasForeignKey("AgentsId")
+                        .HasForeignKey("AgentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -536,7 +488,7 @@ namespace BackEnd.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Agents");
+                    b.Navigation("Agent");
 
                     b.Navigation("Customer");
                 });
@@ -603,7 +555,7 @@ namespace BackEnd.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BackEnd.Entities.Agent", b =>
+            modelBuilder.Entity("BackEnd.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("RealEstateProperties");
                 });

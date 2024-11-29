@@ -8,8 +8,7 @@ namespace BackEnd.Models.RealEstatePropertyModels
 
         [Required]
         public string Category { get; set; } = string.Empty;
-        [Required]
-        public string Typology { get; set; } = string.Empty;
+        public string? Typology { get; set; }
         public bool InHome { get; set; }
         public bool Highlighted { get; set; }
         [Required]

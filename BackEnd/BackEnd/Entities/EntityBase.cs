@@ -7,8 +7,5 @@ namespace BackEnd.Entities
         public int Id { get; set; } 
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
-        //[ForeignKey(nameof(ApplicationUser))]
-        //public string ApplicationUserId { get; set; } = string.Empty;
-        //public virtual ApplicationUser ApplicationUser { get; set; } = new ApplicationUser();
     }
 }

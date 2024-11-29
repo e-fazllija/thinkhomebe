@@ -15,7 +15,7 @@ namespace BackEnd.Services
                 .HasOne(c => c.Customer).WithMany(c => c.RealEstateProperties);
 
             builder.Entity<RealEstateProperty>()
-                .HasOne(c => c.Agents).WithMany(e => e.RealEstateProperties);
+                .HasOne(c => c.Agent).WithMany(c => c.RealEstateProperties).HasForeignKey(p => p.AgentId);
 
             builder.Entity<RealEstateProperty>()
                 .HasMany(c => c.Photos).WithOne(e => e.RealEstateProperty);

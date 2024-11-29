@@ -17,13 +17,14 @@ namespace BackEnd.Services.BusinessServices
         private readonly IMapper _mapper;
         private readonly ILogger<RealEstatePropertyPhotoServices> _logger;
         private readonly IOptionsMonitor<PaginationOptions> options;
-        public RealEstatePropertyPhotoServices(IUnitOfWork unitOfWork, IMapper mapper, ILogger<RealEstatePropertyPhotoServices> logger, IOptionsMonitor<PaginationOptions> options)
+        private readonly IStorageServices _storageServices;
+        public RealEstatePropertyPhotoServices(IUnitOfWork unitOfWork, IMapper mapper, ILogger<RealEstatePropertyPhotoServices> logger, IOptionsMonitor<PaginationOptions> options, IStorageServices storageServices)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             this.options = options;
-
+            _storageServices = storageServices;
         }
         public async Task<RealEstatePropertyPhotoSelectModel> Create(RealEstatePropertyPhotoCreateModel dto)
         {
@@ -46,7 +47,7 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<RealEstatePropertyPhoto> Delete(int id)
+        public async Task Delete(int id)
         {
             try
             {
@@ -64,9 +65,10 @@ namespace BackEnd.Services.BusinessServices
 
                 _unitOfWork.RealEstatePropertyPhotoRepository.Delete(EntityClasses);
                 await _unitOfWork.SaveAsync();
-                _logger.LogInformation(nameof(Delete));
 
-                return EntityClasses;
+                await _storageServices.DeleteFile(EntityClasses.FileName);
+
+                _logger.LogInformation(nameof(Delete));
             }
             catch (Exception ex)
             {
@@ -142,7 +144,7 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var query = await _unitOfWork.dbContext.RealEstatePropertys
+                var query = await _unitOfWork.dbContext.RealEstateProperties
                     //.Include(x => x.RealEstatePropertyPhotoType)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -200,19 +202,21 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 IQueryable<RealEstatePropertyPhoto> query = _unitOfWork.dbContext.RealEstatePropertyPhotos.Where(x => x.Id == realEstatePropertyPhotoId);
-
                 RealEstatePropertyPhoto photo = await query.FirstAsync();
+                IQueryable<RealEstatePropertyPhoto> queryHighlighted = _unitOfWork.dbContext.RealEstatePropertyPhotos
+                    .Where(x => x.Highlighted == true && x.RealEstatePropertyId == photo.RealEstatePropertyId);
+
+                RealEstatePropertyPhoto? photoHighlighted = await queryHighlighted.FirstOrDefaultAsync();
                 photo.Highlighted = true;
                 _unitOfWork.dbContext.RealEstatePropertyPhotos.Update(photo);
                 await _unitOfWork.SaveAsync();
 
-                IQueryable<RealEstatePropertyPhoto> queryHighlighted = _unitOfWork.dbContext.RealEstatePropertyPhotos
-                    .Where(x => x.Highlighted == true && x.RealEstatePropertyId == photo.RealEstatePropertyId);
-
-                RealEstatePropertyPhoto photoHighlighted = await queryHighlighted.FirstAsync();
-                photoHighlighted.Highlighted = false;
-                _unitOfWork.dbContext.RealEstatePropertyPhotos.Update(photoHighlighted);
-                await _unitOfWork.SaveAsync();
+                if(photoHighlighted != null)
+                {
+                    photoHighlighted.Highlighted = false;
+                    _unitOfWork.dbContext.RealEstatePropertyPhotos.Update(photoHighlighted);
+                    await _unitOfWork.SaveAsync();
+                }
 
                 _logger.LogInformation(nameof(SetHighlighted));
             }

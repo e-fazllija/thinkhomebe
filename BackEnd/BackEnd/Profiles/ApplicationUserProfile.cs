@@ -1,5 +1,4 @@
 ﻿using BackEnd.Entities;
-using BackEnd.Models.AgentModels;
 using BackEnd.Models.AuthModels;
 using BackEnd.Models.UserModel;
 

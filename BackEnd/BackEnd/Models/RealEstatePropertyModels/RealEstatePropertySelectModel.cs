@@ -1,4 +1,6 @@
 ﻿using BackEnd.Entities;
+using BackEnd.Models.CustomerModels;
+using BackEnd.Models.RealEstatePropertyPhotoModels;
 using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Models.RealEstatePropertyModels
@@ -9,8 +11,7 @@ namespace BackEnd.Models.RealEstatePropertyModels
 
         [Required]
         public string Category { get; set; } = string.Empty;
-        [Required]
-        public string Typology { get; set; } = string.Empty;
+        public string? Typology { get; set; }
         public bool InHome { get; set; }
         public bool Highlighted { get; set; }
         [Required]
@@ -50,9 +51,9 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? Description { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
-        public virtual ICollection<RealEstatePropertyPhoto> Photos { get; set; } = new List<RealEstatePropertyPhoto>();
+        public virtual ICollection<RealEstatePropertyPhotoSelectModel> Photos { get; set; } = new List<RealEstatePropertyPhotoSelectModel>();
         public int CustomerId { get; set; }
-        public virtual Customer Customer { get; set; } = new Customer();
+        public virtual CustomerSelectModel Customer { get; set; } = new CustomerSelectModel();
         public string AgentId { get; set; }
         public virtual ApplicationUser Agent { get; set; } = new ApplicationUser();
     }

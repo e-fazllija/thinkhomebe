@@ -9,8 +9,7 @@ namespace BackEnd.Data
     {
         
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<RealEstateProperty> RealEstatePropertys { get; set; }
-        public DbSet<Agent> Agents { get; set; }
+        public DbSet<RealEstateProperty> RealEstateProperties { get; set; }
         public DbSet<RealEstatePropertyPhoto> RealEstatePropertyPhotos { get; set; }
         
 
