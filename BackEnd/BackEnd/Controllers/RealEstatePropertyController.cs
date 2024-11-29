@@ -39,7 +39,7 @@ namespace BackEnd.Controllers
             try
             {
                 RealEstatePropertySelectModel Result = await _realEstatePropertyServices.Create(request);
-                return Ok(Result);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -55,7 +55,7 @@ namespace BackEnd.Controllers
             {
                 RealEstatePropertySelectModel Result = await _realEstatePropertyServices.Update(request);
 
-                return Ok(Result);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -71,6 +71,22 @@ namespace BackEnd.Controllers
             {
                 //currentPage = currentPage > 0 ? currentPage : 1;
                 ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(currentPage, filterRequest, null, null);
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route(nameof(GetToInsert))]
+        public async Task<IActionResult> GetToInsert()
+        {
+            try
+            {
+                RealEstatePropertyCreateViewModel res = await _realEstatePropertyServices.GetToInsert();
 
                 return Ok(res);
             }
@@ -104,7 +120,7 @@ namespace BackEnd.Controllers
             try
             {
                 RealEstateProperty result = await _realEstatePropertyServices.Delete(id);
-                return Ok(result);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -112,6 +128,41 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route(nameof(SetHighlighted))]
+        public async Task<IActionResult> SetHighlighted(int realEstatePropertyId)
+        {
+            try
+            {
+                await _realEstatePropertyServices.SetHighlighted(realEstatePropertyId);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route(nameof(SetInHome))]
+        public async Task<IActionResult> SetInHome(int realEstatePropertyId)
+        {
+            try
+            {
+                await _realEstatePropertyServices.SetInHome(realEstatePropertyId);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route(nameof(ExportExcel))]
         public async Task<IActionResult> ExportExcel(char? fromName, char? toName)

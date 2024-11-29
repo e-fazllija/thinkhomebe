@@ -7,6 +7,10 @@ using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
+using BackEnd.Models.CustomerModels;
+using Microsoft.AspNetCore.Identity;
+using BackEnd.Models.UserModel;
+using Microsoft.WindowsAzure.Storage.File.Protocol;
 
 namespace BackEnd.Services.BusinessServices
 {
@@ -17,12 +21,14 @@ namespace BackEnd.Services.BusinessServices
         private readonly ILogger<RealEstatePropertyServices> _logger;
         private readonly IOptionsMonitor<PaginationOptions> options;
         private readonly IStorageServices _storageServices;
+        private readonly UserManager<ApplicationUser> userManager;
         public RealEstatePropertyServices(
             IUnitOfWork unitOfWork, 
             IMapper mapper, 
             ILogger<RealEstatePropertyServices> logger, 
             IOptionsMonitor<PaginationOptions> options,
-            IStorageServices storageServices
+            IStorageServices storageServices,
+            UserManager<ApplicationUser> userManager
             )
         {
             _unitOfWork = unitOfWork;
@@ -30,7 +36,7 @@ namespace BackEnd.Services.BusinessServices
             _logger = logger;
             this.options = options;
             _storageServices = storageServices;
-
+            this.userManager = userManager;
         }
         public async Task<RealEstatePropertySelectModel> Create(RealEstatePropertyCreateModel dto)
         {
@@ -164,6 +170,77 @@ namespace BackEnd.Services.BusinessServices
                 _logger.LogInformation(nameof(Get));
 
                 return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
+        public async Task<RealEstatePropertyCreateViewModel> GetToInsert()
+        {
+            try
+            {
+                IQueryable<Customer> customerQuery = _unitOfWork.dbContext.Customers;
+                var usersList = await userManager.GetUsersInRoleAsync("Agency");
+
+                List<ApplicationUser> users = usersList.ToList();
+               
+                RealEstatePropertyCreateViewModel result = new RealEstatePropertyCreateViewModel();
+                List<Customer> customers = await customerQuery.ToListAsync();
+                result.Customers = _mapper.Map<List<CustomerSelectModel>>(customers);
+                result.Agents = _mapper.Map<List<UserSelectModel>>(users);
+
+                _logger.LogInformation(nameof(GetToInsert));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+        
+        public async Task SetHighlighted(int realEstatePropertyId)
+        {
+            try
+            {
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys.Where(x => x.Id == realEstatePropertyId);
+                IQueryable<RealEstateProperty> queryHighlighted = _unitOfWork.dbContext.RealEstatePropertys.Where(x => x.Highlighted == true);
+
+                RealEstateProperty propertyHighlighted = await query.FirstAsync();
+                propertyHighlighted.Highlighted = false;
+                _unitOfWork.dbContext.RealEstatePropertys.Update(propertyHighlighted);
+                await _unitOfWork.SaveAsync();
+
+                RealEstateProperty property = await query.FirstAsync();
+                property.Highlighted = true;
+                _unitOfWork.dbContext.RealEstatePropertys.Update(property);
+                await _unitOfWork.SaveAsync();
+
+                _logger.LogInformation(nameof(SetHighlighted));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
+        public async Task SetInHome(int realEstatePropertyId)
+        {
+            try
+            {
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstatePropertys.Where(x => x.Id == realEstatePropertyId);
+                
+                RealEstateProperty property = await query.FirstAsync();
+                property.InHome = true;
+                _unitOfWork.dbContext.RealEstatePropertys.Update(property);
+                await _unitOfWork.SaveAsync();
+
+                _logger.LogInformation(nameof(SetInHome));
             }
             catch (Exception ex)
             {

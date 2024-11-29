@@ -33,7 +33,7 @@ namespace BackEnd.Controllers
             try
             {
                 CustomerSelectModel Result = await _customerServices.Create(request);
-                return Ok(Result);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -49,7 +49,7 @@ namespace BackEnd.Controllers
             {
                 CustomerSelectModel Result = await _customerServices.Update(request);
 
-                return Ok(Result);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -98,7 +98,7 @@ namespace BackEnd.Controllers
             try
             {
                 Customer result = await _customerServices.Delete(id);
-                return Ok(result);
+                return Ok();
             }
             catch (Exception ex)
             {

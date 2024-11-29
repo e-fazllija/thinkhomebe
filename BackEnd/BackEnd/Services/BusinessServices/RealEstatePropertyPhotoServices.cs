@@ -194,5 +194,33 @@ namespace BackEnd.Services.BusinessServices
                 }
             }
         }
+
+        public async Task SetHighlighted(int realEstatePropertyPhotoId)
+        {
+            try
+            {
+                IQueryable<RealEstatePropertyPhoto> query = _unitOfWork.dbContext.RealEstatePropertyPhotos.Where(x => x.Id == realEstatePropertyPhotoId);
+
+                RealEstatePropertyPhoto photo = await query.FirstAsync();
+                photo.Highlighted = true;
+                _unitOfWork.dbContext.RealEstatePropertyPhotos.Update(photo);
+                await _unitOfWork.SaveAsync();
+
+                IQueryable<RealEstatePropertyPhoto> queryHighlighted = _unitOfWork.dbContext.RealEstatePropertyPhotos
+                    .Where(x => x.Highlighted == true && x.RealEstatePropertyId == photo.RealEstatePropertyId);
+
+                RealEstatePropertyPhoto photoHighlighted = await queryHighlighted.FirstAsync();
+                photoHighlighted.Highlighted = false;
+                _unitOfWork.dbContext.RealEstatePropertyPhotos.Update(photoHighlighted);
+                await _unitOfWork.SaveAsync();
+
+                _logger.LogInformation(nameof(SetHighlighted));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
     }
 }

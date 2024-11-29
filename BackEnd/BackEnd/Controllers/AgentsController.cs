@@ -53,7 +53,7 @@ namespace BackEnd.Controllers
                 IdentityResult Result = await userManager.UpdateAsync(user);
 
                 if (Result.Succeeded)
-                    return Ok(user);
+                    return Ok();
                 else
                     return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = Result.Errors.ToString() ?? "Si è verificato un errore" });
             }

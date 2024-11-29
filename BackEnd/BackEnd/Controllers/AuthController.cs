@@ -4,7 +4,6 @@ using BackEnd.Interfaces;
 using BackEnd.Models.AuthModels;
 using BackEnd.Models.MailModels;
 using BackEnd.Models.ResponseModel;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

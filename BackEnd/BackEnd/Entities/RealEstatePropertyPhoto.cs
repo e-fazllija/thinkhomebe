@@ -12,5 +12,6 @@ namespace BackEnd.Entities
         public string Url { get; set; } = string.Empty;
         [Required]
         public int Type { get; set; }
+        public bool Highlighted { get; set; }
     }
 }

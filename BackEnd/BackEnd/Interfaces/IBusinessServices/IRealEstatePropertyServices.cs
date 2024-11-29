@@ -9,8 +9,11 @@ namespace BackEnd.Interfaces.IBusinessServices
     {
         Task<RealEstatePropertySelectModel> Create(RealEstatePropertyCreateModel dto);
         Task<ListViewModel<RealEstatePropertySelectModel>> Get(int currentPage, string? filterRequest, char? fromName, char? toName);
+        Task<RealEstatePropertyCreateViewModel> GetToInsert();
         Task<RealEstatePropertySelectModel> Update(RealEstatePropertyUpdateModel dto);
         Task<RealEstatePropertySelectModel> GetById(int id);
         Task<RealEstateProperty> Delete(int id);
+        Task SetHighlighted(int realEstatePropertyId);
+        Task SetInHome(int realEstatePropertyId);
     }
 }
