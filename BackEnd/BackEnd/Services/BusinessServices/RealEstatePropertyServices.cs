@@ -183,7 +183,7 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 IQueryable<Customer> customerQuery = _unitOfWork.dbContext.Customers;
-                var usersList = await userManager.GetUsersInRoleAsync("Agency");
+                var usersList = await userManager.GetUsersInRoleAsync("Agent");
 
                 List<ApplicationUser> users = usersList.ToList();
                

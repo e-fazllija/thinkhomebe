@@ -91,7 +91,7 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
-        [HttpPost]
+        [HttpDelete]
         [Route(nameof(Delete))]
         public async Task<IActionResult> Delete(int id)
         {
