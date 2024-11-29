@@ -50,7 +50,7 @@ namespace BackEnd.Services.BusinessServices
                     foreach (var file in dto.Files)
                     {
                         Stream stream = file.OpenReadStream();
-                        string fileName = file.FileName.Replace(" ", "-");
+                        string fileName = $"RealEstatePropertyPhotos/{propertyAdded.Entity.Id}/{file.FileName.Replace(" ", "-")}";
                         string fileUrl = await _storageServices.UploadFile(stream, fileName);
 
                         RealEstatePropertyPhoto photo = new RealEstatePropertyPhoto()
@@ -87,7 +87,7 @@ namespace BackEnd.Services.BusinessServices
                 foreach (var file in dto.Files)
                 {
                     Stream stream = file.OpenReadStream();
-                    string fileName = file.FileName.Replace(" ", "-");
+                    string fileName = $"RealEstatePropertyPhotos/{dto.PropertyId}/{file.FileName.Replace(" ", "-")}";
                     string fileUrl = await _storageServices.UploadFile(stream, fileName);
 
                     RealEstatePropertyPhoto photo = new RealEstatePropertyPhoto()
