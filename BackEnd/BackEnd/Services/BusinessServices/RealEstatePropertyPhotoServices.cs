@@ -4,10 +4,10 @@ using Microsoft.Extensions.Options;
 using BackEnd.Entities;
 using BackEnd.Interfaces;
 using BackEnd.Interfaces.IBusinessServices;
-using BackEnd.Models.CustomerModels;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyPhotoModels;
+using BackEnd.Models.RealEstatePropertyModels;
 
 namespace BackEnd.Services.BusinessServices
 {
