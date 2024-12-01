@@ -83,12 +83,11 @@ namespace BackEnd.Controllers
         }
         [HttpGet]
         [Route(nameof(Get))]
-        public async Task<IActionResult> Get(int currentPage, string? filterRequest)
+        public async Task<IActionResult> Get(int currentPage, string? filterRequest, string? status, string? typologie)
         {
             try
             {
-                //currentPage = currentPage > 0 ? currentPage : 1;
-                ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(currentPage, filterRequest, null, null);
+                ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(currentPage, filterRequest, status, typologie, null, null);
 
                 return Ok(res);
             }
@@ -220,7 +219,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var result = await _realEstatePropertyServices.Get(0, null, fromName, toName);
+                var result = await _realEstatePropertyServices.Get(0, null, null, null, fromName, toName);
                 DataTable table = Export.ToDataTable<RealEstatePropertySelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateExcelContent(table);
 
@@ -238,7 +237,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var result = await _realEstatePropertyServices.Get(0, null, fromName, toName);
+                var result = await _realEstatePropertyServices.Get(0, null, null, null, fromName, toName);
                 DataTable table = Export.ToDataTable<RealEstatePropertySelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateCsvContent(table);
 

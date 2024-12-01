@@ -89,7 +89,7 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<Customer> query = _unitOfWork.dbContext.Customers;
+                IQueryable<Customer> query = _unitOfWork.dbContext.Customers.OrderByDescending(x => x.Id);
 
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.Name.Contains(filterRequest));
@@ -113,8 +113,8 @@ namespace BackEnd.Services.BusinessServices
                 if (currentPage > 0)
                 {
                     query = query
-                    .Skip((currentPage * options.CurrentValue.CustomerItemPerPage) - options.CurrentValue.CustomerItemPerPage)
-                            .Take(options.CurrentValue.CustomerItemPerPage);
+                    .Skip((currentPage * options.CurrentValue.AnagraficItemPerPage) - options.CurrentValue.AnagraficItemPerPage)
+                            .Take(options.CurrentValue.AnagraficItemPerPage);
                 }
 
                 List<Customer> queryList = await query

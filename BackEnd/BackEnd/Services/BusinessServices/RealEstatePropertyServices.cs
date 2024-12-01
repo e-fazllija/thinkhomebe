@@ -157,14 +157,20 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(int currentPage, string? filterRequest, char? fromName, char? toName)
+        public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(int currentPage, string? filterRequest, string? status, string? typologie, char? fromName, char? toName)
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos);
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).OrderByDescending(x => x.Id);
 
                 if (!string.IsNullOrEmpty(filterRequest))
-                    query = query.Where(x => x.Category.Contains(filterRequest));
+                    query = query.Where(x => x.AddressLine.Contains(filterRequest));
+
+                if (!string.IsNullOrEmpty(status))
+                    query = query.Where(x => x.Status.Contains(status));
+                
+                if (!string.IsNullOrEmpty(typologie))
+                    query = query.Where(x => x.Typology!.Contains(typologie));
 
                 if (fromName != null)
                 {
