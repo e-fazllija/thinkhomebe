@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/BackEnd/BackEnd.sln  -v detailed
+          path: BackEnd/BackEnd.sln  -v detailed
 
   deploy:
     runs-on: ubuntu-latest
