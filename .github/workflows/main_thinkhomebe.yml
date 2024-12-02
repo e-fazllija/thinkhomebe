@@ -29,16 +29,16 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build BackEnd/BackEnd/BackEnd.sln --configuration Release
+        run: dotnet build BackEnd/BackEnd.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish BackEnd/BackEnd/BackEnd.sln -c Release -o ./publish
+        run: dotnet publish BackEnd/BackEnd.sln -c Release -o ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/BackEnd/BackEnd/BackEnd.sln  -v detailed
+          path: ${{env.DOTNET_ROOT}}/BackEnd/BackEnd.sln  -v detailed
 
   deploy:
     runs-on: ubuntu-latest
