@@ -15,12 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Check current working directory
-        run: pwd
-
-      - name: List files in root directory
-        run: ls -R
         
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -29,16 +23,16 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build BackEnd/BackEnd.sln --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish BackEnd/BackEnd.sln -c Release -o ./publish
+        run: dotnet publish -c Release -o BackEnd/BackEnd.sln
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ./publish
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: ubuntu-latest
@@ -60,4 +54,4 @@ jobs:
           app-name: 'thinkhomebe'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B1B710768F754BA5BC5BAE88A22EA1A0 }}
-          package: ./publish
+          package: .
