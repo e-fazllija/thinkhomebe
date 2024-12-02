@@ -11,6 +11,7 @@ namespace BackEnd.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<RealEstateProperty> RealEstateProperties { get; set; }
         public DbSet<RealEstatePropertyPhoto> RealEstatePropertyPhotos { get; set; }
+        public DbSet<Calendar> Calendars { get; set; }
         
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
