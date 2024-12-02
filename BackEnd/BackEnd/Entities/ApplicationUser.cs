@@ -19,5 +19,6 @@ namespace BackEnd.Entities
         public string? AgencyId { get; set; }
         public virtual ApplicationUser? Agency { get; set; }
         public virtual ICollection<RealEstateProperty>? RealEstateProperties { get; set; }
+        public ICollection<Calendar> Calendars { get; set; } = new List<Calendar>();
     }
 }
