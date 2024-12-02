@@ -168,7 +168,7 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
@@ -297,7 +297,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("RealEstateProperties");
+                    b.ToTable("RealEstateProperties", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd.Entities.RealEstatePropertyPhoto", b =>
@@ -335,7 +335,7 @@ namespace BackEnd.Migrations
 
                     b.HasIndex("RealEstatePropertyId");
 
-                    b.ToTable("RealEstatePropertyPhotos");
+                    b.ToTable("RealEstatePropertyPhotos", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
