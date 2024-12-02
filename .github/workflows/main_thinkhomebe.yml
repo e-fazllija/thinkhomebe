@@ -57,4 +57,4 @@ jobs:
           app-name: 'thinkhomebe'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B1B710768F754BA5BC5BAE88A22EA1A0 }}
-          package: ./publish
+          package: $GITHUB_WORKSPACE/publish
