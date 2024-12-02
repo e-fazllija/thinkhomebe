@@ -32,7 +32,7 @@ jobs:
         run: dotnet build BackEnd/BackEnd/BackEnd.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/BackEnd/BackEnd/BackEnd.sln  -v detailed
+        run: dotnet publish BackEnd/BackEnd/BackEnd.sln -c Release -o ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
