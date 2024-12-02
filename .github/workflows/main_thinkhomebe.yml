@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./publish
 
   deploy:
     runs-on: ubuntu-latest
@@ -57,4 +57,4 @@ jobs:
           app-name: 'thinkhomebe'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B1B710768F754BA5BC5BAE88A22EA1A0 }}
-          package: .
+          package: ./publish
