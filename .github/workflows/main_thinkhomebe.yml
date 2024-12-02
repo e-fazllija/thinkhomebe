@@ -26,7 +26,7 @@ jobs:
         run: dotnet build BackEnd/BackEnd.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o BackEnd/BackEnd.sln
+        run: dotnet publish BackEnd/BackEnd.sln -c Release -o ${{env.DOTNET_ROOT}}/publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
