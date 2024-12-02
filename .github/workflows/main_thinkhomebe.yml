@@ -32,13 +32,13 @@ jobs:
         run: dotnet build BackEnd/BackEnd/BackEnd.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/BackEnd/BackEnd  -v detailed
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/BackEnd/BackEnd/BackEnd.sln  -v detailed
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/BackEnd/BackEnd  -v detailed
+          path: ${{env.DOTNET_ROOT}}/BackEnd/BackEnd/BackEnd.sln  -v detailed
 
   deploy:
     runs-on: ubuntu-latest
