@@ -13,4 +13,3 @@ namespace BackEnd.Models.CalendarModels
 
     }
 }
-}

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241129165550_InitialCreate")]
+    [Migration("20241202130901_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -38,7 +38,7 @@ namespace BackEnd.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AgencyId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -107,6 +107,8 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AgencyId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -116,6 +118,46 @@ namespace BackEnd.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Calendar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataFineEvento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataInizioEvento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DescrizioneEvento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LuogoEvento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomeEvento")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Calendars");
                 });
 
             modelBuilder.Entity("BackEnd.Entities.Customer", b =>
@@ -269,6 +311,10 @@ namespace BackEnd.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -474,6 +520,22 @@ namespace BackEnd.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BackEnd.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("BackEnd.Entities.ApplicationUser", "Agency")
+                        .WithMany()
+                        .HasForeignKey("AgencyId");
+
+                    b.Navigation("Agency");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Calendar", b =>
+                {
+                    b.HasOne("BackEnd.Entities.ApplicationUser", null)
+                        .WithMany("Calendars")
+                        .HasForeignKey("ApplicationUserId");
+                });
+
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
                 {
                     b.HasOne("BackEnd.Entities.ApplicationUser", "Agent")
@@ -557,6 +619,8 @@ namespace BackEnd.Migrations
 
             modelBuilder.Entity("BackEnd.Entities.ApplicationUser", b =>
                 {
+                    b.Navigation("Calendars");
+
                     b.Navigation("RealEstateProperties");
                 });
 
