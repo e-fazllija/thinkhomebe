@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using BackEnd.Entities;
 using BackEnd.Interfaces;
 using BackEnd.Models.AuthModels;
@@ -20,9 +22,11 @@ namespace BackEnd.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
+        private SecretClient secretClient;
         private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private string SecretForKey;
         public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMailService mailService, IConfiguration configuration, IMapper mapper)
         {
             this.userManager = userManager;
@@ -30,6 +34,9 @@ namespace BackEnd.Controllers
             _mailService = mailService;
             _configuration = configuration;
             this._mapper = mapper;
+            secretClient = new SecretClient(new Uri(_configuration.GetValue<string>("KeyVault:Url")), new DefaultAzureCredential());
+            KeyVaultSecret secret = secretClient.GetSecret(_configuration.GetValue<string>("KeyVault:Secrets:AuthKey"));
+            SecretForKey = secret.Value;
         }
 
         [HttpPost]
@@ -79,7 +86,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(RegisterAdmin))]
-        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
+        public async Task<IActionResult> RegisterAdmin(RegisterModel model)
         {
             model.UserName = model.UserName.Replace(" ", "_");
 
@@ -124,7 +131,7 @@ namespace BackEnd.Controllers
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:SecretForKey"]));
+                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretForKey));
                 var token = new JwtSecurityToken(
                         issuer: _configuration["Authentication:Issuer"],
                     audience: _configuration["Authentication:Audience"],
@@ -155,7 +162,7 @@ namespace BackEnd.Controllers
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Authentication:SecretForKey"]);
+                var key = Encoding.UTF8.GetBytes(SecretForKey);
 
                 var validationParameters = new TokenValidationParameters
                 {

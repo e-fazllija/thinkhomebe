@@ -3,6 +3,8 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System.IO.Compression;
 using BackEnd.Interfaces;
 using BackEnd.Models.OutputModels;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 
 namespace BackEnd.Services
 {
@@ -13,10 +15,13 @@ namespace BackEnd.Services
         private CloudStorageAccount cloudStorageAccount;
         private CloudBlobClient blobClient;
         private CloudBlobContainer container;
+        private SecretClient secretClient;
         public StorageServices(IConfiguration configuration)
         {
             _configuration = configuration;
-            blobstorageconnection = _configuration.GetValue<string>("Storage:BlobConnectionString");
+            secretClient = new SecretClient(new Uri(_configuration.GetValue<string>("KeyVault:Url")), new DefaultAzureCredential());
+            KeyVaultSecret secret = secretClient.GetSecret(_configuration.GetValue<string>("KeyVault:Secrets:StorageConnectionString"));
+            blobstorageconnection = secret.Value;
             cloudStorageAccount = CloudStorageAccount.Parse(blobstorageconnection);
             blobClient = cloudStorageAccount.CreateCloudBlobClient();
             container = blobClient.GetContainerReference(_configuration.GetValue<string>("Storage:BlobContainerName"));
