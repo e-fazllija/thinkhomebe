@@ -6,6 +6,11 @@ namespace BackEnd.Models.CustomerModels
     {
         [Required]
         public string Code { get; set; } = string.Empty;
+        public bool Buyer { get; set; }
+        public bool Seller { get; set; }
+        public bool Builder { get; set; }
+        public bool Other { get; set; }
+        public bool GoldCustomer { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]

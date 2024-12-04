@@ -143,7 +143,7 @@ namespace BackEnd.Controllers
                 {
                     Id = user.Id,
                     Name = user.Name,
-                    Lastname = user.LastName,
+                    LastName = user.LastName,
                     Email = user.Email,
                     Password = "",
                     Role = userRoles.FirstOrDefault() ?? "",
@@ -188,7 +188,7 @@ namespace BackEnd.Controllers
                     {
                         Id = user.Id,
                         Name = user.Name,
-                        Lastname = user.LastName,
+                        LastName = user.LastName,
                         Email = user.Email,
                         Password = "",
                         Role = userRoles.FirstOrDefault() ?? "",
