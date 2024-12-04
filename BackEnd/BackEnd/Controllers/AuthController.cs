@@ -71,7 +71,7 @@ namespace BackEnd.Controllers
             var roleResult = await userManager.AddToRoleAsync(user, model.Role);
 
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = $"http://localhost:5173/metronic8/vue/demo1/#/email-confirmation/{user.Email}/{token}";
+            var confirmationLink = $"https://www.amministrazionethinkhome.it/#/email-confirmation/{user.Email}/{token}";
             //Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
             MailRequest mailRequest = new MailRequest()
             {
