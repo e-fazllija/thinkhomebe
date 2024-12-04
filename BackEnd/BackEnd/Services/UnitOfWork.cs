@@ -17,6 +17,7 @@ namespace BackEnd.Services
             CustomerRepository = new CustomerRepository(this._context);
             RealEstatePropertyRepository = new RealEstatePropertyRepository(this._context);
             RealEstatePropertyPhotoRepository = new RealEstatePropertyPhotoRepository(this._context);
+            RequestRepository = new RequestRepository(this._context);
         }
 
       
@@ -31,6 +32,11 @@ namespace BackEnd.Services
             private set;
         }
         public IRealEstatePropertyPhotoRepository RealEstatePropertyPhotoRepository
+        {
+            get;
+            private set;
+        }
+        public IRequestRepository RequestRepository
         {
             get;
             private set;

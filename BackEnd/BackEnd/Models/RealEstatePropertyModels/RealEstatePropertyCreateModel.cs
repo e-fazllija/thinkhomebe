@@ -7,10 +7,14 @@ namespace BackEnd.Models.RealEstatePropertyModels
         [Required]
         public string Title { get; set; } = string.Empty;
         [Required]
+        public string ShortTitle { get; set; } = string.Empty;
+        [Required]
         public string Category { get; set; } = string.Empty;
         public string? Typology { get; set; }
         public bool InHome { get; set; }
         public bool Highlighted { get; set; }
+        public bool Auction { get; set; }
+        public bool Sold { get; set; }
         [Required]
         public string Status { get; set; } = string.Empty;
         [Required]
@@ -45,7 +49,11 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public double Price { get; set; }
         public double CondominiumExpenses { get; set; }
         public string? Availability { get; set; }
-        public string? Description { get; set; }
+        [Required]
+        public string Description { get; set; } = string.Empty;
+        [Required]
+        public string ShortDescription { get; set; } = string.Empty;
+        public DateTime AssignmentEnd { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
         public List<IFormFile>? Files { get; set; }
         public int CustomerId { get; set; }
