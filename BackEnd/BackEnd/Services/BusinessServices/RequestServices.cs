@@ -7,6 +7,7 @@ using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.RequestModels;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
+using DocumentFormat.OpenXml.Presentation;
 
 namespace BackEnd.Services.BusinessServices
 {
@@ -146,7 +147,7 @@ namespace BackEnd.Services.BusinessServices
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 RequestSelectModel result = _mapper.Map<RequestSelectModel>(query);
-
+                result.Town = query.City;
                 _logger.LogInformation(nameof(GetById));
 
                 return result;
