@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BackEnd.Entities;
 using BackEnd.Interfaces.IBusinessServices;
-using BackEnd.Models.CustomerModels;
+using BackEnd.Models.RequestModels;
 using BackEnd.Services;
 using System.Data;
 using BackEnd.Models.ResponseModel;
@@ -14,12 +14,12 @@ namespace BackEnd.Controllers
     public class RequestsController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly ICustomerServices _requestServices;
+        private readonly IRequestServices _requestServices;
         private readonly ILogger<RequestsController> _logger;
 
         public RequestsController(
            IConfiguration configuration,
-           ICustomerServices requestServices,
+           IRequestServices requestServices,
             ILogger<RequestsController> logger)
         {
             _configuration = configuration;
@@ -28,11 +28,11 @@ namespace BackEnd.Controllers
         }
         [HttpPost]
         [Route(nameof(Create))]
-        public async Task<IActionResult> Create(CustomerCreateModel request)
+        public async Task<IActionResult> Create(RequestCreateModel request)
         {
             try
             {
-                CustomerSelectModel Result = await _requestServices.Create(request);
+                RequestSelectModel Result = await _requestServices.Create(request);
                 return Ok();
             }
             catch (Exception ex)
@@ -43,11 +43,11 @@ namespace BackEnd.Controllers
         }
         [HttpPost]
         [Route(nameof(Update))]
-        public async Task<IActionResult> Update(CustomerUpdateModel request)
+        public async Task<IActionResult> Update(RequestUpdateModel request)
         {
             try
             {
-                CustomerSelectModel Result = await _requestServices.Update(request);
+                RequestSelectModel Result = await _requestServices.Update(request);
 
                 return Ok();
             }
@@ -64,7 +64,7 @@ namespace BackEnd.Controllers
             try
             {
                 //currentPage = currentPage > 0 ? currentPage : 1;
-                ListViewModel<CustomerSelectModel> res = await _requestServices.Get(currentPage, filterRequest, null, null);
+                ListViewModel<RequestSelectModel> res = await _requestServices.Get(currentPage, filterRequest, null, null);
 
                 return Ok(res);
             }
@@ -80,7 +80,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                CustomerSelectModel result = new CustomerSelectModel();
+                RequestSelectModel result = new RequestSelectModel();
                 result = await _requestServices.GetById(id);
 
                 return Ok(result);
@@ -97,7 +97,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                Customer result = await _requestServices.Delete(id);
+                Request result = await _requestServices.Delete(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -113,7 +113,7 @@ namespace BackEnd.Controllers
             try
             {
                 var result = await _requestServices.Get(0, null, fromName, toName);
-                DataTable table = Export.ToDataTable<CustomerSelectModel>(result.Data);
+                DataTable table = Export.ToDataTable<RequestSelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateExcelContent(table);
 
                 return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Output.xlsx");
@@ -131,7 +131,7 @@ namespace BackEnd.Controllers
             try
             {
                 var result = await _requestServices.Get(0, null, fromName, toName);
-                DataTable table = Export.ToDataTable<CustomerSelectModel>(result.Data);
+                DataTable table = Export.ToDataTable<RequestSelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateCsvContent(table);
 
                 return File(fileBytes, "text/csv", "Output.csv");
