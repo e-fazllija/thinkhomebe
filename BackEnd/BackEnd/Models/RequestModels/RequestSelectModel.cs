@@ -15,7 +15,7 @@ namespace BackEnd.Models.RequestModels
         [Required]
         public string PropertyType { get; set; } = string.Empty;
         [Required]
-        public string province { get; set; } = string.Empty;
+        public string Province { get; set; } = string.Empty;
         [Required]
         public string Town { get; set; } = string.Empty;
         public string? RoomsNumber { get; set; }
