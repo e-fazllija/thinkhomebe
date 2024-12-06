@@ -32,7 +32,6 @@ namespace BackEnd.Controllers
         {
             try
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "errore" });
                 RequestSelectModel Result = await _requestServices.Create(request);
                 return Ok();
             }

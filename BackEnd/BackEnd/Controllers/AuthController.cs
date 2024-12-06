@@ -6,6 +6,7 @@ using BackEnd.Interfaces;
 using BackEnd.Models.AuthModels;
 using BackEnd.Models.MailModels;
 using BackEnd.Models.ResponseModel;
+using BackEnd.Models.UserModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -258,6 +259,25 @@ namespace BackEnd.Controllers
                 var roleAdded = await roleManager.CreateAsync(identityRole);
 
                 return Ok(roleAdded);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
+        [HttpGet]
+        [Route(nameof(GetUser))]
+        public async Task<IActionResult> GetUser(string id)
+        {
+            try
+            {
+                var user = await userManager.FindByIdAsync(id);
+
+                UserSelectModel result = _mapper.Map<UserSelectModel>(user);
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
