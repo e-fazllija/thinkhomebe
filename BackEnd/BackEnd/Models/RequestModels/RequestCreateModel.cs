@@ -8,7 +8,6 @@ namespace BackEnd.Models.RequestModels
         public bool Closed { get; set; }
         [Required]
         public int CustomerId { get; set; }
-        public virtual Customer Customer { get; set; }
         [Required]
         public string Contract { get; set; } = string.Empty;
         [Required]
@@ -27,5 +26,6 @@ namespace BackEnd.Models.RequestModels
         public double Price { get; set; }
         public string? Notes { get; set; }
         public bool Archived { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.Now;
     }
 }

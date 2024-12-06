@@ -17,7 +17,7 @@ namespace BackEnd.Models.RequestModels
         [Required]
         public string province { get; set; } = string.Empty;
         [Required]
-        public string City { get; set; } = string.Empty;
+        public string Town { get; set; } = string.Empty;
         public string? RoomsNumber { get; set; }
         public int MQFrom { get; set; }
         public int MQTo { get; set; }
@@ -28,5 +28,7 @@ namespace BackEnd.Models.RequestModels
         public double Price { get; set; }
         public string? Notes { get; set; }
         public bool Archived { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }
