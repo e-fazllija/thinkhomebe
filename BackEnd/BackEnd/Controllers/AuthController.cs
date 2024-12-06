@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BackEnd.Controllers
 {
@@ -275,8 +276,27 @@ namespace BackEnd.Controllers
             {
                 var user = await userManager.FindByIdAsync(id);
 
-                UserSelectModel result = _mapper.Map<UserSelectModel>(user);
+                var roles = await userManager.GetRolesAsync(user);
 
+                var res = string.Join(", ", roles);
+                UserSelectModel result = _mapper.Map<UserSelectModel>(user);
+                if (roles.Count() > 1)
+                {
+                    if (roles.Contains("Admin"))
+                    {
+                        result.Role = "Admin";
+                    }
+                    else if (roles.Contains("Agency"))
+                    {
+                        result.Role = "Agenzia";
+                    }
+                }
+                else
+                {
+                    result.Role= roles.First() == "Agency" ? result.Role = "Agenzia"
+                        : roles.First() == "Agent" ? result.Role = "Agente" 
+                        : result.Role;
+                }
                 return Ok(result);
             }
             catch (Exception ex)
@@ -284,6 +304,65 @@ namespace BackEnd.Controllers
                 throw new Exception(ex.Message);
             }
 
+        }
+
+        [HttpPost]
+        [Route(nameof(SendResetLink))]
+        public async Task<IActionResult> SendResetLink(string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    return BadRequest();
+                }
+
+                ApplicationUser user = await userManager.FindByEmailAsync(email);
+
+                string token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+                return Ok(token);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route(nameof(ResetPassword))]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            try
+            {
+                var user = await userManager.FindByEmailAsync(model.Email);
+                var resetPassResult = await userManager.ResetPasswordAsync(user, model.Token.Replace("_", "/").Replace("&", "+"), model.Password);
+
+                if (resetPassResult.Succeeded)
+                    return new OkObjectResult("Password Modificata");
+                else
+                {
+                    string error = string.Empty;
+                    if (resetPassResult.Errors.First().Code == "PasswordRequiresUpper")
+                        throw new NullReferenceException("La password deve contenere almeno una lettera maiuscola!");
+                    else if (resetPassResult.Errors.First().Code == "PasswordRequiresNonAlphanumeric")
+                        throw new NullReferenceException("La password deve contenere almeno un carattere speciale!");
+                    else if (resetPassResult.Errors.First().Code == "PasswordTooShort")
+                        throw new NullReferenceException("La password deve contenere almeno 8 caratteri!");
+                    else if (resetPassResult.Errors.First().Code == "PasswordRequiresDigit")
+                        throw new NullReferenceException("La password deve contenere almeno un numero!");
+                    else
+                        throw new Exception("Si è verificato un errore!");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is NullReferenceException)
+                    return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+
+                else
+                    return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Si è verificato un errore!" });
+            }
         }
 
         //[HttpGet]
@@ -308,42 +387,6 @@ namespace BackEnd.Controllers
 
         //    return Ok();
 
-        //}
-
-        //[HttpPost]
-        //[Route(nameof(ResetPassword))]
-        //public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
-        //{
-        //    try
-        //    {
-        //        var user = await userManager.FindByEmailAsync(model.email);
-        //        var resetPassResult = await userManager.ResetPasswordAsync(user, model.token.Replace("_", "/").Replace("&", "+"), model.password);
-
-        //        if (resetPassResult.Succeeded)
-        //            return new OkObjectResult("Password Modificata");
-        //        else
-        //        {
-        //            string error = string.Empty;
-        //            if (resetPassResult.Errors.First().Code == "PasswordRequiresUpper")
-        //                throw new NullReferenceException("La password deve contenere almeno una lettera maiuscola!");
-        //            else if (resetPassResult.Errors.First().Code == "PasswordRequiresNonAlphanumeric")
-        //                throw new NullReferenceException("La password deve contenere almeno un carattere speciale!");
-        //            else if (resetPassResult.Errors.First().Code == "PasswordTooShort")
-        //                throw new NullReferenceException("La password deve contenere almeno 8 caratteri!");
-        //            else if (resetPassResult.Errors.First().Code == "PasswordRequiresDigit")
-        //                throw new NullReferenceException("La password deve contenere almeno un numero!");
-        //            else
-        //                throw new Exception("Si è verificato un errore!");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (ex is NullReferenceException)
-        //            return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-
-        //        else
-        //            return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Si è verificato un errore!" });
-        //    }
         //}
 
         //[HttpPost]
