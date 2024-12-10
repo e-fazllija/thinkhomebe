@@ -43,5 +43,21 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route(nameof(GetAdminHomeDetails))]
+        public async Task<IActionResult> GetAdminHomeDetails()
+        {
+            try
+            {
+                AdminHomeDetailsModel result = await _genericService.GetAdminHomeDetails();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
     }
 }
