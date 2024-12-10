@@ -290,7 +290,7 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var query = await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos)
+                var query = await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).Include(x => x.Agent)
                     //.Include(x => x.RealEstatePropertyType)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
