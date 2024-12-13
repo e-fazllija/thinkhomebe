@@ -59,12 +59,12 @@ namespace BackEnd.Controllers
         }
         [HttpGet]
         [Route(nameof(Get))]
-        public async Task<IActionResult> Get(int currentPage, string? filterRequest)
+        public async Task<IActionResult> Get(int currentPage, string? filterRequest, string? userId)
         {
             try
             {
                 //currentPage = currentPage > 0 ? currentPage : 1;
-                ListViewModel<RequestSelectModel> res = await _requestServices.Get(currentPage, filterRequest, null, null);
+                ListViewModel<RequestSelectModel> res = await _requestServices.Get(currentPage, filterRequest, null, null, userId);
 
                 return Ok(res);
             }
@@ -74,6 +74,24 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route(nameof(GetCustomerRequests))]
+        public async Task<IActionResult> GetCustomerRequests(int customerId)
+        {
+            try
+            {
+                ListViewModel<RequestSelectModel> res = await _requestServices.GetCustomerRequests(customerId);
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route(nameof(GetById))]
         public async Task<IActionResult> GetById(int id)
@@ -112,7 +130,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var result = await _requestServices.Get(0, null, fromName, toName);
+                var result = await _requestServices.Get(0, null, fromName, toName, null);
                 DataTable table = Export.ToDataTable<RequestSelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateExcelContent(table);
 
@@ -130,7 +148,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var result = await _requestServices.Get(0, null, fromName, toName);
+                var result = await _requestServices.Get(0, null, fromName, toName, null);
                 DataTable table = Export.ToDataTable<RequestSelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateCsvContent(table);
 
