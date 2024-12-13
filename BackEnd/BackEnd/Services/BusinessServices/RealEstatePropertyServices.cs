@@ -161,7 +161,8 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).OrderByDescending(x => x.Id);
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos)
+                    .Include(x => x.Agent).Include(x => x.Customer).OrderByDescending(x => x.Id);
 
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
@@ -290,7 +291,7 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var query = await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).Include(x => x.Agent)
+                var query = await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).Include(x => x.Agent).Include(x => x.Customer)
                     //.Include(x => x.RealEstatePropertyType)
                     .FirstOrDefaultAsync(x => x.Id == id);
 

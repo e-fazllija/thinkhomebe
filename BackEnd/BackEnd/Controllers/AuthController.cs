@@ -124,15 +124,17 @@ namespace BackEnd.Controllers
             if (user != null && await userManager.CheckPasswordAsync(user, model.Password))
             {
                 var userRoles = await userManager.GetRolesAsync(user);
+                string role = userRoles.Contains("Admin") ? "Admin" : userRoles.Contains("Agency") ? "Agenzia" : userRoles.Contains("Agent") ? "Agente" : userRoles.FirstOrDefault() ?? "";
                 var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
+                //foreach (var userRole in userRoles)
+                //{
+                //    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                //}
+                authClaims.Add(new Claim(ClaimTypes.Role, role));
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretForKey));
                 var token = new JwtSecurityToken(
                         issuer: _configuration["Authentication:Issuer"],
@@ -148,7 +150,7 @@ namespace BackEnd.Controllers
                     LastName = user.LastName,
                     Email = user.Email,
                     Password = "",
-                    Role = userRoles.FirstOrDefault() ?? "",
+                    Role = role,
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                 };
 
@@ -184,6 +186,7 @@ namespace BackEnd.Controllers
                 if (principal.Identity.IsAuthenticated)
                 {
                     email = principal.Claims.First().Value;
+                    string role = principal.Claims.ElementAt(2).Value;
                     var user = await userManager.FindByEmailAsync(email);
                     var userRoles = await userManager.GetRolesAsync(user);
                     LoginResponse result = new LoginResponse()
@@ -193,7 +196,7 @@ namespace BackEnd.Controllers
                         LastName = user.LastName,
                         Email = user.Email,
                         Password = "",
-                        Role = userRoles.FirstOrDefault() ?? "",
+                        Role = role,
                         Token = api_token.api_token
                     };
 

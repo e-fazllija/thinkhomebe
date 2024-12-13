@@ -8,6 +8,8 @@ using BackEnd.Models.RequestModels;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
 using DocumentFormat.OpenXml.Presentation;
+using System.Collections.Generic;
+using BackEnd.Models.RealEstatePropertyModels;
 
 namespace BackEnd.Services.BusinessServices
 {
@@ -86,7 +88,7 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<ListViewModel<RequestSelectModel>> Get(int currentPage, string? filterRequest, char? fromName, char? toName)
+        public async Task<ListViewModel<RequestSelectModel>> Get(int currentPage, string? filterRequest, char? fromName, char? toName, string? userId)
         {
             try
             {
@@ -135,6 +137,71 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
+        public async Task<ListViewModel<RequestSelectModel>> GetCustomerRequests(int customerId)
+        {
+            try
+            {
+                IQueryable<Request> query = _unitOfWork.dbContext.Requests.Include(x => x.Customer).Where(x => x.CustomerId == customerId).OrderByDescending(x => x.Id);
+                List<Request> requests = await query.ToListAsync();
+
+                ListViewModel<RequestSelectModel> result = new ListViewModel<RequestSelectModel>()
+                {
+                    Total = await query.CountAsync(),
+                    Data = new List<RequestSelectModel>()
+                };
+
+                foreach (var item in requests)
+                {
+                    var realEstatePropertiesQuery = _unitOfWork.dbContext.RealEstateProperties
+                        .Where(x => 
+                        !x.Sold &&
+                        x.Status == item.Contract &&
+                        x.Price <= item.Price &&
+                        x.Town.ToLower().Contains(item.City.ToLower()));
+
+                    if (!string.IsNullOrEmpty(item.PropertyType))
+                    {
+                        realEstatePropertiesQuery.Where(x => (x.Typology ?? "").Contains(item.PropertyType));
+                    }
+
+                    if (!string.IsNullOrEmpty(item.RoomsNumber))
+                    {
+                        realEstatePropertiesQuery.Where(x => x.WarehouseRooms == Convert.ToInt32(item.RoomsNumber));
+                    }
+
+                    if (item.MQFrom > 0)
+                    {
+                        realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate > item.MQFrom);
+                    }
+
+                    if (item.MQTo > 0)
+                    {
+                        realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate < item.MQTo);
+                    }
+
+                    if (item.ParkingSpaces > 0)
+                    {
+                        realEstatePropertiesQuery.Where(x => x.ParkingSpaces >= item.ParkingSpaces);
+                    }
+
+                    List<RealEstateProperty> realEstateProperty = await realEstatePropertiesQuery.ToListAsync();
+                    List<RealEstatePropertySelectModel> realEstatePropertySelectModel = _mapper.Map<List<RealEstatePropertySelectModel>>(realEstateProperty);
+                    RequestSelectModel requestSelectModel = _mapper.Map<RequestSelectModel>(item);
+                    requestSelectModel.RealEstateProperties = realEstatePropertySelectModel;
+                    result.Data.Add(requestSelectModel);
+                }
+
+                _logger.LogInformation(nameof(GetCustomerRequests));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
         public async Task<RequestSelectModel> GetById(int id)
         {
             try
@@ -142,12 +209,50 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var query = await _unitOfWork.dbContext.Requests.Include(x => x.Customer)
+                var request = await _unitOfWork.dbContext.Requests.Include(x => x.Customer)
                     //.Include(x => x.RequestType)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
-                RequestSelectModel result = _mapper.Map<RequestSelectModel>(query);
-                result.Town = query.City;
+                var realEstatePropertiesQuery = _unitOfWork.dbContext.RealEstateProperties
+                        .Where(x =>
+                        !x.Sold &&
+                        x.Status == request.Contract &&
+                        x.Price <= request.Price &&
+                        x.Town.ToLower().Contains(request.City.ToLower()));
+
+                if (!string.IsNullOrEmpty(request.PropertyType))
+                {
+                    realEstatePropertiesQuery.Where(x => (x.Typology ?? "").Contains(request.PropertyType));
+                }
+
+                if (!string.IsNullOrEmpty(request.RoomsNumber))
+                {
+                    realEstatePropertiesQuery.Where(x => x.WarehouseRooms == Convert.ToInt32(request.RoomsNumber));
+                }
+
+                if (request.MQFrom > 0)
+                {
+                    realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate > request.MQFrom);
+                }
+
+                if (request.MQTo > 0)
+                {
+                    realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate < request.MQTo);
+                }
+
+                if (request.ParkingSpaces > 0)
+                {
+                    realEstatePropertiesQuery.Where(x => x.ParkingSpaces >= request.ParkingSpaces);
+                }
+
+                List<RealEstateProperty> realEstateProperty = await realEstatePropertiesQuery.ToListAsync();
+                List<RealEstatePropertySelectModel> realEstatePropertySelectModel = _mapper.Map<List<RealEstatePropertySelectModel>>(realEstateProperty);
+
+                RequestSelectModel result = _mapper.Map<RequestSelectModel>(request);
+                result.Town = request.City;
+                result.RealEstateProperties = new List<RealEstatePropertySelectModel>();
+                result.RealEstateProperties?.AddRange(realEstatePropertySelectModel);
+
                 _logger.LogInformation(nameof(GetById));
 
                 return result;

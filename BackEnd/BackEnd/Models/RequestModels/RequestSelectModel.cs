@@ -1,4 +1,5 @@
 ﻿using BackEnd.Entities;
+using BackEnd.Models.RealEstatePropertyModels;
 using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Models.RequestModels
@@ -28,6 +29,7 @@ namespace BackEnd.Models.RequestModels
         public double Price { get; set; }
         public string? Notes { get; set; }
         public bool Archived { get; set; }
+        public List<RealEstatePropertySelectModel>? RealEstateProperties { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
     }
