@@ -1,5 +1,6 @@
 using Azure.Core;
 using BackEnd.Interfaces;
+using BackEnd.Models.InputModels;
 using BackEnd.Models.MailModels;
 using BackEnd.Models.Options;
 using MailKit.Net.Smtp;
@@ -16,7 +17,7 @@ public class MailService : IMailService
     {
         _mailSettings = mailSettings.Value;
     }
-    
+
     public async Task SendEmailAsync(MailRequest mailRequest)
     {
         var email = new MimeMessage();
@@ -55,5 +56,128 @@ public class MailService : IMailService
         smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
         await smtp.SendAsync(email);
         smtp.Disconnect(true);
+    }
+
+    public async Task SendEvaluationRequestAsync(SendRequestModel mailRequest)
+    {
+        try
+        {
+            var email = new MimeMessage();
+            email.Sender = MailboxAddress.Parse("info@thinkhome.it");
+            email.From.Add(InternetAddress.Parse("info@thinkhome.it"));
+            email.To.Add(MailboxAddress.Parse("info@thinkhome.it"));
+
+            email.Subject = $"Richiesta di valutazione, richiesta di {mailRequest.Name} {mailRequest.LastName}";
+            var builder = new BodyBuilder();
+
+            string body = $"<strong>Nome:</strong> {mailRequest.Name}, <strong>Cognome:</strong> {mailRequest.LastName}, <strong>Email:</strong> {mailRequest.FromEmail}, <strong>Tel - Cell:</strong> {mailRequest.Phone} - {mailRequest.MobilePhone} <br><br>" +
+                $"<strong>Dati immobile:</strong> <br>" +
+                $"<strong>Contratto:</strong> {mailRequest.RequestType}<br>" +
+                $"<strong>Tipologia:</strong> {mailRequest.PropertyType}<br>" +
+                $"<strong>Provincia:</strong> {mailRequest.Province}<br>" +
+                $"<strong>Località:</strong> {mailRequest.Location}<br>" +
+                $"<strong>Indirizzo:</strong> {mailRequest.Address ?? "Non specificato"}<br>" +
+                $"<strong>Numero vani:</strong> {mailRequest.NumberRooms}<br>" +
+                $"<strong>Numero camere:</strong> {mailRequest.NumberBedRooms}<br>" +
+                $"<strong>Numero servizi:</strong> {mailRequest.NumberServices}<br>" +
+                $"<strong>Metri quadri:</strong> {mailRequest.MQ} <br>" +
+                $"<strong>Giardino:</strong> {(mailRequest.Garden ? "Si" : "No")}<br>" +
+                $"<strong>Terrazzo:</strong> {(mailRequest.Terrace ? "Si" : "No")}<br>" +
+                $"<strong>Ascensore:</strong> {(mailRequest.Lift ? "Si" : "No")}<br>" +
+                $"<strong>Arredato:</strong> {(mailRequest.Furnished ? "Si" : "No")}<br>" +
+                $"<strong>Ricaldamento:</strong> {mailRequest.Heating}<br>" +
+                $"<strong>Poto auto:</strong> {mailRequest.Box}<br>" +
+                $"<strong>Canone mensile / prezzo:</strong> {mailRequest.Price}<br>" +
+                $"<strong>Informazioni supplementari:</strong> {mailRequest.Information}<br><br>" +
+                $"<strong>Messaggio:</strong><br><br>";
+
+            builder.HtmlBody = body += mailRequest.Body;
+            email.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.SslOnConnect);
+            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.SendAsync(email);
+            smtp.Disconnect(true);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task SendWorkWithUsRequestAsync(SendRequestModel mailRequest)
+    {
+        try
+        {
+            var email = new MimeMessage();
+            email.Sender = MailboxAddress.Parse("info@thinkhome.it");
+            email.From.Add(InternetAddress.Parse("info@thinkhome.it"));
+            email.To.Add(MailboxAddress.Parse("info@thinkhome.it"));
+
+            email.Subject = $"Lavora con noi, richiesta di {mailRequest.Name} {mailRequest.LastName}";
+            var builder = new BodyBuilder();
+
+            string body =
+                $"<strong>Nome:</strong> {mailRequest.Name}, <strong>Cognome:</strong> {mailRequest.LastName}, <strong>Email:</strong> {mailRequest.FromEmail}, <strong>Tel - Cell:</strong> {mailRequest.Phone} - {mailRequest.MobilePhone} <br><br>" +
+                $"<strong>Messaggio:</strong><br><br>";
+            builder.HtmlBody = body += mailRequest.Body;
+            email.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.SslOnConnect);
+            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.SendAsync(email);
+            smtp.Disconnect(true);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task SendRequestAsync(SendRequestModel mailRequest)
+    {
+        try
+        {
+            var email = new MimeMessage();
+            email.Sender = MailboxAddress.Parse("info@thinkhome.it");
+            email.From.Add(InternetAddress.Parse("info@thinkhome.it"));
+            email.To.Add(MailboxAddress.Parse("info@thinkhome.it"));
+
+            email.Subject = $"Nuova richiesta di {mailRequest.Name} {mailRequest.LastName}";
+            var builder = new BodyBuilder();
+
+            string body = $"Invio di una richiesta di valutazione da:<br>" +
+                $"<strong>Nome:</strong> {mailRequest.Name}, <strong>Cognome:</strong> {mailRequest.LastName}, <strong>Email:</strong> {mailRequest.FromEmail}, <strong>Tel - Cell:</strong> {mailRequest.Phone} - {mailRequest.MobilePhone} <br><br>" +
+                $"<strong>Dati immobile:</strong> <br>" +
+                $"<strong>Contratto:</strong> {mailRequest.RequestType}<br>" +
+                $"<strong>Tipologia:</strong> {mailRequest.PropertyType}<br>" +
+                $"<strong>Provincia:</strong> {mailRequest.Province}<br>" +
+                $"<strong>Località:</strong> {mailRequest.Location}<br>" +
+                $"<strong>Indirizzo:</strong> {mailRequest.Address ?? "Non specificato"}<br>" +
+                $"<strong>Numero vani:</strong> {mailRequest.NumberRooms}<br>" +
+                $"<strong>Numero camere:</strong> {mailRequest.NumberBedRooms}<br>" +
+                $"<strong>Numero servizi:</strong> {mailRequest.NumberServices}<br>" +
+                $"<strong>Metri quadri:</strong> {mailRequest.MQ} <br>" +
+                $"<strong>Giardino:</strong> {(mailRequest.Garden ? "Si" : "No")}<br>" +
+                $"<strong>Terrazzo:</strong> {(mailRequest.Terrace ? "Si" : "No")}<br>" +
+                $"<strong>Ascensore:</strong> {(mailRequest.Lift ? "Si" : "No")}<br>" +
+                $"<strong>Arredato:</strong> {(mailRequest.Furnished ? "Si" : "No")}<br>" +
+                $"<strong>Ricaldamento:</strong> {mailRequest.Heating}<br>" +
+                $"<strong>Poto auto:</strong> {mailRequest.Box}<br>" +
+                $"<strong>Canone mensile / prezzo:</strong> {mailRequest.Price}<br>" +
+                $"<strong>Informazioni supplementari:</strong> {mailRequest.Information}<br><br>" +
+                $"<strong>Messaggio:</strong><br><br>";
+            builder.HtmlBody = body += mailRequest.Body;
+            email.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.SslOnConnect);
+            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.SendAsync(email);
+            smtp.Disconnect(true);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 }
