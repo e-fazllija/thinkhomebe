@@ -7,7 +7,7 @@ namespace BackEnd.Interfaces.IBusinessServices
     {
         Task<RealEstatePropertySelectModel> Create(RealEstatePropertyCreateModel dto);
         Task InsertFiles(UploadFilesModel dto);
-        Task<ListViewModel<RealEstatePropertySelectModel>> Get(int currentPage, string? filterRequest, string? status, string? typologie, char? fromName, char? toName);
+        Task<ListViewModel<RealEstatePropertySelectModel>> Get(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, char? fromName, char? toName);
         Task<RealEstatePropertyCreateViewModel> GetToInsert();
         Task<RealEstatePropertySelectModel> Update(RealEstatePropertyUpdateModel dto);
         Task<RealEstatePropertySelectModel> GetById(int id);

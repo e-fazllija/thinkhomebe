@@ -83,11 +83,15 @@ namespace BackEnd.Controllers
         }
         [HttpGet]
         [Route(nameof(Get))]
-        public async Task<IActionResult> Get(int currentPage, string? filterRequest, string? status, string? typologie)
+        public async Task<IActionResult> Get(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to)
         {
             try
             {
-                ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(currentPage, filterRequest, status, typologie, null, null);
+                ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(currentPage, filterRequest, status, typologie, location,
+                code,
+                from,
+                to,
+                null, null);
 
                 return Ok(res);
             }
@@ -213,41 +217,41 @@ namespace BackEnd.Controllers
             }
         }
 
-        [HttpGet]
-        [Route(nameof(ExportExcel))]
-        public async Task<IActionResult> ExportExcel(char? fromName, char? toName)
-        {
-            try
-            {
-                var result = await _realEstatePropertyServices.Get(0, null, null, null, fromName, toName);
-                DataTable table = Export.ToDataTable<RealEstatePropertySelectModel>(result.Data);
-                byte[] fileBytes = Export.GenerateExcelContent(table);
+        //[HttpGet]
+        //[Route(nameof(ExportExcel))]
+        //public async Task<IActionResult> ExportExcel(char? fromName, char? toName)
+        //{
+        //    try
+        //    {
+        //        var result = await _realEstatePropertyServices.Get(0, null, null, null, fromName, toName);
+        //        DataTable table = Export.ToDataTable<RealEstatePropertySelectModel>(result.Data);
+        //        byte[] fileBytes = Export.GenerateExcelContent(table);
 
-                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Output.xlsx");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
-        [HttpGet]
-        [Route(nameof(ExportCsv))]
-        public async Task<IActionResult> ExportCsv(char? fromName, char? toName)
-        {
-            try
-            {
-                var result = await _realEstatePropertyServices.Get(0, null, null, null, fromName, toName);
-                DataTable table = Export.ToDataTable<RealEstatePropertySelectModel>(result.Data);
-                byte[] fileBytes = Export.GenerateCsvContent(table);
+        //        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Output.xlsx");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex.Message);
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+        //    }
+        //}
+        //[HttpGet]
+        //[Route(nameof(ExportCsv))]
+        //public async Task<IActionResult> ExportCsv(char? fromName, char? toName)
+        //{
+        //    try
+        //    {
+        //        var result = await _realEstatePropertyServices.Get(0, null, null, null, fromName, toName);
+        //        DataTable table = Export.ToDataTable<RealEstatePropertySelectModel>(result.Data);
+        //        byte[] fileBytes = Export.GenerateCsvContent(table);
 
-                return File(fileBytes, "text/csv", "Output.csv");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
+        //        return File(fileBytes, "text/csv", "Output.csv");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex.Message);
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+        //    }
+        //}
     }
 }
