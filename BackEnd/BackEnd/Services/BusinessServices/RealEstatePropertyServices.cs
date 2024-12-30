@@ -175,7 +175,7 @@ namespace BackEnd.Services.BusinessServices
                     query = query.Where(x => x.Typology!.Contains(typologie));
 
                 if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
-                    query = query.Where(x => x.Town!.Contains(location) || x.State!.Contains(location));
+                    query = query.Where(x => x.Town!.Contains(location));
 
                 if (code > 0)
                     query = query.Where(x => x.Id == Convert.ToInt32(code));
