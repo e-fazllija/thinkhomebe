@@ -8,8 +8,6 @@ namespace BackEnd.Models.RealEstatePropertyModels
         [Required]
         public string Title { get; set; } = string.Empty;
         [Required]
-        public string ShortTitle { get; set; } = string.Empty;
-        [Required]
         public string Category { get; set; } = string.Empty;
         public string? Typology { get; set; }
         public bool InHome { get; set; }
@@ -52,8 +50,6 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? Availability { get; set; }
         [Required]
         public string Description { get; set; } = string.Empty;
-        [Required]
-        public string ShortDescription { get; set; } = string.Empty;
         public DateTime AssignmentEnd { get; set; }
         public DateTime UpdateDate { get; set; } = DateTime.Now;
         public int CustomerId { get; set; }

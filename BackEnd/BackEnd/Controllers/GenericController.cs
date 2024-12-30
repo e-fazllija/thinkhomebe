@@ -112,5 +112,21 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route(nameof(InformationRequest))]
+        public async Task<IActionResult> InformationRequest([FromBody] SendRequestModel request)
+        {
+            try
+            {
+                await _mailService.InformationRequestAsync(request);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
     }
 }
