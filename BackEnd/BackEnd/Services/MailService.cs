@@ -180,4 +180,33 @@ public class MailService : IMailService
             throw new Exception(ex.Message);
         }
     }
+
+    public async Task InformationRequestAsync(SendRequestModel mailRequest)
+    {
+        try
+        {
+            var email = new MimeMessage();
+            email.Sender = MailboxAddress.Parse("info@thinkhome.it");
+            email.From.Add(InternetAddress.Parse("info@thinkhome.it"));
+            email.To.Add(MailboxAddress.Parse("info@thinkhome.it"));
+
+            email.Subject = $"Informazioni per immobile Cod. 00{mailRequest.Information}, richiesta di {mailRequest.Name} {mailRequest.LastName}";
+            var builder = new BodyBuilder();
+
+            string body =
+                $"<strong>Nome:</strong> {mailRequest.Name}, <strong>Cognome:</strong> {mailRequest.LastName}, <strong>Email:</strong> {mailRequest.FromEmail}, <strong>Tel - Cell:</strong> {mailRequest.Phone} - {mailRequest.MobilePhone} <br><br>" +
+                $"<strong>Messaggio:</strong><br><br>";
+            builder.HtmlBody = body += mailRequest.Body;
+            email.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.SslOnConnect);
+            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.SendAsync(email);
+            smtp.Disconnect(true);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
 }

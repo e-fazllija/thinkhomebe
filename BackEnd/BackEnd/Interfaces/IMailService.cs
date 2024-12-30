@@ -9,4 +9,5 @@ public interface IMailService
     Task SendEvaluationRequestAsync(SendRequestModel mailRequest);
     Task SendWorkWithUsRequestAsync(SendRequestModel mailRequest);
     Task SendRequestAsync(SendRequestModel mailRequest);
+    Task InformationRequestAsync(SendRequestModel mailRequest);
 }
