@@ -178,7 +178,7 @@ namespace BackEnd.Services.BusinessServices
                     query = query.Where(x => x.Town!.Contains(location));
 
                 if (code > 0)
-                    query = query.Where(x => x.Id == Convert.ToInt32(code));
+                    query = query.Where(x => x.Id == code);
 
                 if (from > 0)
                     query = query.Where(x => x.Price >= from);
