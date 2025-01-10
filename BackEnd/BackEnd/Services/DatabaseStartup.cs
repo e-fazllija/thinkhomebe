@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BackEnd.Data;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 
 namespace BackEnd.Services
 {
@@ -13,12 +15,15 @@ namespace BackEnd.Services
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configuration"></param>
-        public static void ConfigureDatabase(this WebApplicationBuilder builder)
+        public static void ConfigureDatabase(this WebApplicationBuilder builder, string keyVaultUrl, string secretName)
         {
+            SecretClient client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
+            KeyVaultSecret secret = client.GetSecret(secretName);
+
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(
-                    "name=ConnectionStrings:DbConnection",
+                    secret.Value,
                     sqlServerOptionsAction: sqlOptions =>
                     {
                         sqlOptions.EnableRetryOnFailure(

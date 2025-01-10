@@ -6,6 +6,11 @@ namespace BackEnd.Entities
     {
         [Required]
         public string Code { get; set; } = string.Empty;
+        public bool Buyer { get; set; }
+        public bool Seller { get; set; }
+        public bool Builder { get; set; }
+        public bool Other { get; set; }
+        public bool GoldCustomer { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]
@@ -18,8 +23,6 @@ namespace BackEnd.Entities
         public string? AdressLine { get; set; } 
         public string? Town { get; set; } 
         public string? State { get; set; } 
-        public bool Buyer { get; set; } 
-        public bool Seller { get; set; }
         public virtual ICollection<RealEstateProperty> RealEstateProperties { get; set; } = new List<RealEstateProperty>();
     }
 }

@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using BackEnd.Entities;
 using BackEnd.Interfaces;
 using BackEnd.Models.AuthModels;
 using BackEnd.Models.MailModels;
 using BackEnd.Models.ResponseModel;
+using BackEnd.Models.UserModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BackEnd.Controllers
 {
@@ -20,9 +24,11 @@ namespace BackEnd.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
+        private SecretClient secretClient;
         private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private string SecretForKey;
         public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMailService mailService, IConfiguration configuration, IMapper mapper)
         {
             this.userManager = userManager;
@@ -30,6 +36,9 @@ namespace BackEnd.Controllers
             _mailService = mailService;
             _configuration = configuration;
             this._mapper = mapper;
+            secretClient = new SecretClient(new Uri(_configuration.GetValue<string>("KeyVault:Url")), new DefaultAzureCredential());
+            KeyVaultSecret secret = secretClient.GetSecret(_configuration.GetValue<string>("KeyVault:Secrets:AuthKey"));
+            SecretForKey = secret.Value;
         }
 
         [HttpPost]
@@ -64,7 +73,7 @@ namespace BackEnd.Controllers
             var roleResult = await userManager.AddToRoleAsync(user, model.Role);
 
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = $"http://localhost:5173/metronic8/vue/demo1/#/email-confirmation/{user.Email}/{token}";
+            var confirmationLink = $"https://www.amministrazionethinkhome.it/#/email-confirmation/{user.Email}/{token}";
             //Url.Action("ConfirmEmail", "Email", new { token, email = user.Email }, Request.Scheme);
             MailRequest mailRequest = new MailRequest()
             {
@@ -79,7 +88,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(RegisterAdmin))]
-        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
+        public async Task<IActionResult> RegisterAdmin(RegisterModel model)
         {
             model.UserName = model.UserName.Replace(" ", "_");
 
@@ -115,16 +124,18 @@ namespace BackEnd.Controllers
             if (user != null && await userManager.CheckPasswordAsync(user, model.Password))
             {
                 var userRoles = await userManager.GetRolesAsync(user);
+                string role = userRoles.Contains("Admin") ? "Admin" : userRoles.Contains("Agency") ? "Agenzia" : userRoles.Contains("Agent") ? "Agente" : userRoles.FirstOrDefault() ?? "";
                 var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:SecretForKey"]));
+                //foreach (var userRole in userRoles)
+                //{
+                //    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                //}
+                authClaims.Add(new Claim(ClaimTypes.Role, role));
+                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretForKey));
                 var token = new JwtSecurityToken(
                         issuer: _configuration["Authentication:Issuer"],
                     audience: _configuration["Authentication:Audience"],
@@ -136,10 +147,10 @@ namespace BackEnd.Controllers
                 {
                     Id = user.Id,
                     Name = user.Name,
-                    Lastname = user.LastName,
+                    LastName = user.LastName,
                     Email = user.Email,
                     Password = "",
-                    Role = userRoles.FirstOrDefault() ?? "",
+                    Role = role,
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                 };
 
@@ -155,7 +166,7 @@ namespace BackEnd.Controllers
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Authentication:SecretForKey"]);
+                var key = Encoding.UTF8.GetBytes(SecretForKey);
 
                 var validationParameters = new TokenValidationParameters
                 {
@@ -175,16 +186,17 @@ namespace BackEnd.Controllers
                 if (principal.Identity.IsAuthenticated)
                 {
                     email = principal.Claims.First().Value;
+                    string role = principal.Claims.ElementAt(2).Value;
                     var user = await userManager.FindByEmailAsync(email);
                     var userRoles = await userManager.GetRolesAsync(user);
                     LoginResponse result = new LoginResponse()
                     {
                         Id = user.Id,
                         Name = user.Name,
-                        Lastname = user.LastName,
+                        LastName = user.LastName,
                         Email = user.Email,
                         Password = "",
-                        Role = userRoles.FirstOrDefault() ?? "",
+                        Role = role,
                         Token = api_token.api_token
                     };
 
@@ -259,6 +271,103 @@ namespace BackEnd.Controllers
 
         }
 
+        [HttpGet]
+        [Route(nameof(GetUser))]
+        public async Task<IActionResult> GetUser(string id)
+        {
+            try
+            {
+                var user = await userManager.FindByIdAsync(id);
+
+                var roles = await userManager.GetRolesAsync(user);
+
+                var res = string.Join(", ", roles);
+                UserSelectModel result = _mapper.Map<UserSelectModel>(user);
+                if (roles.Count() > 1)
+                {
+                    if (roles.Contains("Admin"))
+                    {
+                        result.Role = "Admin";
+                    }
+                    else if (roles.Contains("Agency"))
+                    {
+                        result.Role = "Agenzia";
+                    }
+                }
+                else
+                {
+                    result.Role= roles.First() == "Agency" ? result.Role = "Agenzia"
+                        : roles.First() == "Agent" ? result.Role = "Agente" 
+                        : result.Role;
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
+        [HttpPost]
+        [Route(nameof(SendResetLink))]
+        public async Task<IActionResult> SendResetLink(string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    return BadRequest();
+                }
+
+                ApplicationUser user = await userManager.FindByEmailAsync(email);
+
+                string token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+                return Ok(token);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route(nameof(ResetPassword))]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            try
+            {
+                var user = await userManager.FindByEmailAsync(model.Email);
+                var resetPassResult = await userManager.ResetPasswordAsync(user, model.Token.Replace("_", "/").Replace("&", "+"), model.Password);
+
+                if (resetPassResult.Succeeded)
+                    return new OkObjectResult("Password Modificata");
+                else
+                {
+                    string error = string.Empty;
+                    if (resetPassResult.Errors.First().Code == "PasswordRequiresUpper")
+                        throw new NullReferenceException("La password deve contenere almeno una lettera maiuscola!");
+                    else if (resetPassResult.Errors.First().Code == "PasswordRequiresNonAlphanumeric")
+                        throw new NullReferenceException("La password deve contenere almeno un carattere speciale!");
+                    else if (resetPassResult.Errors.First().Code == "PasswordTooShort")
+                        throw new NullReferenceException("La password deve contenere almeno 8 caratteri!");
+                    else if (resetPassResult.Errors.First().Code == "PasswordRequiresDigit")
+                        throw new NullReferenceException("La password deve contenere almeno un numero!");
+                    else
+                        throw new Exception("Si è verificato un errore!");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is NullReferenceException)
+                    return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+
+                else
+                    return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Si è verificato un errore!" });
+            }
+        }
+
         //[HttpGet]
         //[Route(nameof(ForgotPassword))]
         //public async Task<IActionResult> ForgotPassword(string email)
@@ -281,42 +390,6 @@ namespace BackEnd.Controllers
 
         //    return Ok();
 
-        //}
-
-        //[HttpPost]
-        //[Route(nameof(ResetPassword))]
-        //public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
-        //{
-        //    try
-        //    {
-        //        var user = await userManager.FindByEmailAsync(model.email);
-        //        var resetPassResult = await userManager.ResetPasswordAsync(user, model.token.Replace("_", "/").Replace("&", "+"), model.password);
-
-        //        if (resetPassResult.Succeeded)
-        //            return new OkObjectResult("Password Modificata");
-        //        else
-        //        {
-        //            string error = string.Empty;
-        //            if (resetPassResult.Errors.First().Code == "PasswordRequiresUpper")
-        //                throw new NullReferenceException("La password deve contenere almeno una lettera maiuscola!");
-        //            else if (resetPassResult.Errors.First().Code == "PasswordRequiresNonAlphanumeric")
-        //                throw new NullReferenceException("La password deve contenere almeno un carattere speciale!");
-        //            else if (resetPassResult.Errors.First().Code == "PasswordTooShort")
-        //                throw new NullReferenceException("La password deve contenere almeno 8 caratteri!");
-        //            else if (resetPassResult.Errors.First().Code == "PasswordRequiresDigit")
-        //                throw new NullReferenceException("La password deve contenere almeno un numero!");
-        //            else
-        //                throw new Exception("Si è verificato un errore!");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (ex is NullReferenceException)
-        //            return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-
-        //        else
-        //            return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Si è verificato un errore!" });
-        //    }
         //}
 
         //[HttpPost]

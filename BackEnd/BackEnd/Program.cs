@@ -19,7 +19,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.ConfigureDatabase();
+builder.ConfigureDatabase(builder.Configuration.GetSection("KeyVault:Url").Value!, builder.Configuration.GetSection("KeyVault:Secrets:DbConnectionString").Value!);
 builder.ConfigureServices();
 builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("PaginationOptions"));
 builder.Services.Configure<MailOptions>(builder.Configuration.GetSection("MailOptions"));

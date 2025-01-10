@@ -157,11 +157,13 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(int currentPage, string? filterRequest, string? status, string? typologie, char? fromName, char? toName)
+        public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(
+            int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, char? fromName, char? toName)
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).OrderByDescending(x => x.Id);
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos)
+                    .Include(x => x.Agent).Include(x => x.Customer).OrderByDescending(x => x.Id);
 
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
@@ -169,8 +171,20 @@ namespace BackEnd.Services.BusinessServices
                 if (!string.IsNullOrEmpty(status))
                     query = query.Where(x => x.Status.Contains(status));
                 
-                if (!string.IsNullOrEmpty(typologie))
+                if (!string.IsNullOrEmpty(typologie) && typologie != "Qualsiasi")
                     query = query.Where(x => x.Typology!.Contains(typologie));
+
+                if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
+                    query = query.Where(x => x.Town!.Contains(location));
+
+                if (code > 0)
+                    query = query.Where(x => x.Id == code);
+
+                if (from > 0)
+                    query = query.Where(x => x.Price >= from);
+
+                if (to > 0)
+                    query = query.Where(x => x.Price <= to);
 
                 if (fromName != null)
                 {
@@ -290,7 +304,7 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var query = await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos)
+                var query = await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).Include(x => x.Agent).Include(x => x.Customer)
                     //.Include(x => x.RealEstatePropertyType)
                     .FirstOrDefaultAsync(x => x.Id == id);
 

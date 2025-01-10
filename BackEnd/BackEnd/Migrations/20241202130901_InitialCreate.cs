@@ -37,7 +37,7 @@ namespace BackEnd.Migrations
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Town = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Region = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AgencyId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgencyId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -56,6 +56,11 @@ namespace BackEnd.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_AspNetUsers_AgencyId",
+                        column: x => x.AgencyId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -190,11 +195,37 @@ namespace BackEnd.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Calendars",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NomeEvento = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DescrizioneEvento = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LuogoEvento = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DataInizioEvento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DataFineEvento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Calendars", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Calendars_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RealEstateProperties",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Typology = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InHome = table.Column<bool>(type: "bit", nullable: false),
@@ -306,11 +337,21 @@ namespace BackEnd.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_AgencyId",
+                table: "AspNetUsers",
+                column: "AgencyId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Calendars_ApplicationUserId",
+                table: "Calendars",
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RealEstateProperties_AgentId",
@@ -345,6 +386,9 @@ namespace BackEnd.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Calendars");
 
             migrationBuilder.DropTable(
                 name: "RealEstatePropertyPhotos");

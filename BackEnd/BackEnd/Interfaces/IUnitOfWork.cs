@@ -10,6 +10,7 @@ namespace BackEnd.Interfaces
         ICustomerRepository CustomerRepository { get; }
         IRealEstatePropertyRepository RealEstatePropertyRepository { get; }
         IRealEstatePropertyPhotoRepository RealEstatePropertyPhotoRepository { get; }
+        IRequestRepository RequestRepository { get; }
         ICalendarRepository CalendarRepository { get; }
         
         Task<int> SaveAsync();

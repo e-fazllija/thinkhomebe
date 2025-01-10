@@ -5,8 +5,6 @@ namespace BackEnd.Services
 {
     public static class JwtStartup
     {
-
-       
         public static void ConfigureJwt(this WebApplicationBuilder builder)
         {
             builder.Services.AddAuthentication("Bearer")
