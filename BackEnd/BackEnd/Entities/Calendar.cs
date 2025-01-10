@@ -2,7 +2,7 @@
 
 namespace BackEnd.Entities
 {
-    public class Calendar
+    public class Calendar : EntityBase
     {
         [Required]
         public string NomeEvento { get; set; } = string.Empty;

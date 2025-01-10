@@ -17,10 +17,16 @@ namespace BackEnd.Services
             CustomerRepository = new CustomerRepository(this._context);
             RealEstatePropertyRepository = new RealEstatePropertyRepository(this._context);
             RealEstatePropertyPhotoRepository = new RealEstatePropertyPhotoRepository(this._context);
+            CalendarRepository = new CalendarRepository(this._context);
         }
 
       
         public ICustomerRepository CustomerRepository
+        {
+            get;
+            private set;
+        }
+        public ICalendarRepository CalendarRepository
         {
             get;
             private set;
