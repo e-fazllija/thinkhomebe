@@ -16,7 +16,7 @@ namespace BackEnd.Models.RequestModels
         [Required]
         public string province { get; set; } = string.Empty;
         [Required]
-        public string City { get; set; } = string.Empty;
+        public string Town { get; set; } = string.Empty;
         public string? Location { get; set; }
         public string? RoomsNumber { get; set; }
         public int MQFrom { get; set; }

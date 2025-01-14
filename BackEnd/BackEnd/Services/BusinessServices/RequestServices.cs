@@ -157,7 +157,7 @@ namespace BackEnd.Services.BusinessServices
                         !x.Sold &&
                         x.Status == item.Contract &&
                         x.Price <= item.Price &&
-                        x.Town.ToLower().Contains(item.City.ToLower()));
+                        x.Town.ToLower().Contains(item.Town.ToLower()));
 
                     if (!string.IsNullOrEmpty(item.PropertyType))
                     {
@@ -218,7 +218,7 @@ namespace BackEnd.Services.BusinessServices
                         !x.Sold &&
                         x.Status == request.Contract &&
                         x.Price <= request.Price &&
-                        x.Town.ToLower().Contains(request.City.ToLower()));
+                        x.Town.ToLower().Contains(request.Town.ToLower()));
 
                 if (!string.IsNullOrEmpty(request.PropertyType))
                 {
@@ -249,7 +249,6 @@ namespace BackEnd.Services.BusinessServices
                 List<RealEstatePropertySelectModel> realEstatePropertySelectModel = _mapper.Map<List<RealEstatePropertySelectModel>>(realEstateProperty);
 
                 RequestSelectModel result = _mapper.Map<RequestSelectModel>(request);
-                result.Town = request.City;
                 result.RealEstateProperties = new List<RealEstatePropertySelectModel>();
                 result.RealEstateProperties?.AddRange(realEstatePropertySelectModel);
 
