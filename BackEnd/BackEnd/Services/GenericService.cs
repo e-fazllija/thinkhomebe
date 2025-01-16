@@ -198,7 +198,7 @@ namespace BackEnd.Services
                         result.RequestHomeDetails.DistinctByTypeRent[item.PropertyType]++;
                     }
                 }
-
+                 
                 result.RealEstatePropertyHomeDetails.DistinctByTownSale = result.RealEstatePropertyHomeDetails.DistinctByTownSale.Where(x => x.Value > 10).ToDictionary();
                 result.RealEstatePropertyHomeDetails.DistinctByTypeSale = result.RealEstatePropertyHomeDetails.DistinctByTypeSale.Where(x => x.Value > 10).ToDictionary();
                 result.RealEstatePropertyHomeDetails.DistinctByTownRent = result.RealEstatePropertyHomeDetails.DistinctByTownRent.Where(x => x.Value > 10).ToDictionary();
