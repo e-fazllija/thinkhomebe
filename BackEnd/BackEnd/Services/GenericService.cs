@@ -199,14 +199,14 @@ namespace BackEnd.Services
                     }
                 }
                  
-                result.RealEstatePropertyHomeDetails.DistinctByTownSale = result.RealEstatePropertyHomeDetails.DistinctByTownSale.Where(x => x.Value > 10).ToDictionary();
-                result.RealEstatePropertyHomeDetails.DistinctByTypeSale = result.RealEstatePropertyHomeDetails.DistinctByTypeSale.Where(x => x.Value > 10).ToDictionary();
-                result.RealEstatePropertyHomeDetails.DistinctByTownRent = result.RealEstatePropertyHomeDetails.DistinctByTownRent.Where(x => x.Value > 10).ToDictionary();
-                result.RealEstatePropertyHomeDetails.DistinctByTypeRent = result.RealEstatePropertyHomeDetails.DistinctByTypeRent.Where(x => x.Value > 10).ToDictionary();
-                result.RequestHomeDetails.DistinctByTownSale = result.RequestHomeDetails.DistinctByTownSale.Where(x => x.Value > 10).ToDictionary();
-                result.RequestHomeDetails.DistinctByTypeSale = result.RequestHomeDetails.DistinctByTypeSale.Where(x => x.Value > 10).ToDictionary();
-                result.RequestHomeDetails.DistinctByTownRent = result.RequestHomeDetails.DistinctByTownRent.Where(x => x.Value > 10).ToDictionary();
-                result.RequestHomeDetails.DistinctByTypeRent = result.RequestHomeDetails.DistinctByTypeRent.Where(x => x.Value > 10).ToDictionary();
+                //result.RealEstatePropertyHomeDetails.DistinctByTownSale = result.RealEstatePropertyHomeDetails.DistinctByTownSale.Where(x => x.Value > 5).ToDictionary();
+                //result.RealEstatePropertyHomeDetails.DistinctByTypeSale = result.RealEstatePropertyHomeDetails.DistinctByTypeSale.Where(x => x.Value > 5).ToDictionary();
+                //result.RealEstatePropertyHomeDetails.DistinctByTownRent = result.RealEstatePropertyHomeDetails.DistinctByTownRent.Where(x => x.Value > 5).ToDictionary();
+                //result.RealEstatePropertyHomeDetails.DistinctByTypeRent = result.RealEstatePropertyHomeDetails.DistinctByTypeRent.Where(x => x.Value > 5).ToDictionary();
+                //result.RequestHomeDetails.DistinctByTownSale = result.RequestHomeDetails.DistinctByTownSale.Where(x => x.Value > 5).ToDictionary();
+                //result.RequestHomeDetails.DistinctByTypeSale = result.RequestHomeDetails.DistinctByTypeSale.Where(x => x.Value > 5).ToDictionary();
+                //result.RequestHomeDetails.DistinctByTownRent = result.RequestHomeDetails.DistinctByTownRent.Where(x => x.Value > 5).ToDictionary();
+                //result.RequestHomeDetails.DistinctByTypeRent = result.RequestHomeDetails.DistinctByTypeRent.Where(x => x.Value > 5).ToDictionary();
 
 
                 result.TotalCustomers = _unitOfWork.dbContext.Customers.Count();
