@@ -15,10 +15,15 @@ namespace BackEnd.Models.OutputModels
         public int Total { get; set; }
         public int TotalSale { get; set; }
         public int TotalRent { get; set; }
+        public int TotalCurrentMonth { get; set; }
         public int TotalLastMonth { get; set; }
-        public int[] TotalCreatedPerMonth { get; set; }
+        public IDictionary<string, int> TotalCreatedPerMonth { get; set; } = new Dictionary<string, int>();
         public int MaxAnnual { get; set; }
         public int MinAnnual { get; set; }
+        public IDictionary<string, int> DistinctByTownSale { get; set; } = new Dictionary<string, int>();
+        public IDictionary<string, int> DistinctByTownRent { get; set; } = new Dictionary<string, int>();
+        public IDictionary<string, int> DistinctByTypeSale { get; set; } = new Dictionary<string, int>();
+        public IDictionary<string, int> DistinctByTypeRent { get; set; } = new Dictionary<string, int>();
     }
 
     public class RequestHomeDetails
@@ -27,11 +32,16 @@ namespace BackEnd.Models.OutputModels
         public int TotalArchived { get; set; }
         public int TotalClosed { get; set; }
         public int TotalActive { get; set; }
+        public int TotalCurrentMonth { get; set; }
         public int TotalLastMonth { get; set; }
         public int TotalSale { get; set; }
         public int TotalRent { get; set; }
-        public int[] TotalCreatedPerMonth { get; set; }
+        public IDictionary<string, int> TotalCreatedPerMonth { get; set; } = new Dictionary<string, int>();
         public int MaxAnnual { get; set; }
         public int MinAnnual { get; set; }
+        public IDictionary<string, int> DistinctByTownSale { get; set; } = new Dictionary<string, int>();
+        public IDictionary<string, int> DistinctByTownRent { get; set; } = new Dictionary<string, int>();
+        public IDictionary<string, int> DistinctByTypeSale { get; set; } = new Dictionary<string, int>();
+        public IDictionary<string, int> DistinctByTypeRent { get; set; } = new Dictionary<string, int>();
     }
 }

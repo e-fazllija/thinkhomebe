@@ -11,10 +11,11 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Utilities;
+using System;
 
 namespace BackEnd.Services
 {
-    public class GenericService: IGenericService
+    public class GenericService : IGenericService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -75,7 +76,7 @@ namespace BackEnd.Services
                 throw new Exception("Si è verificato un errore");
             }
         }
-        
+
         public async Task<AdminHomeDetailsModel> GetAdminHomeDetails()
         {
             try
@@ -88,28 +89,56 @@ namespace BackEnd.Services
                 result.RealEstatePropertyHomeDetails.TotalRent = propertiesInHome.Where(x => x.Status == "Affitto").Count();
                 result.RealEstatePropertyHomeDetails.TotalLastMonth = propertiesInHome.Where(x => x.CreationDate >= DateTime.Now.AddMonths(-1)).Count();
 
-                // Creazione di un array di 12 elementi inizializzati a 0
-                int[] counts = new int[12];
-
-                // Gruppo per mese
-                var groupedByMonth = propertiesInHome.ToList()
-                    .Where(obj => obj.CreationDate.Year == DateTime.Now.Year) // Considera solo l'anno corrente
-                    .GroupBy(obj => obj.CreationDate.Month)
-                    .ToDictionary(g => g.Key, g => g.Count());
-
-                // Aggiorna l'array dei conteggi
-                for (int i = 1; i <= 12; i++)
+                foreach (var item in propertiesInHome.Where(x => x.Status == "Vendita"))
                 {
-                    if (groupedByMonth.ContainsKey(i))
+                    if (!result.RealEstatePropertyHomeDetails.DistinctByTownSale.ContainsKey(item.Town))
                     {
-                        counts[i - 1] = groupedByMonth[i]; // Il mese i corrisponde all'indice i-1
+                        result.RealEstatePropertyHomeDetails.DistinctByTownSale[item.Town] = 1;
+                    }
+                    else
+                    {
+                        result.RealEstatePropertyHomeDetails.DistinctByTownSale[item.Town]++;
+                    }
+
+                    //By type
+                    if (!result.RealEstatePropertyHomeDetails.DistinctByTypeSale.ContainsKey(item.Typology ?? item.Category))
+                    {
+                        result.RealEstatePropertyHomeDetails.DistinctByTypeSale[item.Typology ?? item.Category] = 1;
+                    }
+                    else
+                    {
+                        result.RealEstatePropertyHomeDetails.DistinctByTypeSale[item.Typology ?? item.Category]++;
                     }
                 }
 
-                result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth = counts;
+                foreach (var item in propertiesInHome.Where(x => x.Status == "Affitto"))
+                {
+                    if (!result.RealEstatePropertyHomeDetails.DistinctByTownRent.ContainsKey(item.Town))
+                    {
+                        result.RealEstatePropertyHomeDetails.DistinctByTownRent[item.Town] = 1;
+                    }
+                    else
+                    {
+                        result.RealEstatePropertyHomeDetails.DistinctByTownRent[item.Town]++;
+                    }
 
-                result.RealEstatePropertyHomeDetails.MaxAnnual = result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Max();
-                result.RealEstatePropertyHomeDetails.MinAnnual = result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Min();
+                    //By type
+                    if (!result.RealEstatePropertyHomeDetails.DistinctByTypeRent.ContainsKey(item.Typology ?? item.Category))
+                    {
+                        result.RealEstatePropertyHomeDetails.DistinctByTypeRent[item.Typology ?? item.Category] = 1;
+                    }
+                    else
+                    {
+                        result.RealEstatePropertyHomeDetails.DistinctByTypeRent[item.Typology ?? item.Category]++;
+                    }
+                }
+
+                result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth = propertiesInHome.ToList()
+                    .GroupBy(obj => obj.CreationDate.Month + "/" + obj.CreationDate.Year.ToString())
+                    .ToDictionary(g => g.Key, g => g.Count()); ;
+
+                result.RealEstatePropertyHomeDetails.MaxAnnual = result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Values.Max();
+                result.RealEstatePropertyHomeDetails.MinAnnual = result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Values.Min();
 
                 IQueryable<Request> request = _unitOfWork.dbContext.Requests;
                 result.RequestHomeDetails.Total = request.Count();
@@ -120,27 +149,64 @@ namespace BackEnd.Services
                 result.RequestHomeDetails.TotalSale = request.Where(x => x.Contract == "Vendita" && !x.Closed && !x.Archived).Count();
                 result.RequestHomeDetails.TotalRent = request.Where(x => x.Contract == "Affitto" && !x.Closed && !x.Archived).Count();
 
-                // Creazione di un array di 12 elementi inizializzati a 0
-                int[] requestCounts = new int[12];
-
-                // Gruppo per mese
-                var requestsGroupedByMonth = request.ToList()
-                    .Where(obj => obj.CreationDate.Year == DateTime.Now.Year) // Considera solo l'anno corrente
-                    .GroupBy(obj => obj.CreationDate.Month)
+                result.RequestHomeDetails.TotalCreatedPerMonth = request.ToList()
+                    .GroupBy(obj => obj.CreationDate.Month + "/" + obj.CreationDate.Year.ToString())
                     .ToDictionary(g => g.Key, g => g.Count());
+                result.RequestHomeDetails.MaxAnnual = result.RequestHomeDetails.TotalCreatedPerMonth.Values.Max();
+                result.RequestHomeDetails.MinAnnual = result.RequestHomeDetails.TotalCreatedPerMonth.Values.Min();
 
-                // Aggiorna l'array dei conteggi
-                for (int i = 1; i <= 12; i++)
+                foreach (var item in request.Where(x => x.Contract == "Vendita"))
                 {
-                    if (requestsGroupedByMonth.ContainsKey(i))
+                    if (!result.RequestHomeDetails.DistinctByTownSale.ContainsKey(item.Town))
                     {
-                        requestCounts[i - 1] = requestsGroupedByMonth[i]; // Il mese i corrisponde all'indice i-1
+                        result.RequestHomeDetails.DistinctByTownSale[item.Town] = 1;
+                    }
+                    else
+                    {
+                        result.RequestHomeDetails.DistinctByTownSale[item.Town]++;
+                    }
+
+                    //By type
+                    if (!result.RequestHomeDetails.DistinctByTypeSale.ContainsKey(item.PropertyType))
+                    {
+                        result.RequestHomeDetails.DistinctByTypeSale[item.PropertyType] = 1;
+                    }
+                    else
+                    {
+                        result.RequestHomeDetails.DistinctByTypeSale[item.PropertyType]++;
                     }
                 }
 
-                result.RequestHomeDetails.TotalCreatedPerMonth = requestCounts;
-                result.RequestHomeDetails.MaxAnnual = result.RequestHomeDetails.TotalCreatedPerMonth.Max();
-                result.RequestHomeDetails.MinAnnual = result.RequestHomeDetails.TotalCreatedPerMonth.Min();
+                foreach (var item in request.Where(x => x.Contract == "Affitto"))
+                {
+                    if (!result.RequestHomeDetails.DistinctByTownRent.ContainsKey(item.Town))
+                    {
+                        result.RequestHomeDetails.DistinctByTownRent[item.Town] = 1;
+                    }
+                    else
+                    {
+                        result.RequestHomeDetails.DistinctByTownRent[item.Town]++;
+                    }
+
+                    //By type
+                    if (!result.RequestHomeDetails.DistinctByTypeRent.ContainsKey(item.PropertyType))
+                    {
+                        result.RequestHomeDetails.DistinctByTypeRent[item.PropertyType] = 1;
+                    }
+                    else
+                    {
+                        result.RequestHomeDetails.DistinctByTypeRent[item.PropertyType]++;
+                    }
+                }
+
+                result.RealEstatePropertyHomeDetails.DistinctByTownSale = result.RealEstatePropertyHomeDetails.DistinctByTownSale.Where(x => x.Value > 10).ToDictionary();
+                result.RealEstatePropertyHomeDetails.DistinctByTypeSale = result.RealEstatePropertyHomeDetails.DistinctByTypeSale.Where(x => x.Value > 10).ToDictionary();
+                result.RealEstatePropertyHomeDetails.DistinctByTownRent = result.RealEstatePropertyHomeDetails.DistinctByTownRent.Where(x => x.Value > 10).ToDictionary();
+                result.RealEstatePropertyHomeDetails.DistinctByTypeRent = result.RealEstatePropertyHomeDetails.DistinctByTypeRent.Where(x => x.Value > 10).ToDictionary();
+                result.RequestHomeDetails.DistinctByTownSale = result.RequestHomeDetails.DistinctByTownSale.Where(x => x.Value > 10).ToDictionary();
+                result.RequestHomeDetails.DistinctByTypeSale = result.RequestHomeDetails.DistinctByTypeSale.Where(x => x.Value > 10).ToDictionary();
+                result.RequestHomeDetails.DistinctByTownRent = result.RequestHomeDetails.DistinctByTownRent.Where(x => x.Value > 10).ToDictionary();
+                result.RequestHomeDetails.DistinctByTypeRent = result.RequestHomeDetails.DistinctByTypeRent.Where(x => x.Value > 10).ToDictionary();
 
 
                 result.TotalCustomers = _unitOfWork.dbContext.Customers.Count();
