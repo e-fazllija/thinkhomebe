@@ -157,13 +157,17 @@ namespace BackEnd.Services
 
                 foreach (var item in request.Where(x => x.Contract == "Vendita"))
                 {
-                    if (!result.RequestHomeDetails.DistinctByTownSale.ContainsKey(item.Town))
+                    string[] towns = item.Town.Split(',');
+                    foreach(var town in towns)
                     {
-                        result.RequestHomeDetails.DistinctByTownSale[item.Town] = 1;
-                    }
-                    else
-                    {
-                        result.RequestHomeDetails.DistinctByTownSale[item.Town]++;
+                        if (!result.RequestHomeDetails.DistinctByTownSale.ContainsKey(town))
+                        {
+                            result.RequestHomeDetails.DistinctByTownSale[town] = 1;
+                        }
+                        else
+                        {
+                            result.RequestHomeDetails.DistinctByTownSale[town]++;
+                        }
                     }
 
                     //By type
@@ -179,13 +183,17 @@ namespace BackEnd.Services
 
                 foreach (var item in request.Where(x => x.Contract == "Affitto"))
                 {
-                    if (!result.RequestHomeDetails.DistinctByTownRent.ContainsKey(item.Town))
+                    string[] towns = item.Town.Split(',');
+                    foreach (var town in towns)
                     {
-                        result.RequestHomeDetails.DistinctByTownRent[item.Town] = 1;
-                    }
-                    else
-                    {
-                        result.RequestHomeDetails.DistinctByTownRent[item.Town]++;
+                        if (!result.RequestHomeDetails.DistinctByTownRent.ContainsKey(town))
+                        {
+                            result.RequestHomeDetails.DistinctByTownRent[town] = 1;
+                        }
+                        else
+                        {
+                            result.RequestHomeDetails.DistinctByTownRent[town]++;
+                        }
                     }
 
                     //By type
@@ -203,9 +211,9 @@ namespace BackEnd.Services
                 //result.RealEstatePropertyHomeDetails.DistinctByTypeSale = result.RealEstatePropertyHomeDetails.DistinctByTypeSale.Where(x => x.Value > 5).ToDictionary();
                 //result.RealEstatePropertyHomeDetails.DistinctByTownRent = result.RealEstatePropertyHomeDetails.DistinctByTownRent.Where(x => x.Value > 5).ToDictionary();
                 //result.RealEstatePropertyHomeDetails.DistinctByTypeRent = result.RealEstatePropertyHomeDetails.DistinctByTypeRent.Where(x => x.Value > 5).ToDictionary();
-                result.RequestHomeDetails.DistinctByTownSale = result.RequestHomeDetails.DistinctByTownSale.Where(x => x.Value > 5).ToDictionary();
+                //result.RequestHomeDetails.DistinctByTownSale = result.RequestHomeDetails.DistinctByTownSale.Where(x => x.Value > 5).ToDictionary();
                 //result.RequestHomeDetails.DistinctByTypeSale = result.RequestHomeDetails.DistinctByTypeSale.Where(x => x.Value > 5).ToDictionary();
-                result.RequestHomeDetails.DistinctByTownRent = result.RequestHomeDetails.DistinctByTownRent.Where(x => x.Value > 5).ToDictionary();
+                //result.RequestHomeDetails.DistinctByTownRent = result.RequestHomeDetails.DistinctByTownRent.Where(x => x.Value > 5).ToDictionary();
                 //result.RequestHomeDetails.DistinctByTypeRent = result.RequestHomeDetails.DistinctByTypeRent.Where(x => x.Value > 5).ToDictionary();
 
 
