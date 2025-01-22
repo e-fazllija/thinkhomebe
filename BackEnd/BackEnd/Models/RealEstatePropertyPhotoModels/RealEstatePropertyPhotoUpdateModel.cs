@@ -14,6 +14,8 @@ namespace BackEnd.Models.RealEstatePropertyPhotoModels
         [Required]
         public int Type { get; set; }
         public bool Highlighted { get; set; }
+        [Required]
+        public int Position { get; set; }
         public DateTime UpdateDate { get; set; } = DateTime.Now;
 
     }

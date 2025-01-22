@@ -23,6 +23,8 @@ namespace BackEnd.Models.CustomerModels
         public string? AdressLine { get; set; }
         public string? Town { get; set; }
         public string? State { get; set; }
+        public bool AcquisitionDone { get; set; }
+        public bool OngoingAssignment { get; set; }
         public DateTime UpdateDate { get; set; } = DateTime.Now;
     }
 }

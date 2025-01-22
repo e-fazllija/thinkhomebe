@@ -27,5 +27,6 @@ namespace BackEnd.Entities
         public double Price { get; set; }
         public string? Notes { get; set; }
         public bool Archived { get; set; }
+        public bool MortgageAdviceRequired { get; set; }
     }
 }

@@ -3,8 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Models.CalendarModels
 {
-    public class CalendarCreateModel
+    public class CalendarUpdateModel
     {
+        public int Id { get; set; }
         [Required]
         public string ApplicationUserId { get; set; } = string.Empty;
         [Required]
@@ -18,6 +19,6 @@ namespace BackEnd.Models.CalendarModels
         public string? LuogoEvento { get; set; }
         public DateTime DataInizioEvento { get; set; }
         public DateTime DataFineEvento { get; set; }
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime UpdateDate { get; set; } = DateTime.Now;
     }
 }
