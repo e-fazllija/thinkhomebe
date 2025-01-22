@@ -26,6 +26,7 @@ namespace BackEnd.Models.RequestModels
         public double Price { get; set; }
         public string? Notes { get; set; }
         public bool Archived { get; set; }
+        public bool MortgageAdviceRequired { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
     }
 }

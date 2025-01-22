@@ -9,6 +9,7 @@ using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
 using BackEnd.Services.BusinessServices;
 using BackEnd.Interfaces;
+using BackEnd.Models.RealEstatePropertyPhotoModels;
 
 namespace BackEnd.Controllers
 {
@@ -81,6 +82,24 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route(nameof(UpdatePhotosOrder))]
+        public async Task<IActionResult> UpdatePhotosOrder(List<RealEstatePropertyPhotoUpdateModel> request)
+        {
+            try
+            {
+                List<RealEstatePropertyPhotoSelectModel> result = await _realEstatePropertyPhotoServices.UpdateOrder(request);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route(nameof(Get))]
         public async Task<IActionResult> Get(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to)

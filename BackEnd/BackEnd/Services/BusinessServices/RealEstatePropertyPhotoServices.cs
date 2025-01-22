@@ -7,7 +7,6 @@ using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyPhotoModels;
-using BackEnd.Models.RealEstatePropertyModels;
 
 namespace BackEnd.Services.BusinessServices
 {
@@ -180,6 +179,42 @@ namespace BackEnd.Services.BusinessServices
                 _mapper.Map(EntityClass, response);
 
                 _logger.LogInformation(nameof(Update));
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                if (ex is NullReferenceException)
+                {
+                    throw new Exception(ex.Message);
+                }
+                else
+                {
+                    throw new Exception("Si è verificato un errore in fase di modifica");
+                }
+            }
+        }
+
+        public async Task<List<RealEstatePropertyPhotoSelectModel>> UpdateOrder(List<RealEstatePropertyPhotoUpdateModel> dto)
+        {
+            try
+            {
+                var EntityClasses =
+                    await _unitOfWork.dbContext.RealEstatePropertyPhotos.Where(x => dto.Select(y => y.Id).Contains(x.Id)).ToListAsync();
+
+                foreach (var EntityClass in EntityClasses)
+                {
+                    EntityClass.Position = dto.FindIndex(x => x.Id == EntityClass.Id);
+                }
+                
+                _unitOfWork.RealEstatePropertyPhotoRepository.UpdateRange(EntityClasses);
+                await _unitOfWork.SaveAsync();
+
+                List<RealEstatePropertyPhotoSelectModel> response = new List<RealEstatePropertyPhotoSelectModel>();
+                _mapper.Map(EntityClasses, response);
+
+                _logger.LogInformation(nameof(UpdateOrder));
 
                 return response;
             }
