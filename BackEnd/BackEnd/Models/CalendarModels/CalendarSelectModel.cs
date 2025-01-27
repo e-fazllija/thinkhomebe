@@ -6,6 +6,7 @@ namespace BackEnd.Models.CalendarModels
     public class CalendarSelectModel
     {
         public int Id { get; set; }
+        [Required]
         public string ApplicationUserId { get; set; } = string.Empty;
         public virtual ApplicationUser ApplicationUser { get; set; }
         public string NomeEvento { get; set; } = string.Empty;
@@ -22,5 +23,6 @@ namespace BackEnd.Models.CalendarModels
         public DateTime DataFineEvento { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
+
     }
 }
