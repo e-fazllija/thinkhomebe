@@ -110,12 +110,7 @@ namespace BackEnd.Services.BusinessServices
 
                 result.Total = await query.CountAsync();
 
-                if (currentPage > 0)
-                {
-                    query = query
-                    .Skip((currentPage * options.CurrentValue.AnagraficItemPerPage) - options.CurrentValue.AnagraficItemPerPage)
-                            .Take(options.CurrentValue.AnagraficItemPerPage);
-                }
+                
 
                 List<Customer> queryList = await query
                     //.Include(x => x.CustomerType)

@@ -11,6 +11,7 @@ namespace BackEnd.Interfaces
         IRealEstatePropertyRepository RealEstatePropertyRepository { get; }
         IRealEstatePropertyPhotoRepository RealEstatePropertyPhotoRepository { get; }
         IRequestRepository RequestRepository { get; }
+        ICalendarRepository CalendarRepository { get; }
         
         Task<int> SaveAsync();
         int Save();
