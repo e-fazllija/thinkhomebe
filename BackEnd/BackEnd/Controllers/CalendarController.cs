@@ -57,14 +57,14 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
         [HttpGet]
         [Route(nameof(Get))]
-        public async Task<IActionResult> Get(int currentPage, string? filterRequest)
+        public async Task<IActionResult> Get(string? filterRequest)
         {
             try
             {
-                //currentPage = currentPage > 0 ? currentPage : 1;
-                ListViewModel<CalendarSelectModel> res = await _calendarServices.Get(currentPage, filterRequest, null, null);
+                ListViewModel<CalendarSelectModel> res = await _calendarServices.Get(filterRequest, null, null);
 
                 return Ok(res);
             }
@@ -74,6 +74,41 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+        
+        [HttpGet]
+        [Route(nameof(GetToInsert))]
+        public async Task<IActionResult> GetToInsert(string agencyId)
+        {
+            try
+            {
+                CalendarCreateViewModel res = await _calendarServices.GetToInsert(agencyId);
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route(nameof(GetSearchItems))]
+        public async Task<IActionResult> GetSearchItems(string agencyId)
+        {
+            try
+            {
+                CalendarSearchModel res = await _calendarServices.GetSearchItems(agencyId);
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route(nameof(GetById))]
         public async Task<IActionResult> GetById(int id)
@@ -112,7 +147,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var result = await _calendarServices.Get(0, null, fromName, toName);
+                var result = await _calendarServices.Get(null, fromName, toName);
                 DataTable table = Export.ToDataTable<CalendarSelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateExcelContent(table);
 
@@ -130,7 +165,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var result = await _calendarServices.Get(0, null, fromName, toName);
+                var result = await _calendarServices.Get(null, fromName, toName);
                 DataTable table = Export.ToDataTable<CalendarSelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateCsvContent(table);
 

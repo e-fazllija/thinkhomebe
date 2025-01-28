@@ -3,7 +3,12 @@ using BackEnd.Entities;
 using BackEnd.Interfaces;
 using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.CalendarModels;
+using BackEnd.Models.CustomerModels;
 using BackEnd.Models.OutputModels;
+using BackEnd.Models.RealEstatePropertyModels;
+using BackEnd.Models.RequestModels;
+using BackEnd.Models.UserModel;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Services.BusinessServices
@@ -13,13 +18,17 @@ namespace BackEnd.Services.BusinessServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<CalendarServices> _logger;
-        public CalendarServices(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CalendarServices> logger)
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
+        public CalendarServices(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CalendarServices> logger, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
-
+            this.userManager = userManager;
+            this.roleManager = roleManager;
         }
+
         public async Task<CalendarSelectModel> Create(CalendarCreateModel dto)
         {
             try
@@ -81,14 +90,14 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<ListViewModel<CalendarSelectModel>> Get(int currentPage, string? filterRequest, char? fromName, char? toName)
+        public async Task<ListViewModel<CalendarSelectModel>> Get(string? filterRequest, char? fromName, char? toName)
         {
             try
             {
-                IQueryable<Calendar> query = _unitOfWork.dbContext.Calendars.OrderByDescending(x => x.Id);
+                IQueryable<Calendar> query = _unitOfWork.dbContext.Calendars.OrderByDescending(x => x.DataInizioEvento);
 
                 if (!string.IsNullOrEmpty(filterRequest))
-                    query = query.Where(x => x.NomeEvento.Contains(filterRequest));
+                    query = query.Where(x => x.ApplicationUserId == filterRequest);
 
                 if (fromName != null)
                 {
@@ -114,6 +123,66 @@ namespace BackEnd.Services.BusinessServices
                 result.Data = _mapper.Map<List<CalendarSelectModel>>(queryList);
 
                 _logger.LogInformation(nameof(Get));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
+        public async Task<CalendarCreateViewModel> GetToInsert(string agencyId)
+        {
+            try
+            {
+                List<Customer> customers = await _unitOfWork.dbContext.Customers.ToListAsync();
+                List<RealEstateProperty> properties = await _unitOfWork.dbContext.RealEstateProperties.Where(x => x.Agent.AgencyId == agencyId).ToListAsync();
+                List<Request> requests = await _unitOfWork.dbContext.Requests.ToListAsync();
+
+                CalendarCreateViewModel result = new CalendarCreateViewModel();
+                result.Customers = _mapper.Map<List<CustomerSelectModel>>(customers);
+                result.RealEstateProperties = _mapper.Map<List<RealEstatePropertySelectModel>>(properties);
+                result.Requests = _mapper.Map<List<RequestSelectModel>>(requests);
+
+                _logger.LogInformation(nameof(GetToInsert));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
+        public async Task<CalendarSearchModel> GetSearchItems(string agencyId)
+        {
+            try
+            {
+                ApplicationUser user = await userManager.FindByIdAsync(agencyId);
+                List<UserSelectModel> agencies = new List<UserSelectModel>();
+                List<UserSelectModel> agents = new List<UserSelectModel>();
+                if(await userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    var agenciesList = await userManager.GetUsersInRoleAsync("Agency");
+                    agencies = _mapper.Map<List<UserSelectModel>>(agenciesList);
+                }
+
+                if(await userManager.IsInRoleAsync(user, "Agency"))
+                {
+                    var agentsList = await userManager.GetUsersInRoleAsync("Agent");
+                    agents = _mapper.Map<List<UserSelectModel>>(agentsList);
+                }
+
+                CalendarSearchModel result = new CalendarSearchModel()
+                {
+                    Agencies = agencies,
+                    Agents = agents
+                };
+
+                _logger.LogInformation(nameof(GetSearchItems));
 
                 return result;
             }

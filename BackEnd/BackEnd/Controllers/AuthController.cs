@@ -146,6 +146,7 @@ namespace BackEnd.Controllers
                 LoginResponse result = new LoginResponse()
                 {
                     Id = user.Id,
+                    AgencyId = user.AgencyId ?? string.Empty,
                     Name = user.Name,
                     LastName = user.LastName,
                     Email = user.Email,
@@ -192,6 +193,7 @@ namespace BackEnd.Controllers
                     LoginResponse result = new LoginResponse()
                     {
                         Id = user.Id,
+                        AgencyId = user.AgencyId ?? string.Empty,
                         Name = user.Name,
                         LastName = user.LastName,
                         Email = user.Email,

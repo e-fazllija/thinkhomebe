@@ -16,6 +16,7 @@ namespace BackEnd.Models.UserModel
         public string Town { get; set; } = string.Empty;
         public string? Region { get; set; }
         public string? Role { get; set; }
+        public string? AgencyId { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
     }
