@@ -165,8 +165,11 @@ namespace BackEnd.Services.BusinessServices
                 IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos)
                     .Include(x => x.Agent).Include(x => x.Customer).OrderByDescending(x => x.Id);
 
-                if (!string.IsNullOrEmpty(filterRequest))
+                if (!string.IsNullOrEmpty(filterRequest) && filterRequest != "Asta")
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
+
+                if (!string.IsNullOrEmpty(filterRequest) && filterRequest == "Asta")
+                    query = query.Where(x => x.Auction);
 
                 if (!string.IsNullOrEmpty(status))
                     query = query.Where(x => x.Status.Contains(status));

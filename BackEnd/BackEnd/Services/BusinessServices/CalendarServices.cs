@@ -97,8 +97,18 @@ namespace BackEnd.Services.BusinessServices
                 IQueryable<Calendar> query = _unitOfWork.dbContext.Calendars.OrderByDescending(x => x.DataInizioEvento);
 
                 if (!string.IsNullOrEmpty(filterRequest))
-                    query = query.Where(x => x.ApplicationUserId == filterRequest);
-
+                {
+                    ApplicationUser user = await userManager.FindByIdAsync(filterRequest);
+                    if (await userManager.IsInRoleAsync(user, "Admin") || await userManager.IsInRoleAsync(user, "Agency"))
+                    {
+                        query = query.Where(x => x.ApplicationUserId == filterRequest && x.ApplicationUser.AgencyId == filterRequest);
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.ApplicationUserId == filterRequest);
+                    }                    
+                }
+                    
                 if (fromName != null)
                 {
                     string fromNameString = fromName.ToString();
