@@ -20,6 +20,15 @@ namespace BackEnd.Services
             builder.Entity<RealEstateProperty>()
                 .HasMany(c => c.Photos).WithOne(e => e.RealEstateProperty);
 
+            builder.Entity<RealEstateProperty>()
+                .HasMany(c => c.RealEstatePropertyNotes).WithOne(e => e.RealEstateProperty).HasForeignKey(e => e.RealEstatePropertyId).OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Request>()
+                .HasMany(c => c.RequestNotes).WithOne(e => e.Request).HasForeignKey(e => e.RequestId);
+
+            builder.Entity<Customer>()
+                .HasMany(c => c.CustomerNotes).WithOne(e => e.Customer).HasForeignKey(e => e.CustomerId);
+
             return builder;
         }
 

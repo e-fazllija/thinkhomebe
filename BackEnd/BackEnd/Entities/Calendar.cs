@@ -12,11 +12,11 @@ namespace BackEnd.Entities
         [Required]
         public string Type { get; set; } = string.Empty;
         public int? CustomerId { get; set; }
-        public virtual Customer? Customer { get; set; }
+        public Customer? Customer { get; set; }
         public int? RealEstatePropertyId { get; set; }
-        public virtual RealEstateProperty? RealEstateProperty { get; set; }
+        public RealEstateProperty? RealEstateProperty { get; set; }
         public int? RequestId { get; set; }
-        public virtual Request? Request { get; set; }
+        public Request? Request { get; set; }
         public string? DescrizioneEvento { get; set; }
         public string? LuogoEvento { get; set; }
         public DateTime DataInizioEvento { get; set; }

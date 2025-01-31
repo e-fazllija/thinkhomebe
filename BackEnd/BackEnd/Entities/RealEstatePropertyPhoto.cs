@@ -5,7 +5,7 @@ namespace BackEnd.Entities
     public class RealEstatePropertyPhoto : EntityBase
     {
         public int RealEstatePropertyId { get; set; }
-        public virtual RealEstateProperty RealEstateProperty { get; set; }
+        public RealEstateProperty RealEstateProperty { get; set; }
         [Required]
         public string FileName { get; set; } = string.Empty;
         [Required]

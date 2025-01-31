@@ -28,5 +28,6 @@ namespace BackEnd.Entities
         public string? Notes { get; set; }
         public bool Archived { get; set; }
         public bool MortgageAdviceRequired { get; set; }
+        public ICollection<RequestNotes>? RequestNotes { get; set; }
     }
 }

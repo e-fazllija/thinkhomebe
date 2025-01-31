@@ -49,11 +49,13 @@ namespace BackEnd.Entities
         public string? Availability { get; set; }
         [Required]
         public string Description { get; set; } = string.Empty;
+        public string? VideoUrl { get; set; }
         public DateTime AssignmentEnd { get; set; }
-        public virtual ICollection<RealEstatePropertyPhoto> Photos { get; set; } = new List<RealEstatePropertyPhoto>();
+        public ICollection<RealEstatePropertyPhoto> Photos { get; set; } = new List<RealEstatePropertyPhoto>();
         public int CustomerId { get; set; }
-        public virtual Customer Customer { get; set; }
+        public Customer Customer { get; set; }
         public string AgentId { get; set; } = string.Empty;
-        public virtual ApplicationUser Agent { get; set; }
+        public ApplicationUser Agent { get; set; }
+        public ICollection<RealEstatePropertyNotes>? RealEstatePropertyNotes { get; set; }
     }
 }

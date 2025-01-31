@@ -26,5 +26,6 @@ namespace BackEnd.Entities
         public bool AcquisitionDone { get; set; }
         public bool OngoingAssignment { get; set; }
         public virtual ICollection<RealEstateProperty> RealEstateProperties { get; set; } = new List<RealEstateProperty>();
+        public ICollection<CustomerNotes>? CustomerNotes { get; set; }
     }
 }
