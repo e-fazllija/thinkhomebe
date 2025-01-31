@@ -37,6 +37,37 @@ namespace BackEnd.Services.BusinessServices
                 await _unitOfWork.CalendarRepository.InsertAsync(entityClass);
                 _unitOfWork.Save();
 
+                ApplicationUser user = await userManager.FindByIdAsync(entityClass.ApplicationUserId);
+
+                if(entityClass.RequestId > 0 && entityClass.RequestId != null)
+                {
+                    RequestNotes note = new RequestNotes()
+                    {
+                        RequestId = entityClass.RequestId ?? 0,
+                        Text = $"Nota di: {user.Name} {user.LastName} <br> Titolo: {entityClass.NomeEvento}"
+                    };
+
+                    //await _unitOfWork.dbContext.r
+                }
+
+                if (entityClass.RealEstatePropertyId > 0 && entityClass.RealEstatePropertyId != null)
+                {
+                    RealEstatePropertyNotes note = new RealEstatePropertyNotes()
+                    {
+                        RealEstatePropertyId = entityClass.RealEstatePropertyId ?? 0,
+                        Text = $"Nota di: {user.Name} {user.LastName} <br> Titolo: {entityClass.NomeEvento}"
+                    };
+                }
+
+                if (entityClass.CustomerId > 0 && entityClass.CustomerId != null)
+                {
+                    CustomerNotes note = new CustomerNotes()
+                    {
+                        CustomerId = entityClass.CustomerId ?? 0,
+                        Text = $"Nota di: {user.Name} {user.LastName} <br> Titolo: {entityClass.NomeEvento}"
+                    };
+                }
+
                 CalendarSelectModel response = new CalendarSelectModel();
                 _mapper.Map(entityClass, response);
 
@@ -127,7 +158,8 @@ namespace BackEnd.Services.BusinessServices
 
                 
                 List<Calendar> queryList = await query
-                    //.Include(x => x.CalendarType)
+                    .Include(x => x.ApplicationUser)
+                    .AsNoTracking()
                     .ToListAsync();
 
                 result.Data = _mapper.Map<List<CalendarSelectModel>>(queryList);
