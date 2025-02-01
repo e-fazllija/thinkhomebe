@@ -162,18 +162,21 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos)
-                    .Include(x => x.Agent).Include(x => x.Customer).OrderByDescending(x => x.Id);
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
+                    .Include(x => x.Photos)
+                    //.Include(x => x.Agent)
+                    //.Include(x => x.Customer)
+                    .OrderByDescending(x => x.Id);
 
-                if (!string.IsNullOrEmpty(filterRequest) && filterRequest != "Asta")
+                if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
 
-                if (!string.IsNullOrEmpty(filterRequest) && filterRequest == "Asta")
+                if (!string.IsNullOrEmpty(status) && status != "Asta")
+                    query = query.Where(x => x.Status.Contains(status));
+
+                if (!string.IsNullOrEmpty(status) && status == "Asta")
                     query = query.Where(x => x.Auction);
 
-                if (!string.IsNullOrEmpty(status))
-                    query = query.Where(x => x.Status.Contains(status));
-                
                 if (!string.IsNullOrEmpty(typologie) && typologie != "Qualsiasi")
                     query = query.Where(x => x.Typology!.Contains(typologie));
 
