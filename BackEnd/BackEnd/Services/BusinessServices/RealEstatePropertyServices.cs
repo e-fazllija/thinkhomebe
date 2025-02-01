@@ -172,7 +172,7 @@ namespace BackEnd.Services.BusinessServices
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
 
                 if (!string.IsNullOrEmpty(status) && status != "Aste")
-                    query = query.Where(x => x.Status.Contains(status));
+                    query = query.Where(x => x.Status.Contains(status) && !x.Auction);
 
                 if (!string.IsNullOrEmpty(status) && status == "Aste")
                     query = query.Where(x => x.Auction);
