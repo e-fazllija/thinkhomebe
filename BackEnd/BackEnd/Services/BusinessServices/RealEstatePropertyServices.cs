@@ -171,10 +171,10 @@ namespace BackEnd.Services.BusinessServices
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
 
-                if (!string.IsNullOrEmpty(status) && status != "Asta")
+                if (!string.IsNullOrEmpty(status) && status != "Aste")
                     query = query.Where(x => x.Status.Contains(status));
 
-                if (!string.IsNullOrEmpty(status) && status == "Asta")
+                if (!string.IsNullOrEmpty(status) && status == "Aste")
                     query = query.Where(x => x.Auction);
 
                 if (!string.IsNullOrEmpty(typologie) && typologie != "Qualsiasi")
