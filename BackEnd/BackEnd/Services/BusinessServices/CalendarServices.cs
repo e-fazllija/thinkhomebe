@@ -304,6 +304,92 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
+        private async Task HandleRequestNotes(Calendar entityClass, int? requestId)
+        {
+            var existingRequestNote = await _unitOfWork.dbContext.RequestNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+            if (requestId != null && (entityClass.RequestId == null || entityClass.RequestId != requestId))
+            {
+                if (existingRequestNote == null)
+                {
+                    existingRequestNote = new RequestNotes
+                    {
+                        ApplicationUserId = entityClass.ApplicationUserId,
+                        CalendarId = entityClass.Id,
+                        RequestId = requestId.Value,
+                        Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}"
+                    };
+                    await _unitOfWork.dbContext.RequestNotes.AddAsync(existingRequestNote);
+                }
+                else
+                {
+                    existingRequestNote.RequestId = requestId.Value;
+                    existingRequestNote.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
+                    _unitOfWork.dbContext.RequestNotes.Update(existingRequestNote);
+                }
+            }
+            else if (requestId == null && entityClass.RequestId != null && existingRequestNote != null)
+            {
+                _unitOfWork.dbContext.RequestNotes.Remove(existingRequestNote);
+            }
+        }
+
+        private async Task HandleRealEstatePropertyNotes(Calendar entityClass, int? realEstatePropertyId)
+        {
+            var existingPropertyNote = await _unitOfWork.dbContext.RealEstatePropertyNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+            if (realEstatePropertyId > 0)
+            {
+                if (existingPropertyNote == null)
+                {
+                    existingPropertyNote = new RealEstatePropertyNotes
+                    {
+                        ApplicationUserId = entityClass.ApplicationUserId,
+                        RealEstatePropertyId = realEstatePropertyId ?? 0,
+                        CalendarId = entityClass.Id,
+                        Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}"
+                    };
+                    await _unitOfWork.dbContext.RealEstatePropertyNotes.AddAsync(existingPropertyNote);
+                }
+                else
+                {
+                    existingPropertyNote.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
+                    _unitOfWork.dbContext.RealEstatePropertyNotes.Update(existingPropertyNote);
+                }
+            }
+            else if (existingPropertyNote != null)
+            {
+                _unitOfWork.dbContext.RealEstatePropertyNotes.Remove(existingPropertyNote);
+            }
+        }
+
+        private async Task HandleCustomerNotes(Calendar entityClass, int? customerId)
+        {
+            var existingCustomerNote = await _unitOfWork.dbContext.CustomerNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+            if (customerId > 0)
+            {
+                if (existingCustomerNote == null)
+                {
+                    existingCustomerNote = new CustomerNotes
+                    {
+                        ApplicationUserId = entityClass.ApplicationUserId,
+                        CustomerId = customerId ?? 0,
+                        CalendarId = entityClass.Id,
+                        Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}"
+                    };
+                    await _unitOfWork.dbContext.CustomerNotes.AddAsync(existingCustomerNote);
+                }
+                else
+                {
+                    existingCustomerNote.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
+                    _unitOfWork.dbContext.CustomerNotes.Update(existingCustomerNote);
+                }
+            }
+            else if (existingCustomerNote != null)
+            {
+                _unitOfWork.dbContext.CustomerNotes.Remove(existingCustomerNote);
+            }
+        }
+
+
         public async Task<CalendarSelectModel> Update(CalendarUpdateModel dto)
         {
             try
@@ -320,43 +406,14 @@ namespace BackEnd.Services.BusinessServices
                 if (entityClass.DataFineEvento != dto.DataFineEvento)
                     dto.DataFineEvento = dto.DataFineEvento.AddHours(1);
 
+                await HandleRequestNotes(entityClass, dto.RequestId);
+                await HandleRealEstatePropertyNotes(entityClass, dto.RealEstatePropertyId);
+                await HandleCustomerNotes(entityClass, dto.CustomerId);
+
                 entityClass = _mapper.Map(dto, entityClass);
 
                 _unitOfWork.CalendarRepository.Update(entityClass);
                 await _unitOfWork.SaveAsync();
-
-                if (entityClass.RequestId > 0 && entityClass.RequestId != null)
-                {
-                    RequestNotes? note = await _unitOfWork.dbContext.RequestNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
-                    if (note != null)
-                    {
-                        note.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
-                        _unitOfWork.dbContext.RequestNotes.Update(note);
-                        _unitOfWork.Save();
-                    }
-                }
-
-                if (entityClass.RealEstatePropertyId > 0 && entityClass.RealEstatePropertyId != null)
-                {
-                    RealEstatePropertyNotes? note = await _unitOfWork.dbContext.RealEstatePropertyNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
-                    if (note != null)
-                    {
-                        note.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
-                        _unitOfWork.dbContext.RealEstatePropertyNotes.Update(note);
-                        _unitOfWork.Save();
-                    }
-                }
-
-                if (entityClass.CustomerId > 0 && entityClass.CustomerId != null)
-                {
-                    CustomerNotes? note = await _unitOfWork.dbContext.CustomerNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
-                    if (note != null)
-                    {
-                        note.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
-                        _unitOfWork.dbContext.CustomerNotes.Update(note);
-                        _unitOfWork.Save();
-                    }
-                }
 
                 CalendarSelectModel response = new CalendarSelectModel();
                 _mapper.Map(entityClass, response);
