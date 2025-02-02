@@ -34,6 +34,8 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
+                dto.DataInizioEvento = dto.DataInizioEvento.AddHours(1);
+                dto.DataFineEvento = dto.DataFineEvento.AddHours(1);
                 var entityClass = _mapper.Map<Calendar>(dto);
                 var result = await _unitOfWork.CalendarRepository.InsertAsync(entityClass);
                 _unitOfWork.Save();
