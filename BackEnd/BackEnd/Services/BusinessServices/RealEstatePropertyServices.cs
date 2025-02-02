@@ -163,7 +163,7 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
-                    .Include(x => x.Photos)
+                    .Include(x => x.Photos.OrderBy(x => x.Position))
                     //.Include(x => x.Agent)
                     //.Include(x => x.Customer)
                     .OrderByDescending(x => x.Id);
@@ -311,7 +311,7 @@ namespace BackEnd.Services.BusinessServices
                     throw new Exception("Si è verificato un errore!");
 
                 var query = await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos.OrderBy(y => y.Position)).Include(x => x.Agent).Include(x => x.Customer)
-                    //.Include(x => x.RealEstatePropertyType)
+                    .Include(x => x.RealEstatePropertyNotes)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 RealEstatePropertySelectModel result = _mapper.Map<RealEstatePropertySelectModel>(query);

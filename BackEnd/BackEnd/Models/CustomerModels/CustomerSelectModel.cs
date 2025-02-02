@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BackEnd.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Models.CustomerModels
 {
@@ -29,6 +30,7 @@ namespace BackEnd.Models.CustomerModels
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
         //public virtual CustomerType CustomerType { get; set; } = new CustomerType();
+        public ICollection<CustomerNotes>? CustomerNotes { get; set; }
 
     }
 }

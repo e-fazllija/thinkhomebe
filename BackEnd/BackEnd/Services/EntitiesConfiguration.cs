@@ -24,10 +24,10 @@ namespace BackEnd.Services
                 .HasMany(c => c.RealEstatePropertyNotes).WithOne(e => e.RealEstateProperty).HasForeignKey(e => e.RealEstatePropertyId).OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Request>()
-                .HasMany(c => c.RequestNotes).WithOne(e => e.Request).HasForeignKey(e => e.RequestId);
+                .HasMany(c => c.RequestNotes);
 
             builder.Entity<Customer>()
-                .HasMany(c => c.CustomerNotes).WithOne(e => e.Customer).HasForeignKey(e => e.CustomerId);
+                .HasMany(c => c.CustomerNotes);
 
             return builder;
         }

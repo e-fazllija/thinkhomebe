@@ -8,6 +8,7 @@ using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
 using BackEnd.Models.RequestModels;
 using BackEnd.Models.UserModel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,7 +35,7 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 var entityClass = _mapper.Map<Calendar>(dto);
-                await _unitOfWork.CalendarRepository.InsertAsync(entityClass);
+                var result = await _unitOfWork.CalendarRepository.InsertAsync(entityClass);
                 _unitOfWork.Save();
 
                 ApplicationUser user = await userManager.FindByIdAsync(entityClass.ApplicationUserId);
@@ -43,29 +44,41 @@ namespace BackEnd.Services.BusinessServices
                 {
                     RequestNotes note = new RequestNotes()
                     {
+                        ApplicationUserId = entityClass.ApplicationUserId,
+                        CalendarId = result.Entity.Id,
                         RequestId = entityClass.RequestId ?? 0,
-                        Text = $"Nota di: {user.Name} {user.LastName} <br> Titolo: {entityClass.NomeEvento}"
+                        Text = $"<strong>Nota di</strong>: {user.Name} {user.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}"
                     };
 
-                    //await _unitOfWork.dbContext.r
+                    await _unitOfWork.dbContext.RequestNotes.AddAsync(note);
+                    _unitOfWork.Save();
                 }
 
                 if (entityClass.RealEstatePropertyId > 0 && entityClass.RealEstatePropertyId != null)
                 {
                     RealEstatePropertyNotes note = new RealEstatePropertyNotes()
                     {
+                        ApplicationUserId = entityClass.ApplicationUserId,
+                        CalendarId = result.Entity.Id,
                         RealEstatePropertyId = entityClass.RealEstatePropertyId ?? 0,
-                        Text = $"Nota di: {user.Name} {user.LastName} <br> Titolo: {entityClass.NomeEvento}"
+                        Text = $"<strong>Nota di</strong>: {user.Name} {user.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}"
                     };
+                    await _unitOfWork.dbContext.RealEstatePropertyNotes.AddAsync(note);
+                    _unitOfWork.Save();
                 }
 
                 if (entityClass.CustomerId > 0 && entityClass.CustomerId != null)
                 {
                     CustomerNotes note = new CustomerNotes()
                     {
+                        ApplicationUserId = entityClass.ApplicationUserId,
+                        CalendarId = result.Entity.Id,
                         CustomerId = entityClass.CustomerId ?? 0,
-                        Text = $"Nota di: {user.Name} {user.LastName} <br> Titolo: {entityClass.NomeEvento}"
+                        Text = $"<strong>Nota di</strong>: {user.Name} {user.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}"
                     };
+
+                    await _unitOfWork.dbContext.CustomerNotes.AddAsync(note);
+                    _unitOfWork.Save();
                 }
 
                 CalendarSelectModel response = new CalendarSelectModel();
@@ -92,16 +105,46 @@ namespace BackEnd.Services.BusinessServices
 
                 query = query.Where(x => x.Id == id);
 
-                Calendar EntityClasses = await query.FirstOrDefaultAsync();
+                Calendar entityClass = await query.FirstOrDefaultAsync();
 
-                if (EntityClasses == null)
+                if (entityClass == null)
                     throw new NullReferenceException("Record non trovato!");
 
-                _unitOfWork.CalendarRepository.Delete(EntityClasses);
+                if (entityClass.RequestId > 0 && entityClass.RequestId != null)
+                {
+                    RequestNotes? note = await _unitOfWork.dbContext.RequestNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+                    if(note != null)
+                    {
+                        _unitOfWork.dbContext.RequestNotes.Remove(note);
+                        _unitOfWork.Save();
+                    }
+                }
+
+                if (entityClass.RealEstatePropertyId > 0 && entityClass.RealEstatePropertyId != null)
+                {
+                    RealEstatePropertyNotes? note = await _unitOfWork.dbContext.RealEstatePropertyNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+                    if (note != null)
+                    {
+                        _unitOfWork.dbContext.RealEstatePropertyNotes.Remove(note);
+                        _unitOfWork.Save();
+                    } 
+                }
+
+                if (entityClass.CustomerId > 0 && entityClass.CustomerId != null)
+                {
+                    CustomerNotes? note = await _unitOfWork.dbContext.CustomerNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+                    if (note != null)
+                    {
+                        _unitOfWork.dbContext.CustomerNotes.Remove(note);
+                        _unitOfWork.Save();
+                    }
+                }
+
+                _unitOfWork.CalendarRepository.Delete(entityClass);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation(nameof(Delete));
 
-                return EntityClasses;
+                return entityClass;
             }
             catch (Exception ex)
             {
@@ -263,19 +306,52 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                var EntityClass =
-                    await _unitOfWork.CalendarRepository.FirstOrDefaultAsync(q => q.Where(x => x.Id == dto.Id));
+                var entityClass =
+                    await _unitOfWork.dbContext.Calendars.Include(x => x.ApplicationUser).FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-                if (EntityClass == null)
+                if (entityClass == null)
                     throw new NullReferenceException("Record non trovato!");
 
-                EntityClass = _mapper.Map(dto, EntityClass);
+                entityClass = _mapper.Map(dto, entityClass);
 
-                _unitOfWork.CalendarRepository.Update(EntityClass);
+                _unitOfWork.CalendarRepository.Update(entityClass);
                 await _unitOfWork.SaveAsync();
 
+                if (entityClass.RequestId > 0 && entityClass.RequestId != null)
+                {
+                    RequestNotes? note = await _unitOfWork.dbContext.RequestNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+                    if (note != null)
+                    {
+                        note.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
+                        _unitOfWork.dbContext.RequestNotes.Update(note);
+                        _unitOfWork.Save();
+                    }
+                }
+
+                if (entityClass.RealEstatePropertyId > 0 && entityClass.RealEstatePropertyId != null)
+                {
+                    RealEstatePropertyNotes? note = await _unitOfWork.dbContext.RealEstatePropertyNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+                    if (note != null)
+                    {
+                        note.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
+                        _unitOfWork.dbContext.RealEstatePropertyNotes.Update(note);
+                        _unitOfWork.Save();
+                    }
+                }
+
+                if (entityClass.CustomerId > 0 && entityClass.CustomerId != null)
+                {
+                    CustomerNotes? note = await _unitOfWork.dbContext.CustomerNotes.FirstOrDefaultAsync(x => x.CalendarId == entityClass.Id);
+                    if (note != null)
+                    {
+                        note.Text = $"<strong>Nota di</strong>: {entityClass.ApplicationUser.Name} {entityClass.ApplicationUser.LastName} <br> <strong>Titolo</strong>: {entityClass.NomeEvento}";
+                        _unitOfWork.dbContext.CustomerNotes.Update(note);
+                        _unitOfWork.Save();
+                    }
+                }
+
                 CalendarSelectModel response = new CalendarSelectModel();
-                _mapper.Map(EntityClass, response);
+                _mapper.Map(entityClass, response);
 
                 _logger.LogInformation(nameof(Update));
 
