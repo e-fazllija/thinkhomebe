@@ -137,7 +137,7 @@ namespace BackEnd.Services.BusinessServices
                     throw new Exception("Si è verificato un errore!");
 
                 var query = await _unitOfWork.dbContext.Customers
-                    //.Include(x => x.CustomerType)
+                    .Include(x => x.CustomerNotes)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 CustomerSelectModel result = _mapper.Map<CustomerSelectModel>(query);

@@ -34,5 +34,6 @@ namespace BackEnd.Models.RequestModels
         public List<RealEstatePropertySelectModel>? RealEstateProperties { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
+        public ICollection<RequestNotes>? RequestNotes { get; set; }
     }
 }

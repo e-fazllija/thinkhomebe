@@ -209,7 +209,7 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var request = await _unitOfWork.dbContext.Requests.Include(x => x.Customer)
+                var request = await _unitOfWork.dbContext.Requests.Include(x => x.Customer).Include(x => x.RequestNotes)
                     //.Include(x => x.RequestType)
                     .FirstOrDefaultAsync(x => x.Id == id);
 

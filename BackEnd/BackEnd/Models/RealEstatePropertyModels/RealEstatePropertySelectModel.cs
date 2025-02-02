@@ -62,5 +62,6 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public virtual CustomerSelectModel Customer { get; set; } = new CustomerSelectModel();
         public string AgentId { get; set; }
         public virtual ApplicationUser Agent { get; set; } = new ApplicationUser();
+        public ICollection<RealEstatePropertyNotes>? RealEstatePropertyNotes { get; set; }
     }
 }
