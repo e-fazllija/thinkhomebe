@@ -152,6 +152,7 @@ namespace BackEnd.Controllers
                     Email = user.Email,
                     Password = "",
                     Role = role,
+                    Color = user.Color,
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                 };
 
@@ -199,7 +200,8 @@ namespace BackEnd.Controllers
                         Email = user.Email,
                         Password = "",
                         Role = role,
-                        Token = api_token.api_token
+                        Token = api_token.api_token,
+                        Color = user.Color
                     };
 
                     return Ok(result);
