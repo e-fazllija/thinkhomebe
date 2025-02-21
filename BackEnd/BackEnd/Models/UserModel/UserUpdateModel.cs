@@ -23,6 +23,7 @@ namespace BackEnd.Models.UserModel
         [Required(ErrorMessage = "Town is required")]
         public string Town { get; set; } = string.Empty;
         public string? Region { get; set; }
+        public string Color { get; set; } = "#ffffff";
         public DateTime UpdateDate { get; set; } = DateTime.Now;
     }
 }

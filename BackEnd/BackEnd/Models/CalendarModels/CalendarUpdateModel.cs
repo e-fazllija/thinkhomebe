@@ -17,6 +17,7 @@ namespace BackEnd.Models.CalendarModels
         public int? RequestId { get; set; }
         public string? DescrizioneEvento { get; set; }
         public string? LuogoEvento { get; set; }
+        public string? Color { get; set; }
         public DateTime DataInizioEvento { get; set; }
         public DateTime DataFineEvento { get; set; }
         public DateTime UpdateDate { get; set; } = DateTime.Now;

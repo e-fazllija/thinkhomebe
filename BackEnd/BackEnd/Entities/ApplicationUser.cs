@@ -17,6 +17,7 @@ namespace BackEnd.Entities
         public string Town { get; set; } = string.Empty;
         public string? Region { get; set; }
         public string? AgencyId { get; set; }
+        public string Color { get; set; } = "#ffffff";
         public ApplicationUser? Agency { get; set; }
         public ICollection<RealEstateProperty>? RealEstateProperties { get; set; }
        //public ICollection<Calendar>? Calendars { get; set; }
