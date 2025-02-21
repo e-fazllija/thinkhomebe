@@ -27,5 +27,6 @@ namespace BackEnd.Models.AuthModels
         public string Town { get; set; } = string.Empty;
         public string? Region { get; set; }
         public string? AgencyId { get; set; }
+        public string Color { get; set; } = "#ffffff";
     }
 }

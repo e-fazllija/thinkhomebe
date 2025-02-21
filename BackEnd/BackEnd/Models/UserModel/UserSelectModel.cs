@@ -17,6 +17,7 @@ namespace BackEnd.Models.UserModel
         public string? Region { get; set; }
         public string? Role { get; set; }
         public string? AgencyId { get; set; }
+        public string Color { get; set; } = "#ffffff";
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
     }
