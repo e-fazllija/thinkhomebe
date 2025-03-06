@@ -16,6 +16,7 @@ namespace BackEnd.Data
         public DbSet<RealEstatePropertyNotes> RealEstatePropertyNotes { get; set; }
         public DbSet<RequestNotes> RequestNotes { get; set; }
         public DbSet<CustomerNotes> CustomerNotes { get; set; }
+        public DbSet<Documentation> Documentation { get; set; }
         
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
