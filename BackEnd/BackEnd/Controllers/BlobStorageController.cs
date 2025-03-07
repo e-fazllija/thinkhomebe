@@ -35,6 +35,7 @@ namespace BackEnd.Controllers
 
                 Documentation document = new Documentation()
                 {
+                    FileName = fileName,
                     FileUrl = fileUrl
                 };
 
@@ -60,12 +61,32 @@ namespace BackEnd.Controllers
                     .Select(document => new DocumentationSelectModel
                     {
                         Id = document.Id,
-                        FileName = Path.GetFileNameWithoutExtension(new Uri(document.FileUrl).AbsolutePath),
+                        FileName = document.FileName,
                         FileUrl = document.FileUrl
 
                     }).ToList();
 
                 return Ok(docs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        [Route(nameof(DeleteModule))]
+        public async Task<IActionResult> DeleteModule(int id)
+        {
+            try
+            {
+                Documentation document = await _unitOfWork.dbContext.Documentation.FirstAsync(x => x.Id == id);
+
+                await _storageServices.DeleteFile(document.FileName);
+
+                _unitOfWork.dbContext.Documentation.Remove(document);
+                await _unitOfWork.SaveAsync();
+                return Ok();
             }
             catch (Exception ex)
             {
