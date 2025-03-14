@@ -400,11 +400,8 @@ namespace BackEnd.Services.BusinessServices
                 if (entityClass == null)
                     throw new NullReferenceException("Record non trovato!");
 
-                if(entityClass.DataInizioEvento != dto.DataInizioEvento)
-                    dto.DataInizioEvento = dto.DataInizioEvento.AddHours(1);
-
-                if (entityClass.DataFineEvento != dto.DataFineEvento)
-                    dto.DataFineEvento = dto.DataFineEvento.AddHours(1);
+                dto.DataInizioEvento = dto.DataInizioEvento.AddHours(1);
+                dto.DataFineEvento = dto.DataFineEvento.AddHours(1);
 
                 await HandleRequestNotes(entityClass, dto.RequestId);
                 await HandleRealEstatePropertyNotes(entityClass, dto.RealEstatePropertyId);
