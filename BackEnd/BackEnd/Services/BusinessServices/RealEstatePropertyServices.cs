@@ -115,7 +115,7 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos);
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).Include(x => x.RealEstatePropertyNotes);
 
                 if (id == 0)
                     throw new NullReferenceException("L'id non può essere 0");
@@ -126,6 +126,12 @@ namespace BackEnd.Services.BusinessServices
 
                 if (EntityClasses == null)
                     throw new NullReferenceException("Record non trovato!");
+
+                if (EntityClasses.RealEstatePropertyNotes != null && EntityClasses.RealEstatePropertyNotes?.Count > 0)
+                {
+                    _unitOfWork.dbContext.RealEstatePropertyNotes.RemoveRange(EntityClasses.RealEstatePropertyNotes);
+                    await _unitOfWork.SaveAsync();
+                }
 
                 _unitOfWork.RealEstatePropertyRepository.Delete(EntityClasses);
                 await _unitOfWork.SaveAsync();
