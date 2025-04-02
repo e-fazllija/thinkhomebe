@@ -33,5 +33,6 @@ namespace BackEnd.Models.RequestModels
         public bool Archived { get; set; }
         public bool MortgageAdviceRequired { get; set; }
         public DateTime UpdateDate { get; set; } = DateTime.Now;
+        public string AgencyId { get; set; } = string.Empty;
     }
 }
