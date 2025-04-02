@@ -156,7 +156,7 @@ namespace BackEnd.Services.BusinessServices
                         .Where(x => 
                         !x.Sold &&
                         x.Status == item.Contract &&
-                        x.Price <= item.Price &&
+                        x.Price <= item.PriceTo && x.Price >= item.PriceFrom &&
                         x.Town.ToLower().Contains(item.Town.ToLower()));
 
                     if (!string.IsNullOrEmpty(item.PropertyType))
@@ -217,7 +217,7 @@ namespace BackEnd.Services.BusinessServices
                         .Where(x =>
                         !x.Sold &&
                         x.Status == request.Contract &&
-                        x.Price <= request.Price &&
+                        x.Price <= request.PriceTo && x.Price >= request.PriceFrom &&
                         x.Town.ToLower().Contains(request.Town.ToLower()));
 
                 if (!string.IsNullOrEmpty(request.PropertyType))

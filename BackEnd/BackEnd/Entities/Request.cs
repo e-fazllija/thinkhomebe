@@ -24,10 +24,15 @@ namespace BackEnd.Entities
         public string? Heating { get; set; }
         public int ParkingSpaces { get; set; }
         [Required]
-        public double Price { get; set; }
+        public double PriceTo { get; set; }
+        public double PriceFrom { get; set; }
+        public int GardenFrom { get; set; }
+        public int GardenTo { get; set; }
         public string? Notes { get; set; }
         public bool Archived { get; set; }
         public bool MortgageAdviceRequired { get; set; }
         public ICollection<RequestNotes>? RequestNotes { get; set; }
+        public string? AgencyId { get; set; }
+        public virtual ApplicationUser? Agency { get; set; }
     }
 }

@@ -29,8 +29,8 @@ namespace BackEnd.Models.CustomerModels
         public bool OngoingAssignment { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
-        //public virtual CustomerType CustomerType { get; set; } = new CustomerType();
         public ICollection<CustomerNotes>? CustomerNotes { get; set; }
-
+        public string AgencyId { get; set; } = string.Empty;
+        public ApplicationUser? Agency { get; set; }
     }
 }

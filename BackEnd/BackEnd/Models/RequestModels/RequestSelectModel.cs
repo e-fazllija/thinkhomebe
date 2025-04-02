@@ -8,16 +8,11 @@ namespace BackEnd.Models.RequestModels
     {
         public int Id { get; set; }
         public bool Closed { get; set; }
-        [Required]
         public int CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
-        [Required]
         public string Contract { get; set; } = string.Empty;
-        [Required]
         public string PropertyType { get; set; } = string.Empty;
-        [Required]
         public string Province { get; set; } = string.Empty;
-        [Required]
         public string Town { get; set; } = string.Empty;
         public string? Location { get; set; }
         public string? RoomsNumber { get; set; }
@@ -26,8 +21,10 @@ namespace BackEnd.Models.RequestModels
         public string? PropertyState { get; set; }
         public string? Heating { get; set; }
         public int ParkingSpaces { get; set; }
-        [Required]
-        public double Price { get; set; }
+        public double PriceTo { get; set; }
+        public double PriceFrom { get; set; }
+        public int GardenFrom { get; set; }
+        public int GardenTo { get; set; }
         public string? Notes { get; set; }
         public bool Archived { get; set; }
         public bool MortgageAdviceRequired { get; set; }
@@ -35,5 +32,7 @@ namespace BackEnd.Models.RequestModels
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public ICollection<RequestNotes>? RequestNotes { get; set; }
+        public string AgencyId { get; set; } = string.Empty;
+        public ApplicationUser? Agency { get; set; }
     }
 }

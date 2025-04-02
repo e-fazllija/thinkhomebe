@@ -2,7 +2,7 @@
 
 namespace BackEnd.Entities
 {
-    public class Calendar: EntityBase
+    public class Calendar : EntityBase
     {
         [Required]
         public string ApplicationUserId { get; set; } = string.Empty;
@@ -22,5 +22,8 @@ namespace BackEnd.Entities
         public string? Color { get; set; }
         public DateTime DataInizioEvento { get; set; }
         public DateTime DataFineEvento { get; set; }
+        public bool Confirmed { get; set; }
+        public bool Cancelled { get; set; }
+        public bool Postponed { get; set; }
     }
 }

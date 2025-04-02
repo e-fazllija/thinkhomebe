@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BackEnd.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Models.CustomerModels
 {
@@ -25,6 +26,6 @@ namespace BackEnd.Models.CustomerModels
         public bool AcquisitionDone { get; set; }
         public bool OngoingAssignment { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
-
+        public string AgencyId { get; set; } = string.Empty;
     }
 }
