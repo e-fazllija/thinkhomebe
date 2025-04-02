@@ -29,6 +29,12 @@ namespace BackEnd.Services
             builder.Entity<Customer>()
                 .HasMany(c => c.CustomerNotes);
 
+            builder.Entity<Customer>()
+                .HasOne(c => c.Agency).WithMany().OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Request>()
+                .HasOne(c => c.Agency).WithMany().OnDelete(DeleteBehavior.NoAction);
+
             return builder;
         }
 

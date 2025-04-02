@@ -50,6 +50,8 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public int YearOfConstruction { get; set; }
         [Required]
         public double Price { get; set; }
+        public double PriceReduced { get; set; }
+        public int MQGarden { get; set; }
         public double CondominiumExpenses { get; set; }
         public string? Availability { get; set; }
         [Required]

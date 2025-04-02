@@ -20,5 +20,8 @@ namespace BackEnd.Models.CalendarModels
         public DateTime DataInizioEvento { get; set; }
         public DateTime DataFineEvento { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
+        public bool Confirmed { get; set; }
+        public bool Cancelled { get; set; }
+        public bool Postponed { get; set; }
     }
 }
