@@ -127,11 +127,11 @@ namespace BackEnd.Services.BusinessServices
                 if (EntityClasses == null)
                     throw new NullReferenceException("Record non trovato!");
 
-                if (EntityClasses.RealEstatePropertyNotes != null && EntityClasses.RealEstatePropertyNotes?.Count > 0)
-                {
-                    _unitOfWork.dbContext.RealEstatePropertyNotes.RemoveRange(EntityClasses.RealEstatePropertyNotes);
-                    await _unitOfWork.SaveAsync();
-                }
+                //if (EntityClasses.RealEstatePropertyNotes != null && EntityClasses.RealEstatePropertyNotes?.Count > 0)
+                //{
+                //    _unitOfWork.dbContext.RealEstatePropertyNotes.RemoveRange(EntityClasses.RealEstatePropertyNotes);
+                //    await _unitOfWork.SaveAsync();
+                //}
 
                 _unitOfWork.RealEstatePropertyRepository.Delete(EntityClasses);
                 await _unitOfWork.SaveAsync();
