@@ -19,6 +19,7 @@ namespace BackEnd.Services
             RealEstatePropertyPhotoRepository = new RealEstatePropertyPhotoRepository(this._context);
             RequestRepository = new RequestRepository(this._context);
             CalendarRepository = new CalendarRepository(this._context);
+            DocumentsTabRepository = new DocumentsTabRepository(this._context);
         }
 
       
@@ -47,7 +48,12 @@ namespace BackEnd.Services
             get;
             private set;
         }
-        
+        public IDocumentsTabRepository DocumentsTabRepository
+        {
+            get;
+            private set;
+        }
+
         public void Dispose()
         {
             _context.Dispose();
