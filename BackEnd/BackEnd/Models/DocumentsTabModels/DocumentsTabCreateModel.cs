@@ -84,5 +84,7 @@ namespace BackEnd.Models.DocumentsTabModelModels
         public bool MiscellaneousDocuments { get; set; }
         public IFormFile MiscellaneousDocumentsFile { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
+        public string? RealEstatePropertyId { get; set; }
+
     }
 }

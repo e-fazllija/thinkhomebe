@@ -120,7 +120,6 @@ namespace BackEnd.Entities
 
         public bool MiscellaneousDocuments { get; set; }
         public string? MiscellaneousDocumentsUrl { get; set; }
-
-        public virtual ICollection<RealEstateProperty>? RealEstateProperties { get; set; }
+        public string? RealEstatePropertyId { get; set; }
     }
 }

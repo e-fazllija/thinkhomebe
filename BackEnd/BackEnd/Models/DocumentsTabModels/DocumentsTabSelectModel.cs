@@ -124,6 +124,8 @@ namespace BackEnd.Models.DocumentsTabModels
         public string? MiscellaneousDocumentsUrl { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
+        public string? RealEstatePropertyId { get; set; }
+
 
     }
 }
