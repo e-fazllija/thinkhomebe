@@ -1,125 +1,123 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BackEnd.Entities
+﻿namespace BackEnd.Entities
 {
     public class DocumentsTab : EntityBase
     {
         public bool IdentificationDocument { get; set; }
-        public string? IdentificationDocumentUrl { get; set; }
+        public int? IdentificationDocumentDocumentId { get; set; }
 
         public bool TaxCodeOrHealthCard { get; set; }
-        public string? TaxCodeOrHealthCardUrl { get; set; }
+        public int? TaxCodeOrHealthCardDocumentId { get; set; }
 
         public bool MarriageCertificateSummary { get; set; }
-        public string? MarriageCertificateSummaryUrl { get; set; }
+        public int? MarriageCertificateSummaryDocumentId { get; set; }
 
         public bool DeedOfOrigin { get; set; }
-        public string? DeedOfOriginUrl { get; set; }
+        public int? DeedOfOriginDocumentId { get; set; }
 
         public bool SystemsComplianceDeclaration { get; set; }
-        public string? SystemsComplianceDeclarationUrl { get; set; }
+        public int? SystemsComplianceDeclarationDocumentId { get; set; }
 
         public bool ElectricalElectronicSystem { get; set; }
-        public string? ElectricalElectronicSystemUrl { get; set; }
+        public int? ElectricalElectronicSystemDocumentId { get; set; }
 
         public bool PlumbingSanitarySystem { get; set; }
-        public string? PlumbingSanitarySystemUrl { get; set; }
+        public int? PlumbingSanitarySystemDocumentId { get; set; }
 
         public bool GasSystem { get; set; }
-        public string? GasSystemUrl { get; set; }
+        public int? GasSystemDocumentId { get; set; }
 
         public bool HeatingAirConditioningSystem { get; set; }
-        public string? HeatingAirConditioningSystemUrl { get; set; }
+        public int? HeatingAirConditioningSystemDocumentId { get; set; }
 
         public bool LiftingSystem { get; set; }
-        public string? LiftingSystemUrl { get; set; }
+        public int? LiftingSystemDocumentId { get; set; }
 
         public bool FireSafetySystem { get; set; }
-        public string? FireSafetySystemUrl { get; set; }
+        public int? FireSafetySystemDocumentId { get; set; }
 
         public bool BoilerMaintenanceLog { get; set; }
-        public string? BoilerMaintenanceLogUrl { get; set; }
+        public int? BoilerMaintenanceLogDocumentId { get; set; }
 
         public bool HabitabilityCertificate { get; set; }
-        public string? HabitabilityCertificateUrl { get; set; }
+        public int? HabitabilityCertificateDocumentId { get; set; }
 
         public bool StructuralIntegrityCertificate { get; set; }
-        public string? StructuralIntegrityCertificateUrl { get; set; }
+        public int? StructuralIntegrityCertificateDocumentId { get; set; }
 
         public bool BuildingCadastralComplianceReport { get; set; }
-        public string? BuildingCadastralComplianceReportUrl { get; set; }
+        public int? BuildingCadastralComplianceReportDocumentId { get; set; }
 
         public bool LandRegistry { get; set; }
-        public string? LandRegistryUrl { get; set; }
+        public int? LandRegistryDocumentId { get; set; }
 
         public bool CadastralSurveyAndFloorPlan { get; set; }
-        public string? CadastralSurveyAndFloorPlanUrl { get; set; }
+        public int? CadastralSurveyAndFloorPlanDocumentId { get; set; }
 
         public bool CadastralMapExtract { get; set; }
-        public string? CadastralMapExtractUrl { get; set; }
+        public int? CadastralMapExtractDocumentId { get; set; }
 
         public bool FloorPlanWithSubsidiaryUnits { get; set; }
-        public string? FloorPlanWithSubsidiaryUnitsUrl { get; set; }
+        public int? FloorPlanWithSubsidiaryUnitsDocumentId { get; set; }
 
         public bool EnergyPerformanceCertificate { get; set; }
-        public string? EnergyPerformanceCertificateUrl { get; set; }
+        public int? EnergyPerformanceCertificateDocumentId { get; set; }
 
         public bool MortgageLienRegistrySearch { get; set; }
-        public string? MortgageLienRegistrySearchUrl { get; set; }
+        public int? MortgageLienRegistrySearchDocumentId { get; set; }
 
         public bool Condominium { get; set; }
-        public string? CondominiumUrl { get; set; }
+        public int? CondominiumDocumentId { get; set; }
 
         public bool CondominiumBylaws { get; set; }
-        public string? CondominiumBylawsUrl { get; set; }
+        public int? CondominiumBylawsDocumentId { get; set; }
 
         public bool MillesimalTables { get; set; }
-        public string? MillesimalTablesUrl { get; set; }
+        public int? MillesimalTablesDocumentId { get; set; }
 
         public bool LatestFinancialStatementAndBudget { get; set; }
-        public string? LatestFinancialStatementAndBudgetUrl { get; set; }
+        public int? LatestFinancialStatementAndBudgetDocumentId { get; set; }
 
         public bool LastTwoCondominiumMeetingMinutes { get; set; }
-        public string? LastTwoCondominiumMeetingMinutesUrl { get; set; }
+        public int? LastTwoCondominiumMeetingMinutesDocumentId { get; set; }
 
         public bool SignedStatementFromAdministrator { get; set; }
-        public string? SignedStatementFromAdministratorUrl { get; set; }
+        public int? SignedStatementFromAdministratorDocumentId { get; set; }
 
         public bool ChamberOfCommerceBusinessRegistrySearch { get; set; }
-        public string? ChamberOfCommerceBusinessRegistrySearchUrl { get; set; }
+        public int? ChamberOfCommerceBusinessRegistrySearchDocumentId { get; set; }
 
         public bool PowerOfAttorney { get; set; }
-        public string? PowerOfAttorneyUrl { get; set; }
+        public int? PowerOfAttorneyDocumentId { get; set; }
 
         public bool UrbanPlanningComplianceCertificate { get; set; }
-        public string? UrbanPlanningComplianceCertificateUrl { get; set; }
+        public int? UrbanPlanningComplianceCertificateDocumentId { get; set; }
 
         public bool LeaseAgreement { get; set; }
-        public string? LeaseAgreementUrl { get; set; }
+        public int? LeaseAgreementDocumentId { get; set; }
 
         public bool LastMortgagePaymentReceipt { get; set; }
-        public string? LastMortgagePaymentReceiptUrl { get; set; }
+        public int? LastMortgagePaymentReceiptDocumentId { get; set; }
 
         public bool TaxDeductionDocumentation { get; set; }
-        public string? TaxDeductionDocumentationUrl { get; set; }
+        public int? TaxDeductionDocumentationDocumentId { get; set; }
 
         public bool PurchaseOffer { get; set; }
-        public string? PurchaseOfferUrl { get; set; }
+        public int? PurchaseOfferDocumentId { get; set; }
 
         public bool CommissionAgreement { get; set; }
-        public string? CommissionAgreementUrl { get; set; }
+        public int? CommissionAgreementDocumentId { get; set; }
 
         public bool PreliminarySaleAgreement { get; set; }
-        public string? PreliminarySaleAgreementUrl { get; set; }
+        public int? PreliminarySaleAgreementDocumentId { get; set; }
 
         public bool DeedOfSale { get; set; }
-        public string? DeedOfSaleUrl { get; set; }
+        public int? DeedOfSaleDocumentId { get; set; }
 
         public bool MortgageDeed { get; set; }
-        public string? MortgageDeedUrl { get; set; }
+        public int? MortgageDeedDocumentId { get; set; }
 
         public bool MiscellaneousDocuments { get; set; }
-        public string? MiscellaneousDocumentsUrl { get; set; }
-        public string? RealEstatePropertyId { get; set; }
+        public int? MiscellaneousDocumentsDocumentId { get; set; }
+        public int? RealEstatePropertyDocumentId { get; set; }
     }
 }
