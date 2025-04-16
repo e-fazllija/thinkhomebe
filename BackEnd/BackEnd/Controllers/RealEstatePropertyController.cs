@@ -122,11 +122,11 @@ namespace BackEnd.Controllers
         }
         [HttpGet]
         [Route(nameof(GetToInsert))]
-        public async Task<IActionResult> GetToInsert()
+        public async Task<IActionResult> GetToInsert(string? agencyId)
         {
             try
             {
-                RealEstatePropertyCreateViewModel res = await _realEstatePropertyServices.GetToInsert();
+                RealEstatePropertyCreateViewModel res = await _realEstatePropertyServices.GetToInsert(agencyId);
 
                 return Ok(res);
             }

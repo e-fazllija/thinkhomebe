@@ -85,11 +85,14 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<ListViewModel<CustomerSelectModel>> Get(int currentPage, string? filterRequest, char? fromName, char? toName)
+        public async Task<ListViewModel<CustomerSelectModel>> Get(int currentPage, string? agencyId, string? filterRequest, char? fromName, char? toName)
         {
             try
             {
                 IQueryable<Customer> query = _unitOfWork.dbContext.Customers.OrderByDescending(x => x.Id);
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    query = query.Where(x => x.AgencyId == agencyId);
 
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.Name.Contains(filterRequest));

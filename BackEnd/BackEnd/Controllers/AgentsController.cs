@@ -61,12 +61,14 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(Get))]
-        public async Task<IActionResult> Get(int currentPage, string? filterRequest)
+        public async Task<IActionResult> Get(int currentPage, string agencyId, string? filterRequest)
         {
             try
             {
                 //currentPage = currentPage > 0 ? currentPage : 1;
                 var usersList = await userManager.GetUsersInRoleAsync("Agent");
+                usersList = usersList.Where(x => x.AgencyId == agencyId).ToList();
+
                 if (!string.IsNullOrEmpty(filterRequest))
                     usersList = usersList.Where(x => x.Email.Contains(filterRequest)).ToList();
 

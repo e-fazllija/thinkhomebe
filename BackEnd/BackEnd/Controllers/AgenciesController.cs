@@ -65,6 +65,8 @@ namespace BackEnd.Controllers
             {
                 //currentPage = currentPage > 0 ? currentPage : 1;
                 var usersList = await userManager.GetUsersInRoleAsync("Agency");
+
+
                 if(!string.IsNullOrEmpty(filterRequest))
                     usersList = usersList.Where(x => x.Email.Contains(filterRequest)).ToList();
 

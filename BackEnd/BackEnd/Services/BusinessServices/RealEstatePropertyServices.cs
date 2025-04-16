@@ -238,12 +238,18 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<RealEstatePropertyCreateViewModel> GetToInsert()
+        public async Task<RealEstatePropertyCreateViewModel> GetToInsert(string? agencyId)
         {
             try
             {
                 IQueryable<Customer> customerQuery = _unitOfWork.dbContext.Customers;
                 var usersList = await userManager.GetUsersInRoleAsync("Agent");
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    usersList = usersList.Where(x => x.AgencyId == agencyId).ToList();
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    customerQuery = customerQuery.Where(x => x.AgencyId == agencyId);
 
                 List<ApplicationUser> users = usersList.ToList();
 
