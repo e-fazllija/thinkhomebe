@@ -7,8 +7,6 @@ using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.RequestModels;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
-using DocumentFormat.OpenXml.Presentation;
-using System.Collections.Generic;
 using BackEnd.Models.RealEstatePropertyModels;
 
 namespace BackEnd.Services.BusinessServices
@@ -88,11 +86,14 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<ListViewModel<RequestSelectModel>> Get(int currentPage, string? filterRequest, char? fromName, char? toName, string? userId)
+        public async Task<ListViewModel<RequestSelectModel>> Get(int currentPage, string? agencyId, string? filterRequest, char? fromName, char? toName, string? userId)
         {
             try
             {
                 IQueryable<Request> query = _unitOfWork.dbContext.Requests.OrderByDescending(x => x.Id).Include(x => x.Customer);
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    query = query.Where(x => x.AgencyId == agencyId);
 
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.Customer.Name.Contains(filterRequest));

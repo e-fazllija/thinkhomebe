@@ -4,35 +4,35 @@ using Microsoft.Extensions.Options;
 using BackEnd.Entities;
 using BackEnd.Interfaces;
 using BackEnd.Interfaces.IBusinessServices;
-using BackEnd.Models.CustomerModels;
+using BackEnd.Models.DocumentsTabModels;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
+using BackEnd.Models.DocumentsTabModelModels;
+using BackEnd.Models.CustomerModels;
 
 namespace BackEnd.Services.BusinessServices
 {
-    public class CustomerServices : ICustomerServices
+    public class DocumentsTabServices : IDocumentsTabServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<CustomerServices> _logger;
-        private readonly IOptionsMonitor<PaginationOptions> options;
-        public CustomerServices(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CustomerServices> logger, IOptionsMonitor<PaginationOptions> options)
+        private readonly ILogger<DocumentsTabServices> _logger;
+        public DocumentsTabServices(IUnitOfWork unitOfWork, IMapper mapper, ILogger<DocumentsTabServices> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
-            this.options = options;
 
         }
-        public async Task<CustomerSelectModel> Create(CustomerCreateModel dto)
+        public async Task<DocumentsTabSelectModel> Create(DocumentsTabCreateModel dto)
         {
             try
             {
-                var entityClass = _mapper.Map<Customer>(dto);
-                await _unitOfWork.CustomerRepository.InsertAsync(entityClass);
+                var entityClass = _mapper.Map<DocumentsTab>(dto);
+                await _unitOfWork.DocumentsTabRepository.InsertAsync(entityClass);
                 _unitOfWork.Save();
 
-                CustomerSelectModel response = new CustomerSelectModel();
+                DocumentsTabSelectModel response = new DocumentsTabSelectModel();
                 _mapper.Map(entityClass, response);
 
                 _logger.LogInformation(nameof(Create));
@@ -45,23 +45,23 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<Customer> Delete(int id)
+        public async Task<DocumentsTab> Delete(int id)
         {
             try
             {
-                IQueryable<Customer> query = _unitOfWork.dbContext.Customers;
+                IQueryable<DocumentsTab> query = _unitOfWork.dbContext.DocumentsTabs;
 
                 if (id == 0)
                     throw new NullReferenceException("L'id non può essere 0");
 
                 query = query.Where(x => x.Id == id);
 
-                Customer EntityClasses = await query.FirstOrDefaultAsync();
+                DocumentsTab EntityClasses = await query.FirstOrDefaultAsync();
 
                 if (EntityClasses == null)
                     throw new NullReferenceException("Record non trovato!");
 
-                _unitOfWork.CustomerRepository.Delete(EntityClasses);
+                _unitOfWork.DocumentsTabRepository.Delete(EntityClasses);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation(nameof(Delete));
 
@@ -85,54 +85,7 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<ListViewModel<CustomerSelectModel>> Get(int currentPage, string? agencyId, string? filterRequest, char? fromName, char? toName)
-        {
-            try
-            {
-                IQueryable<Customer> query = _unitOfWork.dbContext.Customers.OrderByDescending(x => x.Id);
-
-                if (!string.IsNullOrEmpty(agencyId))
-                    query = query.Where(x => x.AgencyId == agencyId);
-
-                if (!string.IsNullOrEmpty(filterRequest))
-                    query = query.Where(x => x.Name.Contains(filterRequest));
-
-                if (fromName != null)
-                {
-                    string fromNameString = fromName.ToString();
-                    query = query.Where(x => string.Compare(x.Name.Substring(0, 1), fromNameString) >= 0);
-                }
-
-                if (toName != null)
-                {
-                    string toNameString = toName.ToString();
-                    query = query.Where(x => string.Compare(x.Name.Substring(0, 1), toNameString) <= 0);
-                }
-
-                ListViewModel<CustomerSelectModel> result = new ListViewModel<CustomerSelectModel>();
-
-                result.Total = await query.CountAsync();
-
-                
-
-                List<Customer> queryList = await query
-                    //.Include(x => x.CustomerType)
-                    .ToListAsync();
-
-                result.Data = _mapper.Map<List<CustomerSelectModel>>(queryList);
-
-                _logger.LogInformation(nameof(Get));
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception("Si è verificato un errore");
-            }
-        }
-
-        public async Task<CustomerSelectModel> GetById(int id)
+        public async Task<DocumentsTabSelectModel> GetById(int id)
         {
             try
             {
@@ -143,7 +96,7 @@ namespace BackEnd.Services.BusinessServices
                     .Include(x => x.CustomerNotes)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
-                CustomerSelectModel result = _mapper.Map<CustomerSelectModel>(query);
+                DocumentsTabSelectModel result = _mapper.Map<DocumentsTabSelectModel>(query);
 
                 _logger.LogInformation(nameof(GetById));
 
@@ -156,22 +109,22 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<CustomerSelectModel> Update(CustomerUpdateModel dto)
+        public async Task<DocumentsTabSelectModel> Update(DocumentsTabUpdateModel dto)
         {
             try
             {
                 var EntityClass =
-                    await _unitOfWork.CustomerRepository.FirstOrDefaultAsync(q => q.Where(x => x.Id == dto.Id));
+                    await _unitOfWork.DocumentsTabRepository.FirstOrDefaultAsync(q => q.Where(x => x.Id == dto.Id));
 
                 if (EntityClass == null)
                     throw new NullReferenceException("Record non trovato!");
 
                 EntityClass = _mapper.Map(dto, EntityClass);
 
-                _unitOfWork.CustomerRepository.Update(EntityClass);
+                _unitOfWork.DocumentsTabRepository.Update(EntityClass);
                 await _unitOfWork.SaveAsync();
 
-                CustomerSelectModel response = new CustomerSelectModel();
+                DocumentsTabSelectModel response = new DocumentsTabSelectModel();
                 _mapper.Map(EntityClass, response);
 
                 _logger.LogInformation(nameof(Update));

@@ -11,6 +11,7 @@ using BackEnd.Models.UserModel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.WindowsAzure.Storage.File.Protocol;
 
 namespace BackEnd.Services.BusinessServices
 {
@@ -166,25 +167,28 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<ListViewModel<CalendarSelectModel>> Get(string? filterRequest, char? fromName, char? toName)
+        public async Task<ListViewModel<CalendarSelectModel>> Get(string agencyId, string? agentId, char? fromName, char? toName)
         {
             try
             {
-                IQueryable<Calendar> query = _unitOfWork.dbContext.Calendars.OrderByDescending(x => x.DataInizioEvento);
+                IQueryable<Calendar> query = _unitOfWork.dbContext.Calendars.OrderByDescending(x => x.DataInizioEvento).Where(x => x.ApplicationUser.AgencyId == agencyId);
 
-                if (!string.IsNullOrEmpty(filterRequest))
-                {
-                    ApplicationUser user = await userManager.FindByIdAsync(filterRequest);
-                    if (await userManager.IsInRoleAsync(user, "Admin") || await userManager.IsInRoleAsync(user, "Agency"))
-                    {
-                        query = query.Where(x => x.ApplicationUserId == filterRequest && x.ApplicationUser.AgencyId == filterRequest);
-                    }
-                    else
-                    {
-                        query = query.Where(x => x.ApplicationUserId == filterRequest);
-                    }                    
-                }
+                //if (!string.IsNullOrEmpty(filterRequest))
+                //{
+                //    ApplicationUser user = await userManager.FindByIdAsync(filterRequest);
+                //    if (await userManager.IsInRoleAsync(user, "Admin") || await userManager.IsInRoleAsync(user, "Agency"))
+                //    {
+                //        query = query.Where(x => x.ApplicationUserId == filterRequest && x.ApplicationUser.AgencyId == filterRequest);
+                //    }
+                //    else
+                //    {
+                //        query = query.Where(x => x.ApplicationUserId == filterRequest);
+                //    }                    
+                //}
                     
+                if(!string.IsNullOrEmpty(agentId))
+                    query = query.Where(x => x.ApplicationUserId == agentId);
+
                 if (fromName != null)
                 {
                     string fromNameString = fromName.ToString();
@@ -224,9 +228,9 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                List<Customer> customers = await _unitOfWork.dbContext.Customers.ToListAsync();
+                List<Customer> customers = await _unitOfWork.dbContext.Customers.Where(x => x.AgencyId == agencyId).ToListAsync();
                 List<RealEstateProperty> properties = await _unitOfWork.dbContext.RealEstateProperties.Where(x => x.Agent.AgencyId == agencyId).ToListAsync();
-                List<Request> requests = await _unitOfWork.dbContext.Requests.ToListAsync();
+                List<Request> requests = await _unitOfWork.dbContext.Requests.Where(x => x.AgencyId == agencyId).ToListAsync();
 
                 CalendarCreateViewModel result = new CalendarCreateViewModel();
                 result.Customers = _mapper.Map<List<CustomerSelectModel>>(customers);
@@ -244,11 +248,11 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<CalendarSearchModel> GetSearchItems(string agencyId)
+        public async Task<CalendarSearchModel> GetSearchItems(string userId, string? agencyId)
         {
             try
             {
-                ApplicationUser user = await userManager.FindByIdAsync(agencyId);
+                ApplicationUser user = await userManager.FindByIdAsync(userId);
                 List<UserSelectModel> agencies = new List<UserSelectModel>();
                 List<UserSelectModel> agents = new List<UserSelectModel>();
                 if(await userManager.IsInRoleAsync(user, "Admin"))
@@ -260,6 +264,7 @@ namespace BackEnd.Services.BusinessServices
                 if(await userManager.IsInRoleAsync(user, "Agency"))
                 {
                     var agentsList = await userManager.GetUsersInRoleAsync("Agent");
+                    agentsList = agentsList.Where(x => x.AgencyId == (agencyId ?? userId)).ToList();
                     agents = _mapper.Map<List<UserSelectModel>>(agentsList);
                 }
 

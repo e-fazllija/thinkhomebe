@@ -60,11 +60,11 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(Get))]
-        public async Task<IActionResult> Get(string? filterRequest)
+        public async Task<IActionResult> Get(string agencyId, string? agentId)
         {
             try
             {
-                ListViewModel<CalendarSelectModel> res = await _calendarServices.Get(filterRequest, null, null);
+                ListViewModel<CalendarSelectModel> res = await _calendarServices.Get(agencyId, agentId, null, null);
 
                 return Ok(res);
             }
@@ -94,11 +94,11 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(GetSearchItems))]
-        public async Task<IActionResult> GetSearchItems(string agencyId)
+        public async Task<IActionResult> GetSearchItems(string userId, string? agencyId)
         {
             try
             {
-                CalendarSearchModel res = await _calendarServices.GetSearchItems(agencyId);
+                CalendarSearchModel res = await _calendarServices.GetSearchItems(userId, agencyId);
 
                 return Ok(res);
             }
@@ -140,42 +140,6 @@ namespace BackEnd.Controllers
                 _logger.LogError(ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
-        }
-        [HttpGet]
-        [Route(nameof(ExportExcel))]
-        public async Task<IActionResult> ExportExcel(char? fromName, char? toName)
-        {
-            try
-            {
-                var result = await _calendarServices.Get(null, fromName, toName);
-                DataTable table = Export.ToDataTable<CalendarSelectModel>(result.Data);
-                byte[] fileBytes = Export.GenerateExcelContent(table);
-
-                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Output.xlsx");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
-        [HttpGet]
-        [Route(nameof(ExportCsv))]
-        public async Task<IActionResult> ExportCsv(char? fromName, char? toName)
-        {
-            try
-            {
-                var result = await _calendarServices.Get(null, fromName, toName);
-                DataTable table = Export.ToDataTable<CalendarSelectModel>(result.Data);
-                byte[] fileBytes = Export.GenerateCsvContent(table);
-
-                return File(fileBytes, "text/csv", "Output.csv");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
+        }        
     }
 }
