@@ -102,15 +102,12 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(Get))]
-        public async Task<IActionResult> Get(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to)
+        public async Task<IActionResult> Get(int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
         {
             try
             {
-                ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(currentPage, filterRequest, status, typologie, location,
-                code,
-                from,
-                to,
-                null, null);
+                ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(
+                    currentPage, agencyId, filterRequest, contract, priceFrom, priceTo, category, typologie, town);
 
                 return Ok(res);
             }
@@ -168,7 +165,7 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
-        
+
         [HttpDelete]
         [Route(nameof(DeletePhoto))]
         public async Task<IActionResult> DeletePhoto(int id)
