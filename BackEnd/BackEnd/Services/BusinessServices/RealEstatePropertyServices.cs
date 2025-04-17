@@ -164,6 +164,70 @@ namespace BackEnd.Services.BusinessServices
         }
 
         public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(
+             int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, char? fromName, char? toName)
+        {
+            try
+            {
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
+                     .Include(x => x.Photos.OrderBy(x => x.Position))
+                     .OrderByDescending(x => x.Id);
+                if (!string.IsNullOrEmpty(filterRequest))
+                    query = query.Where(x => x.AddressLine.Contains(filterRequest));
+
+                if (!string.IsNullOrEmpty(status) && status != "Aste")
+                    query = query.Where(x => x.Status.Contains(status) && !x.Auction);
+
+                if (!string.IsNullOrEmpty(status) && status == "Aste")
+                    query = query.Where(x => x.Auction);
+                if (!string.IsNullOrEmpty(typologie) && typologie != "Qualsiasi")
+                    query = query.Where(x => x.Typology!.Contains(typologie));
+                if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
+                    query = query.Where(x => x.Town!.Contains(location));
+                if (code > 0)
+                    query = query.Where(x => x.Id == code);
+                if (from > 0)
+                    query = query.Where(x => x.Price >= from);
+                if (to > 0)
+                    query = query.Where(x => x.Price <= to);
+                if (fromName != null)
+                {
+                    string fromNameString = fromName.ToString();
+                    query = query.Where(x => string.Compare(x.Category.Substring(0, 1), fromNameString) >= 0);
+                }
+                if (toName != null)
+                {
+                    string toNameString = toName.ToString();
+                    query = query.Where(x => string.Compare(x.Category.Substring(0, 1), toNameString) <= 0);
+                }
+                ListViewModel<RealEstatePropertySelectModel> result = new ListViewModel<RealEstatePropertySelectModel>();
+
+                result.Total = await query.CountAsync();
+
+                if (currentPage > 0)
+                {
+                    query = query
+                    .Skip((currentPage * options.CurrentValue.RealEstatePropertyItemPerPage) - options.CurrentValue.RealEstatePropertyItemPerPage)
+                            .Take(options.CurrentValue.RealEstatePropertyItemPerPage);
+                }
+
+                List<RealEstateProperty> queryList = await query
+                    //.Include(x => x.RealEstatePropertyType)
+                    .ToListAsync();
+
+                result.Data = _mapper.Map<List<RealEstatePropertySelectModel>>(queryList);
+
+                _logger.LogInformation(nameof(Get));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
+        public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(
             int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
         {
             try

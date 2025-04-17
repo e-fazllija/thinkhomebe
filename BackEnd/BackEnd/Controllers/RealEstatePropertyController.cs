@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BackEnd.Entities;
 using BackEnd.Interfaces.IBusinessServices;
-using BackEnd.Models.CustomerModels;
-using BackEnd.Services;
-using System.Data;
 using BackEnd.Models.ResponseModel;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
-using BackEnd.Services.BusinessServices;
-using BackEnd.Interfaces;
 using BackEnd.Models.RealEstatePropertyPhotoModels;
 
 namespace BackEnd.Controllers
@@ -92,6 +86,27 @@ namespace BackEnd.Controllers
                 List<RealEstatePropertyPhotoSelectModel> result = await _realEstatePropertyPhotoServices.UpdateOrder(request);
 
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route(nameof(GetMain))]
+        public async Task<IActionResult> GetMain(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to)
+        {
+            try
+            {
+                ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(currentPage, filterRequest, status, typologie, location,
+                 code,
+                 from,
+                 to,
+                 null, null);
+
+                return Ok(res);
             }
             catch (Exception ex)
             {
