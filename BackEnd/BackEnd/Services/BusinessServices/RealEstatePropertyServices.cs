@@ -164,52 +164,46 @@ namespace BackEnd.Services.BusinessServices
         }
 
         public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(
-            int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, char? fromName, char? toName)
+            int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
         {
             try
             {
                 IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
                     .Include(x => x.Photos.OrderBy(x => x.Position))
-                    //.Include(x => x.Agent)
-                    //.Include(x => x.Customer)
                     .OrderByDescending(x => x.Id);
 
+                if (!string.IsNullOrEmpty(agencyId))
+                    query = query.Where(x => x.Agent.AgencyId!.Contains(agencyId));
+
                 if (!string.IsNullOrEmpty(filterRequest))
-                    query = query.Where(x => x.AddressLine.Contains(filterRequest));
+                    query = query.Where(x => 
+                    x.AddressLine.Contains(filterRequest) || 
+                    x.Id.ToString().Contains(filterRequest));
 
-                if (!string.IsNullOrEmpty(status) && status != "Aste")
-                    query = query.Where(x => x.Status.Contains(status) && !x.Auction);
+                if (!string.IsNullOrEmpty(contract))
+                    query = query.Where(x => x.Status == contract);
 
-                if (!string.IsNullOrEmpty(status) && status == "Aste")
-                    query = query.Where(x => x.Auction);
+                if (priceFrom > 0)
+                    query = query.Where(x => x.Price >= priceFrom);
 
-                if (!string.IsNullOrEmpty(typologie) && typologie != "Qualsiasi")
-                    query = query.Where(x => x.Typology!.Contains(typologie));
+                if (priceTo > 0)
+                    query = query.Where(x => x.Price <= priceTo);
 
-                if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
-                    query = query.Where(x => x.Town!.Contains(location));
+                if (!string.IsNullOrEmpty(category))
+                    query = query.Where(x => x.Category == category);
+                
+                if (!string.IsNullOrEmpty(typologie))
+                    query = query.Where(x => x.Typology == typologie);
 
-                if (code > 0)
-                    query = query.Where(x => x.Id == code);
-
-                if (from > 0)
-                    query = query.Where(x => x.Price >= from);
-
-                if (to > 0)
-                    query = query.Where(x => x.Price <= to);
-
-                if (fromName != null)
+                if (!string.IsNullOrEmpty(town))
                 {
-                    string fromNameString = fromName.ToString();
-                    query = query.Where(x => string.Compare(x.Category.Substring(0, 1), fromNameString) >= 0);
-                }
+                    var townList = town.Split(",", StringSplitOptions.RemoveEmptyEntries)
+                       .Select(t => t.Trim().ToLower())
+                       .ToList();
 
-                if (toName != null)
-                {
-                    string toNameString = toName.ToString();
-                    query = query.Where(x => string.Compare(x.Category.Substring(0, 1), toNameString) <= 0);
+                    query = query.Where(x => townList.Contains(x.Town.ToLower()));
                 }
-
+                   
                 ListViewModel<RealEstatePropertySelectModel> result = new ListViewModel<RealEstatePropertySelectModel>();
 
                 result.Total = await query.CountAsync();

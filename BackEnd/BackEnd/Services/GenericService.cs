@@ -77,12 +77,12 @@ namespace BackEnd.Services
             }
         }
 
-        public async Task<AdminHomeDetailsModel> GetAdminHomeDetails()
+        public async Task<AdminHomeDetailsModel> GetAdminHomeDetails(string agencyId)
         {
             try
             {
                 AdminHomeDetailsModel result = new AdminHomeDetailsModel();
-                IQueryable<RealEstateProperty> propertiesInHome = _unitOfWork.dbContext.RealEstateProperties;
+                IQueryable<RealEstateProperty> propertiesInHome = _unitOfWork.dbContext.RealEstateProperties.Where(x => x.Agent.AgencyId == agencyId);
 
                 result.RealEstatePropertyHomeDetails.Total = propertiesInHome.Count();
                 result.RealEstatePropertyHomeDetails.TotalSale = propertiesInHome.Where(x => x.Status == "Vendita").Count();
@@ -135,25 +135,32 @@ namespace BackEnd.Services
 
                 result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth = propertiesInHome.ToList()
                     .GroupBy(obj => obj.CreationDate.Month + "/" + obj.CreationDate.Year.ToString())
-                    .ToDictionary(g => g.Key, g => g.Count()); ;
+                    .ToDictionary(g => g.Key, g => g.Count());
 
-                result.RealEstatePropertyHomeDetails.MaxAnnual = result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Values.Max();
-                result.RealEstatePropertyHomeDetails.MinAnnual = result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Values.Min();
+                result.RealEstatePropertyHomeDetails.MaxAnnual = result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Values.Any() ?
+                    result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Values.Max() : 0;
 
-                IQueryable<Request> request = _unitOfWork.dbContext.Requests;
+                result.RealEstatePropertyHomeDetails.MinAnnual = result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Values.Any() ? 
+                    result.RealEstatePropertyHomeDetails.TotalCreatedPerMonth.Values.Min() : 0;
+
+                IQueryable<Request> request = _unitOfWork.dbContext.Requests.Where(x => x.AgencyId == agencyId);
                 result.RequestHomeDetails.Total = request.Count();
                 result.RequestHomeDetails.TotalActive = request.Where(x => !x.Closed && !x.Archived).Count();
                 result.RequestHomeDetails.TotalArchived = request.Where(x => x.Archived).Count();
                 result.RequestHomeDetails.TotalClosed = request.Where(x => x.Closed).Count();
-                result.RequestHomeDetails.TotalLastMonth = _unitOfWork.dbContext.Requests.Where(x => x.CreationDate >= DateTime.Now.AddMonths(-1) && !x.Closed && !x.Archived).Count();
+                result.RequestHomeDetails.TotalLastMonth = _unitOfWork.dbContext.Requests.Where(x => x.AgencyId == agencyId && x.CreationDate >= DateTime.Now.AddMonths(-1) && !x.Closed && !x.Archived).Count();
                 result.RequestHomeDetails.TotalSale = request.Where(x => x.Contract == "Vendita" && !x.Closed && !x.Archived).Count();
                 result.RequestHomeDetails.TotalRent = request.Where(x => x.Contract == "Affitto" && !x.Closed && !x.Archived).Count();
 
                 result.RequestHomeDetails.TotalCreatedPerMonth = request.ToList()
                     .GroupBy(obj => obj.CreationDate.Month + "/" + obj.CreationDate.Year.ToString())
                     .ToDictionary(g => g.Key, g => g.Count());
-                result.RequestHomeDetails.MaxAnnual = result.RequestHomeDetails.TotalCreatedPerMonth.Values.Max();
-                result.RequestHomeDetails.MinAnnual = result.RequestHomeDetails.TotalCreatedPerMonth.Values.Min();
+
+                result.RequestHomeDetails.MaxAnnual = result.RequestHomeDetails.TotalCreatedPerMonth.Values.Count() > 0 ?
+                    result.RequestHomeDetails.TotalCreatedPerMonth.Values.Max() : 0;
+
+                result.RequestHomeDetails.MinAnnual = result.RequestHomeDetails.TotalCreatedPerMonth.Values.Count() > 0 ?
+                    result.RequestHomeDetails.TotalCreatedPerMonth.Values.Min() : 0;
 
                 foreach (var item in request.Where(x => x.Contract == "Vendita"))
                 {
@@ -207,18 +214,8 @@ namespace BackEnd.Services
                     }
                 }
 
-                //result.RealEstatePropertyHomeDetails.DistinctByTownSale = result.RealEstatePropertyHomeDetails.DistinctByTownSale.Where(x => x.Value > 5).ToDictionary();
-                //result.RealEstatePropertyHomeDetails.DistinctByTypeSale = result.RealEstatePropertyHomeDetails.DistinctByTypeSale.Where(x => x.Value > 5).ToDictionary();
-                //result.RealEstatePropertyHomeDetails.DistinctByTownRent = result.RealEstatePropertyHomeDetails.DistinctByTownRent.Where(x => x.Value > 5).ToDictionary();
-                //result.RealEstatePropertyHomeDetails.DistinctByTypeRent = result.RealEstatePropertyHomeDetails.DistinctByTypeRent.Where(x => x.Value > 5).ToDictionary();
-                //result.RequestHomeDetails.DistinctByTownSale = result.RequestHomeDetails.DistinctByTownSale.Where(x => x.Value > 5).ToDictionary();
-                //result.RequestHomeDetails.DistinctByTypeSale = result.RequestHomeDetails.DistinctByTypeSale.Where(x => x.Value > 5).ToDictionary();
-                //result.RequestHomeDetails.DistinctByTownRent = result.RequestHomeDetails.DistinctByTownRent.Where(x => x.Value > 5).ToDictionary();
-                //result.RequestHomeDetails.DistinctByTypeRent = result.RequestHomeDetails.DistinctByTypeRent.Where(x => x.Value > 5).ToDictionary();
-
-
-                result.TotalCustomers = _unitOfWork.dbContext.Customers.Count();
-                result.TotalAgents = userManager.GetUsersInRoleAsync("Agent").Result.Count();
+                result.TotalCustomers = _unitOfWork.dbContext.Customers.Where(x => x.AgencyId == agencyId).Count();
+                result.TotalAgents = userManager.GetUsersInRoleAsync("Agent").Result.Where(x => x.AgencyId == agencyId).Count();
 
                 return result;
             }
