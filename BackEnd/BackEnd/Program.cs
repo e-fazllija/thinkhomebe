@@ -31,7 +31,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-//builder.ConfigureJwt(builder.Configuration.GetSection("KeyVault:Url").Value!, builder.Configuration.GetSection("KeyVault:Secrets:AuthKey").Value!);
+builder.ConfigureJwt(builder.Configuration.GetSection("KeyVault:Url").Value!, builder.Configuration.GetSection("KeyVault:Secrets:AuthKey").Value!);
 
 var app = builder.Build();
 
@@ -44,7 +44,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthorization();
 
 app.MapControllers();
 
