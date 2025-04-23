@@ -58,5 +58,9 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public DateTime UpdateDate { get; set; } = DateTime.Now;
         public int CustomerId { get; set; }
         public string AgentId { get; set; } = string.Empty;
+        public string? TypeOfAssignment { get; set; }
+        public int AgreedCommission { get; set; }
+        public int FlatRateCommission { get; set; }
+
     }
 }

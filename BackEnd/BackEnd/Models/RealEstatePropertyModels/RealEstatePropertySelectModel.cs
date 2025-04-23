@@ -56,6 +56,10 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? Availability { get; set; }
         [Required]
         public string Description { get; set; } = string.Empty;
+        public int AgreedCommission { get; set; }
+        public int FlatRateCommission { get; set; }
+        public string? TypeOfAssignment { get; set; }
+
         public string? VideoUrl { get; set; }
         public DateTime AssignmentEnd { get; set; }
         public DateTime CreationDate { get; set; }
