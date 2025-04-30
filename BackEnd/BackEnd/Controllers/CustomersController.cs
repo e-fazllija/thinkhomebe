@@ -59,12 +59,12 @@ namespace BackEnd.Controllers
         }
         [HttpGet]
         [Route(nameof(Get))]
-        public async Task<IActionResult> Get(int currentPage, string? filterRequest)
+        public async Task<IActionResult> Get(int currentPage, string agencyId, string? filterRequest)
         {
             try
             {
                 //currentPage = currentPage > 0 ? currentPage : 1;
-                ListViewModel<CustomerSelectModel> res = await _customerServices.Get(currentPage, filterRequest, null, null);
+                ListViewModel<CustomerSelectModel> res = await _customerServices.Get(currentPage, agencyId, filterRequest, null, null);
 
                 return Ok(res);
             }
@@ -112,7 +112,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var result = await _customerServices.Get(0, null, fromName, toName);
+                var result = await _customerServices.Get(0, null, null, fromName, toName);
                 DataTable table = Export.ToDataTable<CustomerSelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateExcelContent(table);
 
@@ -130,7 +130,7 @@ namespace BackEnd.Controllers
         {
             try
             {
-                var result = await _customerServices.Get(0, null, fromName, toName);
+                var result = await _customerServices.Get(0, null, null, fromName, toName);
                 DataTable table = Export.ToDataTable<CustomerSelectModel>(result.Data);
                 byte[] fileBytes = Export.GenerateCsvContent(table);
 

@@ -51,11 +51,11 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(GetAdminHomeDetails))]
-        public async Task<IActionResult> GetAdminHomeDetails()
+        public async Task<IActionResult> GetAdminHomeDetails(string agencyId)
         {
             try
             {
-                AdminHomeDetailsModel result = await _genericService.GetAdminHomeDetails();
+                AdminHomeDetailsModel result = await _genericService.GetAdminHomeDetails(agencyId);
                 return Ok(result);
             }
             catch (Exception ex)

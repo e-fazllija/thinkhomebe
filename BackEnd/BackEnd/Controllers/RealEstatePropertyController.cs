@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BackEnd.Entities;
 using BackEnd.Interfaces.IBusinessServices;
-using BackEnd.Models.CustomerModels;
-using BackEnd.Services;
-using System.Data;
 using BackEnd.Models.ResponseModel;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
-using BackEnd.Services.BusinessServices;
-using BackEnd.Interfaces;
 using BackEnd.Models.RealEstatePropertyPhotoModels;
 
 namespace BackEnd.Controllers
@@ -101,16 +95,34 @@ namespace BackEnd.Controllers
         }
 
         [HttpGet]
-        [Route(nameof(Get))]
-        public async Task<IActionResult> Get(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to)
+        [Route(nameof(GetMain))]
+        public async Task<IActionResult> GetMain(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to)
         {
             try
             {
                 ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(currentPage, filterRequest, status, typologie, location,
-                code,
-                from,
-                to,
-                null, null);
+                 code,
+                 from,
+                 to,
+                 null, null);
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route(nameof(Get))]
+        public async Task<IActionResult> Get(int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
+        {
+            try
+            {
+                ListViewModel<RealEstatePropertySelectModel> res = await _realEstatePropertyServices.Get(
+                    currentPage, agencyId, filterRequest, contract, priceFrom, priceTo, category, typologie, town);
 
                 return Ok(res);
             }
@@ -122,11 +134,11 @@ namespace BackEnd.Controllers
         }
         [HttpGet]
         [Route(nameof(GetToInsert))]
-        public async Task<IActionResult> GetToInsert()
+        public async Task<IActionResult> GetToInsert(string? agencyId)
         {
             try
             {
-                RealEstatePropertyCreateViewModel res = await _realEstatePropertyServices.GetToInsert();
+                RealEstatePropertyCreateViewModel res = await _realEstatePropertyServices.GetToInsert(agencyId);
 
                 return Ok(res);
             }
@@ -168,7 +180,7 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
-        
+
         [HttpDelete]
         [Route(nameof(DeletePhoto))]
         public async Task<IActionResult> DeletePhoto(int id)

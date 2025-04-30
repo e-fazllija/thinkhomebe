@@ -164,16 +164,13 @@ namespace BackEnd.Services.BusinessServices
         }
 
         public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(
-            int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, char? fromName, char? toName)
+             int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, char? fromName, char? toName)
         {
             try
             {
                 IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
-                    .Include(x => x.Photos.OrderBy(x => x.Position))
-                    //.Include(x => x.Agent)
-                    //.Include(x => x.Customer)
-                    .OrderByDescending(x => x.Id);
-
+                     .Include(x => x.Photos.OrderBy(x => x.Position))
+                     .OrderByDescending(x => x.Id);
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
 
@@ -182,34 +179,26 @@ namespace BackEnd.Services.BusinessServices
 
                 if (!string.IsNullOrEmpty(status) && status == "Aste")
                     query = query.Where(x => x.Auction);
-
                 if (!string.IsNullOrEmpty(typologie) && typologie != "Qualsiasi")
                     query = query.Where(x => x.Typology!.Contains(typologie));
-
                 if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
                     query = query.Where(x => x.Town!.Contains(location));
-
                 if (code > 0)
                     query = query.Where(x => x.Id == code);
-
                 if (from > 0)
                     query = query.Where(x => x.Price >= from);
-
                 if (to > 0)
                     query = query.Where(x => x.Price <= to);
-
                 if (fromName != null)
                 {
                     string fromNameString = fromName.ToString();
                     query = query.Where(x => string.Compare(x.Category.Substring(0, 1), fromNameString) >= 0);
                 }
-
                 if (toName != null)
                 {
                     string toNameString = toName.ToString();
                     query = query.Where(x => string.Compare(x.Category.Substring(0, 1), toNameString) <= 0);
                 }
-
                 ListViewModel<RealEstatePropertySelectModel> result = new ListViewModel<RealEstatePropertySelectModel>();
 
                 result.Total = await query.CountAsync();
@@ -238,12 +227,87 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
-        public async Task<RealEstatePropertyCreateViewModel> GetToInsert()
+        public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(
+            int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
+        {
+            try
+            {
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
+                    .Include(x => x.Photos.OrderBy(x => x.Position))
+                    .OrderByDescending(x => x.Id);
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    query = query.Where(x => x.Agent.AgencyId!.Contains(agencyId));
+
+                if (!string.IsNullOrEmpty(filterRequest))
+                    query = query.Where(x => 
+                    x.AddressLine.Contains(filterRequest) || 
+                    x.Id.ToString().Contains(filterRequest));
+
+                if (!string.IsNullOrEmpty(contract))
+                    query = query.Where(x => x.Status == contract);
+
+                if (priceFrom > 0)
+                    query = query.Where(x => x.Price >= priceFrom);
+
+                if (priceTo > 0)
+                    query = query.Where(x => x.Price <= priceTo);
+
+                if (!string.IsNullOrEmpty(category))
+                    query = query.Where(x => x.Category == category);
+                
+                if (!string.IsNullOrEmpty(typologie))
+                    query = query.Where(x => x.Typology == typologie);
+
+                if (!string.IsNullOrEmpty(town))
+                {
+                    var townList = town.Split(",", StringSplitOptions.RemoveEmptyEntries)
+                       .Select(t => t.Trim().ToLower())
+                       .ToList();
+
+                    query = query.Where(x => townList.Contains(x.Town.ToLower()));
+                }
+                   
+                ListViewModel<RealEstatePropertySelectModel> result = new ListViewModel<RealEstatePropertySelectModel>();
+
+                result.Total = await query.CountAsync();
+
+                if (currentPage > 0)
+                {
+                    query = query
+                    .Skip((currentPage * options.CurrentValue.RealEstatePropertyItemPerPage) - options.CurrentValue.RealEstatePropertyItemPerPage)
+                            .Take(options.CurrentValue.RealEstatePropertyItemPerPage);
+                }
+
+                List<RealEstateProperty> queryList = await query
+                    //.Include(x => x.RealEstatePropertyType)
+                    .ToListAsync();
+
+                result.Data = _mapper.Map<List<RealEstatePropertySelectModel>>(queryList);
+
+                _logger.LogInformation(nameof(Get));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
+        public async Task<RealEstatePropertyCreateViewModel> GetToInsert(string? agencyId)
         {
             try
             {
                 IQueryable<Customer> customerQuery = _unitOfWork.dbContext.Customers;
                 var usersList = await userManager.GetUsersInRoleAsync("Agent");
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    usersList = usersList.Where(x => x.AgencyId == agencyId).ToList();
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    customerQuery = customerQuery.Where(x => x.AgencyId == agencyId);
 
                 List<ApplicationUser> users = usersList.ToList();
 

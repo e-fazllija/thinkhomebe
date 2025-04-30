@@ -86,32 +86,32 @@ namespace BackEnd.Controllers
             return Ok(new AuthResponseModel { Status = "Success", Message = "User created successfully!" });
         }
 
-        [HttpPost]
-        [Route(nameof(RegisterAdmin))]
-        public async Task<IActionResult> RegisterAdmin(RegisterModel model)
-        {
-            model.UserName = model.UserName.Replace(" ", "_");
+        //[HttpPost]
+        //[Route(nameof(RegisterAdmin))]
+        //public async Task<IActionResult> RegisterAdmin(RegisterModel model)
+        //{
+        //    model.UserName = model.UserName.Replace(" ", "_");
 
-            var userExists = await userManager.FindByNameAsync(model.UserName);
-            if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "User already exists!" });
+        //    var userExists = await userManager.FindByNameAsync(model.UserName);
+        //    if (userExists != null)
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "User already exists!" });
 
-            ApplicationUser user = _mapper.Map<ApplicationUser>(model);
-            user.SecurityStamp = Guid.NewGuid().ToString();
+        //    ApplicationUser user = _mapper.Map<ApplicationUser>(model);
+        //    user.SecurityStamp = Guid.NewGuid().ToString();
 
-            var result = await userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel { Status = "Error", Message = "User creation failed! Please check user details and try again." });
-            if (!await roleManager.RoleExistsAsync("Admin"))
-                await roleManager.CreateAsync(new IdentityRole("Admin"));
-            if (!await roleManager.RoleExistsAsync("User"))
-                await roleManager.CreateAsync(new IdentityRole("User"));
-            if (await roleManager.RoleExistsAsync("Admin"))
-            {
-                await userManager.AddToRoleAsync(user, "Admin");
-            }
-            return Ok(new AuthResponseModel { Status = "Success", Message = "User created successfully!" });
-        }
+        //    var result = await userManager.CreateAsync(user, model.Password);
+        //    if (!result.Succeeded)
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+        //    if (!await roleManager.RoleExistsAsync("Admin"))
+        //        await roleManager.CreateAsync(new IdentityRole("Admin"));
+        //    if (!await roleManager.RoleExistsAsync("User"))
+        //        await roleManager.CreateAsync(new IdentityRole("User"));
+        //    if (await roleManager.RoleExistsAsync("Admin"))
+        //    {
+        //        await userManager.AddToRoleAsync(user, "Admin");
+        //    }
+        //    return Ok(new AuthResponseModel { Status = "Success", Message = "User created successfully!" });
+        //}
 
 
         [HttpPost]
@@ -129,20 +129,18 @@ namespace BackEnd.Controllers
                 {
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(ClaimTypes.Role, role),
                 };
-                //foreach (var userRole in userRoles)
-                //{
-                //    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                //}
-                authClaims.Add(new Claim(ClaimTypes.Role, role));
+                
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretForKey));
                 var token = new JwtSecurityToken(
-                        issuer: _configuration["Authentication:Issuer"],
+                    issuer: _configuration["Authentication:Issuer"],
                     audience: _configuration["Authentication:Audience"],
-                expires: DateTime.Now.AddDays(1),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                    );
+                    expires: DateTime.Now.AddDays(1),
+                    claims: authClaims,
+                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+
                 LoginResponse result = new LoginResponse()
                 {
                     Id = user.Id,
