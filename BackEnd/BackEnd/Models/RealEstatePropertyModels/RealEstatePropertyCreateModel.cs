@@ -58,6 +58,9 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public List<IFormFile>? Files { get; set; }
         public int CustomerId { get; set; }
         public string AgentId { get; set; } = string.Empty;
+        public string? TypeOfAssignment { get; set; }
+        public int AgreedCommission { get; set; }
+        public int FlatRateCommission { get; set; }
 
     }
 }

@@ -164,12 +164,13 @@ namespace BackEnd.Services.BusinessServices
         }
 
         public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(
-             int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, char? fromName, char? toName)
+             int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, string? agencyId, char? fromName, char? toName)
         {
             try
             {
                 IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
                      .Include(x => x.Photos.OrderBy(x => x.Position))
+                     //.Include(x => x.Agent)
                      .OrderByDescending(x => x.Id);
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
@@ -189,6 +190,8 @@ namespace BackEnd.Services.BusinessServices
                     query = query.Where(x => x.Price >= from);
                 if (to > 0)
                     query = query.Where(x => x.Price <= to);
+                if (!string.IsNullOrEmpty(agencyId))
+                    query = query.Where(x => x.Agent.AgencyId == agencyId);
                 if (fromName != null)
                 {
                     string fromNameString = fromName.ToString();
