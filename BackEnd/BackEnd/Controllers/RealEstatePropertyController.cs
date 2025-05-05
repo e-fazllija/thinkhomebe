@@ -96,7 +96,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(GetMain))]
-        public async Task<IActionResult> GetMain(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to)
+        public async Task<IActionResult> GetMain(int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, string? agencyId)
         {
             try
             {
@@ -104,6 +104,7 @@ namespace BackEnd.Controllers
                  code,
                  from,
                  to,
+                 agencyId,
                  null, null);
 
                 return Ok(res);

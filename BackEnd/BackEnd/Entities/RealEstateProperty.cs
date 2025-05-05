@@ -53,9 +53,9 @@ namespace BackEnd.Entities
         [Required]
         public string Description { get; set; } = string.Empty;
         public string? VideoUrl { get; set; }
-        public int AgreedCommission { get; set; }
-        public int FlatRateCommission { get; set; }
-        public string? TypeOfAssignment { get; set; }
+        //public int AgreedCommission { get; set; }
+        //public int FlatRateCommission { get; set; }
+        //public string? TypeOfAssignment { get; set; }
         public DateTime AssignmentEnd { get; set; }
         public ICollection<RealEstatePropertyPhoto> Photos { get; set; } = new List<RealEstatePropertyPhoto>();
         public int CustomerId { get; set; }
