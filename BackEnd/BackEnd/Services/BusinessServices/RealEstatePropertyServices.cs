@@ -172,6 +172,7 @@ namespace BackEnd.Services.BusinessServices
                      .Include(x => x.Photos.OrderBy(x => x.Position))
                      //.Include(x => x.Agent)
                      .OrderByDescending(x => x.Id);
+
                 if (!string.IsNullOrEmpty(filterRequest))
                     query = query.Where(x => x.AddressLine.Contains(filterRequest));
 
@@ -248,7 +249,16 @@ namespace BackEnd.Services.BusinessServices
                     x.Id.ToString().Contains(filterRequest));
 
                 if (!string.IsNullOrEmpty(contract))
-                    query = query.Where(x => x.Status == contract);
+                {
+                    if (contract == "Aste")
+                    {
+                        query = query.Where(x => x.Status == "Vendita" && x.Auction);
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.Status == contract && !x.Auction);
+                    }
+                }
 
                 if (priceFrom > 0)
                     query = query.Where(x => x.Price >= priceFrom);
