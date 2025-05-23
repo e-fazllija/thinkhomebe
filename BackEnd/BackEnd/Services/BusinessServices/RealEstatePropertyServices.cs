@@ -182,9 +182,10 @@ namespace BackEnd.Services.BusinessServices
                 if (!string.IsNullOrEmpty(status) && status == "Aste")
                     query = query.Where(x => x.Auction);
                 if (!string.IsNullOrEmpty(typologie) && typologie != "Qualsiasi")
-                    query = query.Where(x => x.Typology!.Contains(typologie));
+                    query = query.Where(x => x.Typology!.ToLower().Contains(typologie.ToLower()));
                 if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
-                    query = query.Where(x => x.Town!.Contains(location));
+                    query = query.Where(x => x.Town.ToLower()!.Contains(location.ToLower()));
+
                 if (code > 0)
                     query = query.Where(x => x.Id == code);
                 if (from > 0)
