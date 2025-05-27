@@ -20,6 +20,7 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string AddressLine { get; set; } = string.Empty;
         [Required]
         public string Town { get; set; } = string.Empty;
+        public string? Location { get; set; }
         [Required]
         public string State { get; set; } = string.Empty;
         [Required]
