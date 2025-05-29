@@ -279,7 +279,7 @@ namespace BackEnd.Services.BusinessServices
                        .Select(t => t.Trim().ToLower())
                        .ToList();
 
-                    query = query.Where(x => townList.Contains(x.Town.ToLower()));
+                    query = query.Where(x => townList.Contains(x.Town.ToLower()) || x.Location!.ToLower().Contains(town.ToLower()));
                 }
                    
                 ListViewModel<RealEstatePropertySelectModel> result = new ListViewModel<RealEstatePropertySelectModel>();
