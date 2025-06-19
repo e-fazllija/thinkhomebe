@@ -133,6 +133,24 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route(nameof(GetPropertyCount))]
+        public IActionResult GetPropertyCount()
+        {
+            try
+            {
+                int res = _realEstatePropertyServices.GetPropertyCount();
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route(nameof(GetToInsert))]
         public async Task<IActionResult> GetToInsert(string? agencyId)
