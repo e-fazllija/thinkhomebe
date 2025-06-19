@@ -312,6 +312,25 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
+        public int GetPropertyCount()
+        {
+            try
+            {
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties;
+
+                int total = query.Count();
+
+                _logger.LogInformation(nameof(GetPropertyCount));
+
+                return total;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
         public async Task<RealEstatePropertyCreateViewModel> GetToInsert(string? agencyId)
         {
             try

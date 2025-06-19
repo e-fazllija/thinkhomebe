@@ -13,6 +13,7 @@ namespace BackEnd.Entities
         public bool Highlighted { get; set; }
         public bool Auction { get; set; }
         public bool Sold { get; set; }
+        public bool Archived { get; set; }
         public bool Negotiation { get; set; }
         [Required]
         public string Status { get; set; } = string.Empty;
