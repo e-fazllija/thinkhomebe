@@ -25,6 +25,7 @@ namespace BackEnd.Models.UserModel
         public string? Region { get; set; }
         public string Color { get; set; } = "#ffffff";
         public string AgencyId { get; set; }
+        public bool EmailConfirmed { get; set; }
         public DateTime UpdateDate { get; set; } = DateTime.Now;
     }
 }

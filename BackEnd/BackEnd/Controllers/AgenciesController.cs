@@ -46,8 +46,8 @@ namespace BackEnd.Controllers
                 IdentityResult Result = await userManager.UpdateAsync(user);
 
                 if (Result.Succeeded)
-                    return Ok(); 
-                else 
+                    return Ok();
+                else
                     return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = Result.Errors.ToString() ?? "Si è verificato un errore" });
             }
             catch (Exception ex)
@@ -67,7 +67,7 @@ namespace BackEnd.Controllers
                 var usersList = await userManager.GetUsersInRoleAsync("Agency");
 
 
-                if(!string.IsNullOrEmpty(filterRequest))
+                if (!string.IsNullOrEmpty(filterRequest))
                     usersList = usersList.Where(x => x.Email.Contains(filterRequest)).ToList();
 
                 List<ApplicationUser> users = usersList.ToList();
@@ -84,6 +84,31 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route(nameof(GetMain))]
+        public async Task<IActionResult> GetMain()
+        {
+            try
+            {
+                //currentPage = currentPage > 0 ? currentPage : 1;
+                var usersList = await userManager.GetUsersInRoleAsync("Agency");
+
+                List<ApplicationUser> users = usersList.Where(x => x.EmailConfirmed).ToList();
+                ListViewModel<UserSelectModel> result = new ListViewModel<UserSelectModel>();
+
+                result.Total = users.Count();
+                result.Data = _mapper.Map<List<UserSelectModel>>(users);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route(nameof(GetById))]
         public async Task<IActionResult> GetById(string id)
@@ -109,7 +134,7 @@ namespace BackEnd.Controllers
             try
             {
                 ApplicationUser? user = await userManager.FindByIdAsync(id);
-                if(user != null)
+                if (user != null)
                 {
                     await userManager.DeleteAsync(user);
                     return Ok();
@@ -118,7 +143,7 @@ namespace BackEnd.Controllers
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Utente non trovato" });
                 }
-                
+
             }
             catch (Exception ex)
             {
