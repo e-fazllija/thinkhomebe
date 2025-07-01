@@ -169,7 +169,7 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
-                     .Include(x => x.Photos.OrderBy(x => x.Position)).Where(x => !x.Archived)
+                     .Include(x => x.Photos.OrderBy(x => x.Position)).Where(x => !x.Archived && x.Agent!.Agency!.EmailConfirmed)
                      //.Include(x => x.Agent)
                      .OrderByDescending(x => x.Id);
 
