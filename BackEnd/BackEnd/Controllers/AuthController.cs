@@ -58,6 +58,12 @@ namespace BackEnd.Controllers
 
             var result = await userManager.CreateAsync(user, model.Password);
 
+            if(model.Role == "Agency")
+            {
+                ApplicationUser newUser = await userManager.FindByEmailAsync(user.Email);
+                newUser.AgencyId = newUser.Id;
+                await userManager.UpdateAsync(newUser);
+            }
             if (!result.Succeeded && result.Errors.First().Code == "PasswordRequiresUpper")
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel { Status = "Error", Message = "La password deve contenere almeno una lettera maiuscola!" });
             else if (!result.Succeeded && result.Errors.First().Code == "PasswordRequiresNonAlphanumeric")
