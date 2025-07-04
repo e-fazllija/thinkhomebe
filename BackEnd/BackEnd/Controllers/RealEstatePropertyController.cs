@@ -4,6 +4,7 @@ using BackEnd.Models.ResponseModel;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
 using BackEnd.Models.RealEstatePropertyPhotoModels;
+using BackEnd.Models.CalendarModels;
 
 namespace BackEnd.Controllers
 {
@@ -259,6 +260,23 @@ namespace BackEnd.Controllers
                 await _realEstatePropertyServices.SetInHome(realEstatePropertyId);
 
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route(nameof(GetSearchItems))]
+        public async Task<IActionResult> GetSearchItems(string userId, string? agencyId)
+        {
+            try
+            {
+                CalendarSearchModel res = await _realEstatePropertyServices.GetSearchItems(userId, agencyId);
+
+                return Ok(res);
             }
             catch (Exception ex)
             {

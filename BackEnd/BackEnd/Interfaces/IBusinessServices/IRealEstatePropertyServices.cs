@@ -1,4 +1,5 @@
-﻿using BackEnd.Models.OutputModels;
+﻿using BackEnd.Models.CalendarModels;
+using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
 
 namespace BackEnd.Interfaces.IBusinessServices
@@ -16,5 +17,6 @@ namespace BackEnd.Interfaces.IBusinessServices
         Task Delete(int id);
         Task SetHighlighted(int realEstatePropertyId);
         Task SetInHome(int realEstatePropertyId);
+        Task<CalendarSearchModel> GetSearchItems(string userId, string? agencyId);
     }
 }
