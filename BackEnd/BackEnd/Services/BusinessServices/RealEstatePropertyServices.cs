@@ -10,6 +10,7 @@ using BackEnd.Models.RealEstatePropertyModels;
 using BackEnd.Models.CustomerModels;
 using Microsoft.AspNetCore.Identity;
 using BackEnd.Models.UserModel;
+using BackEnd.Models.CalendarModels;
 
 namespace BackEnd.Services.BusinessServices
 {
@@ -247,8 +248,8 @@ namespace BackEnd.Services.BusinessServices
                     query = query.Where(x => x.Agent.AgencyId!.Contains(agencyId));
 
                 if (!string.IsNullOrEmpty(filterRequest))
-                    query = query.Where(x => 
-                    x.AddressLine.Contains(filterRequest) || 
+                    query = query.Where(x =>
+                    x.AddressLine.Contains(filterRequest) ||
                     x.Id.ToString().Contains(filterRequest));
 
                 if (!string.IsNullOrEmpty(contract))
@@ -271,7 +272,7 @@ namespace BackEnd.Services.BusinessServices
 
                 if (!string.IsNullOrEmpty(category))
                     query = query.Where(x => x.Category == category);
-                
+
                 if (!string.IsNullOrEmpty(typologie))
                     query = query.Where(x => x.Typology == typologie);
 
@@ -283,7 +284,7 @@ namespace BackEnd.Services.BusinessServices
 
                     query = query.Where(x => townList.Contains(x.Town.ToLower()));
                 }
-                   
+
                 ListViewModel<RealEstatePropertySelectModel> result = new ListViewModel<RealEstatePropertySelectModel>();
 
                 result.Total = await query.CountAsync();
@@ -465,6 +466,41 @@ namespace BackEnd.Services.BusinessServices
                 {
                     throw new Exception("Si è verificato un errore in fase di modifica");
                 }
+            }
+        }
+
+        public async Task<CalendarSearchModel> GetSearchItems(string userId, string? agencyId)
+        {
+            try
+            {
+                ApplicationUser user = await userManager.FindByIdAsync(userId);
+                List<UserSelectModel> agencies = new List<UserSelectModel>();
+                List<UserSelectModel> agents = new List<UserSelectModel>();
+
+                var agenciesList = await userManager.GetUsersInRoleAsync("Agency");
+                agencies = _mapper.Map<List<UserSelectModel>>(agenciesList);
+
+
+
+                var agentsList = await userManager.GetUsersInRoleAsync("Agent");
+                agentsList = agentsList.Where(x => x.AgencyId == (agencyId ?? userId)).ToList();
+                agents = _mapper.Map<List<UserSelectModel>>(agentsList);
+
+
+                CalendarSearchModel result = new CalendarSearchModel()
+                {
+                    Agencies = agencies,
+                    Agents = agents
+                };
+
+                _logger.LogInformation(nameof(GetSearchItems));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
             }
         }
     }
