@@ -21,6 +21,7 @@ namespace BackEnd.Services
             builder.Services.AddTransient<IRequestServices, RequestServices>();
             builder.Services.AddTransient<ICalendarServices, CalendarServices>();
             builder.Services.AddTransient<IDocumentsTabServices, DocumentsTabServices>();
+            builder.Services.AddTransient<ILocationServices, LocationServices>();
         }
     }
 }
