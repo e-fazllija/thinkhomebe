@@ -63,6 +63,7 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? TypeOfAssignment { get; set; }
         public int AgreedCommission { get; set; }
         public int FlatRateCommission { get; set; }
+        public int StornoProvvigione { get; set; }
 
     }
 }

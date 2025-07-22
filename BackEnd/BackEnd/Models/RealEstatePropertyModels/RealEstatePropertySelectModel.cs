@@ -60,6 +60,7 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string Description { get; set; } = string.Empty;
         public int AgreedCommission { get; set; }
         public int FlatRateCommission { get; set; }
+        public int StornoProvvigione { get; set; }
         public string? TypeOfAssignment { get; set; }
 
         public string? VideoUrl { get; set; }
