@@ -10,171 +10,88 @@ namespace BackEnd.Services
             if (context.Locations.Any())
                 return; // Database already seeded
 
-            // Prima crea la provincia di Roma
-            var romaProvince = new Province { Name = "Roma" };
-            context.Provinces.Add(romaProvince);
-            await context.SaveChangesAsync();
-
-            // Crea le città
-            var cities = new List<City>
+            // Dictionary of provinces and their cities
+            var provinceCities = new Dictionary<string, List<string>>
             {
-                new City { Name = "Ardea", ProvinceId = romaProvince.Id },
-                new City { Name = "Cave", ProvinceId = romaProvince.Id },
-                new City { Name = "Fiumicino", ProvinceId = romaProvince.Id },
-                new City { Name = "Genazzano", ProvinceId = romaProvince.Id },
-                new City { Name = "Guidonia Montecelio", ProvinceId = romaProvince.Id },
-                new City { Name = "Labico", ProvinceId = romaProvince.Id },
-                new City { Name = "Monte Compatri", ProvinceId = romaProvince.Id },
-                new City { Name = "Palestrina", ProvinceId = romaProvince.Id },
-                new City { Name = "Rocca Priora", ProvinceId = romaProvince.Id },
-                new City { Name = "Roma", ProvinceId = romaProvince.Id },
-                new City { Name = "Tivoli", ProvinceId = romaProvince.Id },
-                new City { Name = "Zagarolo", ProvinceId = romaProvince.Id }
+                ["Arezzo"] = new List<string> { "Arezzo", "Castiglion Fiorentino", "Cortona" },
+                ["Caserta"] = new List<string> { "Aversa", "Caserta", "Vairano Patenora" },
+                ["Chieti"] = new List<string> { "Chieti", "Lanciano", "San Salvo Marina" },
+                ["Firenze"] = new List<string> { "Empoli", "Firenze", "Tavarnelle Val di Pesa" },
+                ["Frosinone"] = new List<string> { "Acuto", "Alatri", "Anagni", "Arce", "Boville Ernica", "Fiuggi", "Frosinone", "Morolo", "Paliano", "Piglio", "Serrone", "Sgurgola" },
+                ["L'Aquila"] = new List<string> { "Campo di Giove", "Carsoli", "L'Aquila", "Rocca di Cambio", "Rocca di Mezzo", "Sulmona", "Tagliacozzo", "Tornimparte" },
+                ["Latina"] = new List<string> { "Aprilia", "Cori", "Latina", "Rocca Massima", "Sabaudia", "San Felice Circeo", "Sermoneta", "Terracina" },
+                ["Napoli"] = new List<string> { "Forio d'Ischia", "Napoli", "Pompei" },
+                ["Perugia"] = new List<string> { "Assisi", "Collazzone", "Paciano", "Perugia" },
+                ["Rieti"] = new List<string> { "Amatrice", "Leonessa", "Mompeo", "Petrella Salto", "Poggio Nativo", "Rieti", "Rocca Sinibalda", "Torre in Sabina" },
+                ["Roma"] = new List<string> { "Agosta", "Albano Laziale", "Alessandrino", "Allumiere", "Anzio", "Arcinazzo Romano", "Ardea", "Ariccia", "Artena", "Bellegra", "Bracciano", "Campagnano di Roma", "Carpineto Romano", "Casape", "Castel Gandolfo", "Castel Giubileo", "Castel Madama", "Castel San Pietro", "Castel San Pietro Romano", "Cave", "Cerveteri", "Ciampino", "Civitavecchia", "Colleferro", "Colonna", "Fiano Romano", "Fiumicino", "Fonte Nuova", "Frascati", "Gallicano nel Lazio", "Gavignano", "Genazzano", "Genzano di Roma", "Gorga", "Grottaferrata", "Guidonia Montecelio", "Infernetto", "Labico", "Lanuvio", "Lariano", "Marino", "Mentana", "Monte Porzio Catone", "Montecompatri", "Montelanico", "Montelibretti", "Monterotondo", "Nazzano", "Nemi", "Nettuno", "Olevano Romano", "Palestrina", "Palombara Sabina", "Pisoniano", "Poli", "Pomezia", "Portuense", "Riano", "Rocca di Cave", "Rocca di Papa", "Rocca Priora", "Rocca Santo Stefano", "Roiate", "Roma", "Sacrofano", "San Cesareo", "San Gregorio da Sassola", "San Polo dei Cavalieri", "San Vito Romano", "Sant'Angelo Romano", "Sant'Oreste", "Santa Marinella", "Segni", "Subiaco", "Tivoli", "Tolfa", "Torre Maura", "Torre Spaccata", "Tor Tre Teste", "Valmontone", "Velletri", "Zagarolo" },
+                ["Sassari"] = new List<string> { "Alghero", "Olbia", "Sassari" },
+                ["Terni"] = new List<string> { "Narni", "Narni Scalo", "Terni" },
+                ["Trento"] = new List<string> { "Mezzana", "Rovereto", "Trento" },
+                ["Viterbo"] = new List<string> { "Bolsena", "Civita Castellana", "Tarquinia", "Viterbo" }
             };
 
-            context.Cities.AddRange(cities);
-            await context.SaveChangesAsync();
-
-            // Crea le località
-            var locations = new List<Location>
+            // Dictionary of cities and their locations
+            var cityLocations = new Dictionary<string, List<string>>
             {
-                // Ardea
-                new Location { Name = "Centro Storico", CityId = cities.First(c => c.Name == "Ardea").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Nuova California", CityId = cities.First(c => c.Name == "Ardea").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Tor San Lorenzo", CityId = cities.First(c => c.Name == "Ardea").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Marina di Ardea", CityId = cities.First(c => c.Name == "Ardea").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Castagnetta", CityId = cities.First(c => c.Name == "Ardea").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Cave
-                new Location { Name = "Colle Palme", CityId = cities.First(c => c.Name == "Cave").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "San Bartolomeo", CityId = cities.First(c => c.Name == "Cave").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Fiumicino
-                new Location { Name = "Fiumicino Paese", CityId = cities.First(c => c.Name == "Fiumicino").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Isola Sacra", CityId = cities.First(c => c.Name == "Fiumicino").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Focene", CityId = cities.First(c => c.Name == "Fiumicino").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Fregene", CityId = cities.First(c => c.Name == "Fiumicino").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Palidoro", CityId = cities.First(c => c.Name == "Fiumicino").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Parco Leonardo", CityId = cities.First(c => c.Name == "Fiumicino").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Genazzano
-                new Location { Name = "Centro Storico", CityId = cities.First(c => c.Name == "Genazzano").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "San Vito", CityId = cities.First(c => c.Name == "Genazzano").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Colle Pizzuto", CityId = cities.First(c => c.Name == "Genazzano").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Ponte Sfondato", CityId = cities.First(c => c.Name == "Genazzano").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Guidonia Montecelio
-                new Location { Name = "Albuccione", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Casacalda", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Castel Arcione", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Colle Verde", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "La Botte", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Marco Simone", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Montecelio", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Setteville", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Villa Nova", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Villalba", CityId = cities.First(c => c.Name == "Guidonia Montecelio").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Labico
-                new Location { Name = "Colle Spina", CityId = cities.First(c => c.Name == "Labico").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Monte Compatri
-                new Location { Name = "Colle Mattia", CityId = cities.First(c => c.Name == "Monte Compatri").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Laghetto", CityId = cities.First(c => c.Name == "Monte Compatri").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Palestrina
-                new Location { Name = "Carchitti", CityId = cities.First(c => c.Name == "Palestrina").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Valvarino", CityId = cities.First(c => c.Name == "Palestrina").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Rocca Priora
-                new Location { Name = "Colle di Fuori", CityId = cities.First(c => c.Name == "Rocca Priora").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Roma
-                new Location { Name = "Acilia", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Alessandrino", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Axa", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Boccea", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Borghesiana", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Casal Bernocchi", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Casal Palocco", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Casalotti", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Castel Fusano", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Castelverde", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Centocelle", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Centro Giano", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Cinecittà", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Colle Monfortani", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Colle Prenestino", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Colle del Sole", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Corcolle", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Corcolle Alto", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Don Bosco", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Dragona", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Dragoncello", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Eur", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Finocchio", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Fonte Laurentina", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Fosso San Giuliano", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Giardinetti", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Giardini di Corcolle", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Infernetto", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "La Pisana", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "La Storta", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Longarina", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Lunghezza", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Madonnetta", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Malafede", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Monte Sacro", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Osteria del Curato", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Ostia", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Ostia Antica", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Ostia Levante", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Ostia Ponente", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Pantano Borghese", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Piana del Sole", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Pigneto", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Ponte Galeria", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Ponte di Nona", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Portuense", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Prato Fiorito", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Prima Porta", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Rocca Cencia", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Romanina", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Roma Est", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "San Vittorino", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Saxa Rubra", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Settecamini", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Tor Bella Monaca", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Tor Tre Teste", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Tor Vergata", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Tor de Cenci", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Torre Angela", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Torre Gaia", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Torre Maura", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Torre Spaccata", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Tuscolana", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Vallerano", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Vermicino", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Villa Verde", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Villaggio Breda", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Villaggio Prenestino", CityId = cities.First(c => c.Name == "Roma").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Tivoli
-                new Location { Name = "Centro Storico", CityId = cities.First(c => c.Name == "Tivoli").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Tivoli Terme", CityId = cities.First(c => c.Name == "Tivoli").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Villa Adriana", CityId = cities.First(c => c.Name == "Tivoli").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Campolimpido", CityId = cities.First(c => c.Name == "Tivoli").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Colle di Tivoli", CityId = cities.First(c => c.Name == "Tivoli").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Ponte Lucano", CityId = cities.First(c => c.Name == "Tivoli").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "San Paolo", CityId = cities.First(c => c.Name == "Tivoli").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-
-                // Zagarolo
-                new Location { Name = "Centro Paese", CityId = cities.First(c => c.Name == "Zagarolo").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Valle Martella", CityId = cities.First(c => c.Name == "Zagarolo").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new Location { Name = "Via Prenestina", CityId = cities.First(c => c.Name == "Zagarolo").Id, CreationDate = DateTime.Now, UpdateDate = DateTime.Now }
+                ["Ardea"] = new List<string> { "Centro Storico", "Nuova California", "Tor San Lorenzo", "Marina di Ardea", "Castagnetta" },
+                ["Cave"] = new List<string> { "Colle Palme", "San Bartolomeo" },
+                ["Fiumicino"] = new List<string> { "Fiumicino Paese", "Isola Sacra", "Focene", "Fregene", "Palidoro", "Parco Leonardo" },
+                ["Genazzano"] = new List<string> { "Centro Storico", "San Vito", "Colle Pizzuto", "Ponte Sfondato" },
+                ["Guidonia Montecelio"] = new List<string> { "Albuccione", "Casacalda", "Castel Arcione", "Colle Verde", "La Botte", "Marco Simone", "Montecelio", "Setteville", "Villa Nova", "Villalba" },
+                ["Labico"] = new List<string> { "Colle Spina" },
+                ["Monte Compatri"] = new List<string> { "Colle Mattia", "Laghetto" },
+                ["Palestrina"] = new List<string> { "Carchitti", "Valvarino" },
+                ["Rocca Priora"] = new List<string> { "Colle di Fuori" },
+                ["Roma"] = new List<string> { "Acilia", "Alessandrino", "Axa", "Boccea", "Borghesiana", "Casal Bernocchi", "Casal Palocco", "Casalotti", "Castel Fusano", "Castelverde", "Centocelle", "Centro Giano", "Cinecittà", "Colle Monfortani", "Colle Prenestino", "Colle del Sole", "Corcolle", "Corcolle Alto", "Don Bosco", "Dragona", "Dragoncello", "Eur", "Finocchio", "Fonte Laurentina", "Fosso San Giuliano", "Giardinetti", "Giardini di Corcolle", "Infernetto", "La Pisana", "La Storta", "Longarina", "Lunghezza", "Madonnetta", "Malafede", "Monte Sacro", "Osteria del Curato", "Ostia", "Ostia Antica", "Ostia Levante", "Ostia Ponente", "Pantano Borghese", "Piana del Sole", "Pigneto", "Ponte Galeria", "Ponte di Nona", "Portuense", "Prato Fiorito", "Prima Porta", "Rocca Cencia", "Romanina", "Roma Est", "San Vittorino", "Saxa Rubra", "Settecamini", "Tor Bella Monaca", "Tor Tre Teste", "Tor Vergata", "Tor de Cenci", "Torre Angela", "Torre Gaia", "Torre Maura", "Torre Spaccata", "Tuscolana", "Vallerano", "Vermicino", "Villa Verde", "Villaggio Breda", "Villaggio Prenestino" },
+                ["Tivoli"] = new List<string> { "Centro Storico", "Tivoli Terme", "Villa Adriana", "Campolimpido", "Colle di Tivoli", "Ponte Lucano", "San Paolo" },
+                ["Zagarolo"] = new List<string> { "Centro Paese", "Valle Martella", "Via Prenestina" }
             };
 
-            context.Locations.AddRange(locations);
+            // Create provinces
+            var provinces = new List<Province>();
+            foreach (var provinceName in provinceCities.Keys)
+            {
+                var province = new Province { Name = provinceName };
+                context.Provinces.Add(province);
+                provinces.Add(province);
+            }
+            await context.SaveChangesAsync();
+
+            // Create cities
+            var cities = new List<City>();
+            foreach (var kvp in provinceCities)
+            {
+                var province = provinces.First(p => p.Name == kvp.Key);
+                foreach (var cityName in kvp.Value)
+                {
+                    var city = new City { Name = cityName, ProvinceId = province.Id };
+                    context.Cities.Add(city);
+                    cities.Add(city);
+                }
+            }
+            await context.SaveChangesAsync();
+
+            // Create locations
+            var locations = new List<Location>();
+            foreach (var kvp in cityLocations)
+            {
+                var city = cities.FirstOrDefault(c => c.Name == kvp.Key);
+                if (city != null)
+                {
+                    foreach (var locationName in kvp.Value)
+                    {
+                        var location = new Location 
+                        { 
+                            Name = locationName, 
+                            CityId = city.Id, 
+                            CreationDate = DateTime.Now, 
+                            UpdateDate = DateTime.Now 
+                        };
+                        context.Locations.Add(location);
+                        locations.Add(location);
+                    }
+                }
+            }
             await context.SaveChangesAsync();
         }
     }

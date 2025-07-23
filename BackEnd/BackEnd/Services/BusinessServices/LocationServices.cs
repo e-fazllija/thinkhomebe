@@ -23,8 +23,10 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                // Verifica che la città esista
-                var city = await _context.Cities.FindAsync(dto.CityId);
+                // Verifica che la città esista e includi la provincia
+                var city = await _context.Cities
+                    .Include(c => c.Province)
+                    .FirstOrDefaultAsync(c => c.Id == dto.CityId);
                 if (city == null)
                     throw new ArgumentException("Città non trovata");
 
@@ -64,8 +66,10 @@ namespace BackEnd.Services.BusinessServices
                 if (location == null)
                     throw new Exception("Location not found");
 
-                // Verifica che la città esista
-                var city = await _context.Cities.FindAsync(dto.CityId);
+                // Verifica che la città esista e includi la provincia
+                var city = await _context.Cities
+                    .Include(c => c.Province)
+                    .FirstOrDefaultAsync(c => c.Id == dto.CityId);
                 if (city == null)
                     throw new ArgumentException("Città non trovata");
 
@@ -287,6 +291,20 @@ namespace BackEnd.Services.BusinessServices
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating location order");
+                throw;
+            }
+        }
+
+        public async Task<bool> SeedLocations()
+        {
+            try
+            {
+                await LocationDataSeeder.SeedLocations(_context);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error seeding locations");
                 throw;
             }
         }

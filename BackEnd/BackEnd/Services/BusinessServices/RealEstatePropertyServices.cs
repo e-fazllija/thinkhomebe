@@ -332,6 +332,100 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
+        public async Task<ListViewModel<RealEstatePropertyListModel>> GetList(int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
+        {
+            try
+            {
+                IQueryable<RealEstateProperty> query = _unitOfWork.dbContext.RealEstateProperties
+                    .Include(x => x.Photos.OrderBy(x => x.Position))
+                    .OrderByDescending(x => x.Id);
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    query = query.Where(x => x.Agent.AgencyId!.Contains(agencyId));
+
+                if (!string.IsNullOrEmpty(filterRequest))
+                    query = query.Where(x =>
+                    x.AddressLine.Contains(filterRequest) ||
+                    x.Id.ToString().Contains(filterRequest));
+
+                if (!string.IsNullOrEmpty(contract))
+                {
+                    if (contract == "Aste")
+                    {
+                        query = query.Where(x => x.Status == "Vendita" && x.Auction);
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.Status == contract && !x.Auction);
+                    }
+                }
+
+                if (priceFrom > 0)
+                    query = query.Where(x => x.Price >= priceFrom);
+
+                if (priceTo > 0)
+                    query = query.Where(x => x.Price <= priceTo);
+
+                if (!string.IsNullOrEmpty(category))
+                    query = query.Where(x => x.Category == category);
+
+                if (!string.IsNullOrEmpty(typologie))
+                    query = query.Where(x => x.Typology == typologie);
+
+                if (!string.IsNullOrEmpty(town))
+                {
+                    var townList = town.Split(",", StringSplitOptions.RemoveEmptyEntries)
+                       .Select(t => t.Trim().ToLower())
+                       .ToList();
+
+                    query = query.Where(x => townList.Contains(x.Town.ToLower()));
+                }
+
+                ListViewModel<RealEstatePropertyListModel> result = new ListViewModel<RealEstatePropertyListModel>();
+
+                result.Total = await query.CountAsync();
+
+                if (currentPage > 0)
+                {
+                    query = query
+                    .Skip((currentPage * options.CurrentValue.RealEstatePropertyItemPerPage) - options.CurrentValue.RealEstatePropertyItemPerPage)
+                            .Take(options.CurrentValue.RealEstatePropertyItemPerPage);
+                }
+
+                // Proiezione ottimizzata per la lista
+                var queryList = await query
+                    .Select(x => new RealEstatePropertyListModel
+                    {
+                        Id = x.Id,
+                        CreationDate = x.CreationDate,
+                        AssignmentEnd = x.AssignmentEnd,
+                        CommercialSurfaceate = x.CommercialSurfaceate,
+                        AddressLine = x.AddressLine,
+                        Town = x.Town,
+                        Region = x.State,
+                        Price = x.Price,
+                        Category = x.Category,
+                        Typology = x.Typology,
+                        StateOfTheProperty = x.StateOfTheProperty,
+                        Status = x.Status,
+                        Auction = x.Auction,
+                        FirstPhotoUrl = x.Photos.OrderBy(p => p.Position).Select(p => p.Url).FirstOrDefault()
+                    })
+                    .ToListAsync();
+
+                result.Data = queryList;
+
+                _logger.LogInformation(nameof(GetList));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
         public async Task<RealEstatePropertyCreateViewModel> GetToInsert(string? agencyId)
         {
             try

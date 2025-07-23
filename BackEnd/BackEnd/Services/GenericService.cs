@@ -5,6 +5,7 @@ using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
 using BackEnd.Models.RealEstatePropertyPhotoModels;
+using BackEnd.Models.LocationModels;
 using BackEnd.Services.BusinessServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Utilities;
 using System;
+using BackEnd.Interfaces.IBusinessServices;
 
 namespace BackEnd.Services
 {
@@ -22,13 +24,16 @@ namespace BackEnd.Services
         private readonly ILogger<GenericService> _logger;
         private readonly IOptionsMonitor<PaginationOptions> options;
         private readonly UserManager<ApplicationUser> userManager;
-        public GenericService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GenericService> logger, IOptionsMonitor<PaginationOptions> options, UserManager<ApplicationUser> userManager)
+        private readonly ILocationServices _locationServices;
+        
+        public GenericService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GenericService> logger, IOptionsMonitor<PaginationOptions> options, UserManager<ApplicationUser> userManager, ILocationServices locationServices)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             this.options = options;
             this.userManager = userManager;
+            _locationServices = locationServices;
         }
 
         public async Task<HomeDetailsModel> GetHomeDetails()
@@ -223,6 +228,19 @@ namespace BackEnd.Services
             {
                 _logger.LogError(ex.Message);
                 throw new Exception("Si è verificato un errore");
+            }
+        }
+
+        public async Task<List<LocationSelectModel>> GetLocations()
+        {
+            try
+            {
+                return await _locationServices.GetAll();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore nel recupero delle località");
             }
         }
     }

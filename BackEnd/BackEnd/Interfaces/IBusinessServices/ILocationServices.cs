@@ -12,5 +12,6 @@ namespace BackEnd.Interfaces.IBusinessServices
         Task<List<LocationSelectModel>> GetAll();
         Task<List<LocationGroupedModel>> GetGroupedByCity();
         Task Delete(int id);
+        Task<bool> SeedLocations();
     }
 } 
