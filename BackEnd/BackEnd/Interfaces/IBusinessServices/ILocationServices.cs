@@ -12,7 +12,5 @@ namespace BackEnd.Interfaces.IBusinessServices
         Task<List<LocationSelectModel>> GetAll();
         Task<List<LocationGroupedModel>> GetGroupedByCity();
         Task Delete(int id);
-        Task ToggleActive(int id);
-        Task UpdateOrder(List<LocationUpdateModel> locations);
     }
 } 

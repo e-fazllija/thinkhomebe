@@ -23,13 +23,15 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
+                // Verifica che la città esista
+                var city = await _context.Cities.FindAsync(dto.CityId);
+                if (city == null)
+                    throw new ArgumentException("Città non trovata");
+
                 var location = new Location
                 {
                     Name = dto.Name,
-                    City = dto.City,
-                    Province = dto.Province,
-                    IsActive = dto.IsActive,
-                    OrderIndex = dto.OrderIndex,
+                    CityId = dto.CityId,
                     CreationDate = DateTime.Now,
                     UpdateDate = DateTime.Now
                 };
@@ -41,12 +43,10 @@ namespace BackEnd.Services.BusinessServices
                 {
                     Id = location.Id,
                     Name = location.Name,
-                    City = location.City,
-                    Province = location.Province,
-                    IsActive = location.IsActive,
-                    OrderIndex = location.OrderIndex,
-                    CreationDate = location.CreationDate,
-                    UpdateDate = location.UpdateDate
+                    CityId = location.CityId,
+                    CityName = city.Name,
+                    ProvinceId = city.ProvinceId,
+                    ProvinceName = city.Province.Name
                 };
             }
             catch (Exception ex)
@@ -64,11 +64,13 @@ namespace BackEnd.Services.BusinessServices
                 if (location == null)
                     throw new Exception("Location not found");
 
+                // Verifica che la città esista
+                var city = await _context.Cities.FindAsync(dto.CityId);
+                if (city == null)
+                    throw new ArgumentException("Città non trovata");
+
                 location.Name = dto.Name;
-                location.City = dto.City;
-                location.Province = dto.Province;
-                location.IsActive = dto.IsActive;
-                location.OrderIndex = dto.OrderIndex;
+                location.CityId = dto.CityId;
                 location.UpdateDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
@@ -77,12 +79,10 @@ namespace BackEnd.Services.BusinessServices
                 {
                     Id = location.Id,
                     Name = location.Name,
-                    City = location.City,
-                    Province = location.Province,
-                    IsActive = location.IsActive,
-                    OrderIndex = location.OrderIndex,
-                    CreationDate = location.CreationDate,
-                    UpdateDate = location.UpdateDate
+                    CityId = location.CityId,
+                    CityName = city.Name,
+                    ProvinceId = city.ProvinceId,
+                    ProvinceName = city.Province.Name
                 };
             }
             catch (Exception ex)
@@ -96,7 +96,11 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                var location = await _context.Locations.FindAsync(id);
+                var location = await _context.Locations
+                    .Include(l => l.City)
+                    .ThenInclude(c => c.Province)
+                    .FirstOrDefaultAsync(l => l.Id == id);
+
                 if (location == null)
                     throw new Exception("Location not found");
 
@@ -104,12 +108,10 @@ namespace BackEnd.Services.BusinessServices
                 {
                     Id = location.Id,
                     Name = location.Name,
-                    City = location.City,
-                    Province = location.Province,
-                    IsActive = location.IsActive,
-                    OrderIndex = location.OrderIndex,
-                    CreationDate = location.CreationDate,
-                    UpdateDate = location.UpdateDate
+                    CityId = location.CityId,
+                    CityName = location.City.Name,
+                    ProvinceId = location.City.ProvinceId,
+                    ProvinceName = location.City.Province.Name
                 };
             }
             catch (Exception ex)
@@ -123,19 +125,22 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                var query = _context.Locations.AsQueryable();
+                var query = _context.Locations
+                    .Include(l => l.City)
+                    .ThenInclude(c => c.Province)
+                    .AsQueryable();
 
                 if (!string.IsNullOrEmpty(filterRequest))
                 {
-                    query = query.Where(l => l.Name.Contains(filterRequest) || l.City.Contains(filterRequest) || l.Province.Contains(filterRequest));
+                    query = query.Where(l => l.Name.Contains(filterRequest) || l.City.Name.Contains(filterRequest) || l.City.Province.Name.Contains(filterRequest));
                 }
 
                 if (!string.IsNullOrEmpty(city))
                 {
-                    query = query.Where(l => l.City == city);
+                    query = query.Where(l => l.City.Name == city);
                 }
 
-                query = query.OrderBy(l => l.City).ThenBy(l => l.OrderIndex).ThenBy(l => l.Name);
+                query = query.OrderBy(l => l.City.Name).ThenBy(l => l.Name);
 
                 var totalCount = await query.CountAsync();
                 var pageSize = 20;
@@ -148,12 +153,10 @@ namespace BackEnd.Services.BusinessServices
                     {
                         Id = l.Id,
                         Name = l.Name,
-                        City = l.City,
-                        Province = l.Province,
-                        IsActive = l.IsActive,
-                        OrderIndex = l.OrderIndex,
-                        CreationDate = l.CreationDate,
-                        UpdateDate = l.UpdateDate
+                        CityId = l.CityId,
+                        CityName = l.City.Name,
+                        ProvinceId = l.City.ProvinceId,
+                        ProvinceName = l.City.Province.Name
                     })
                     .ToListAsync();
 
@@ -175,20 +178,18 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 return await _context.Locations
-                    .Where(l => l.IsActive)
-                    .OrderBy(l => l.City)
-                    .ThenBy(l => l.OrderIndex)
+                    .Include(l => l.City)
+                    .ThenInclude(c => c.Province)
+                    .OrderBy(l => l.City.Name)
                     .ThenBy(l => l.Name)
                     .Select(l => new LocationSelectModel
                     {
                         Id = l.Id,
                         Name = l.Name,
-                        City = l.City,
-                        Province = l.Province,
-                        IsActive = l.IsActive,
-                        OrderIndex = l.OrderIndex,
-                        CreationDate = l.CreationDate,
-                        UpdateDate = l.UpdateDate
+                        CityId = l.CityId,
+                        CityName = l.City.Name,
+                        ProvinceId = l.City.ProvinceId,
+                        ProvinceName = l.City.Province.Name
                     })
                     .ToListAsync();
             }
@@ -204,14 +205,13 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 var locations = await _context.Locations
-                    .Where(l => l.IsActive)
-                    .OrderBy(l => l.City)
-                    .ThenBy(l => l.OrderIndex)
+                    .Include(l => l.City)
+                    .OrderBy(l => l.City.Name)
                     .ThenBy(l => l.Name)
                     .ToListAsync();
 
                 var grouped = locations
-                    .GroupBy(l => l.City)
+                    .GroupBy(l => l.City.Name)
                     .Select(g => new LocationGroupedModel
                     {
                         City = g.Key,
@@ -258,7 +258,6 @@ namespace BackEnd.Services.BusinessServices
                 if (location == null)
                     throw new Exception("Location not found");
 
-                location.IsActive = !location.IsActive;
                 location.UpdateDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
@@ -279,7 +278,6 @@ namespace BackEnd.Services.BusinessServices
                     var location = await _context.Locations.FindAsync(locationDto.Id);
                     if (location != null)
                     {
-                        location.OrderIndex = locationDto.OrderIndex;
                         location.UpdateDate = DateTime.Now;
                     }
                 }

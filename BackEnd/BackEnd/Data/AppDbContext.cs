@@ -18,6 +18,8 @@ namespace BackEnd.Data
         public DbSet<CustomerNotes> CustomerNotes { get; set; }
         public DbSet<Documentation> Documentation { get; set; }
         public DbSet<DocumentsTab> DocumentsTabs { get; set; }
+        public DbSet<Province> Provinces { get; set; }
+        public DbSet<City> Cities { get; set; }
         public DbSet<Location> Locations { get; set; }
         
 

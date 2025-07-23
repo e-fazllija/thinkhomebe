@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BackEnd.Models.LocationModels
+namespace BackEnd.Entities
 {
-    public class LocationUpdateModel
+    public class Province
     {
         public int Id { get; set; }
         
@@ -10,7 +10,7 @@ namespace BackEnd.Models.LocationModels
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
         
-        [Required]
-        public int CityId { get; set; }
+        // Navigation property
+        public virtual ICollection<City> Cities { get; set; } = new List<City>();
     }
 } 

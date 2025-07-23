@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.Entities
 {
@@ -9,15 +10,10 @@ namespace BackEnd.Entities
         public string Name { get; set; } = string.Empty;
         
         [Required]
-        [MaxLength(100)]
-        public string City { get; set; } = string.Empty;
+        public int CityId { get; set; }
         
-        [Required]
-        [MaxLength(100)]
-        public string Province { get; set; } = string.Empty;
-        
-        public bool IsActive { get; set; } = true;
-        
-        public int OrderIndex { get; set; } = 0;
+        // Navigation property
+        [ForeignKey("CityId")]
+        public virtual City City { get; set; } = null!;
     }
 } 

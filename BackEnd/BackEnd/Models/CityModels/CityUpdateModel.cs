@@ -1,14 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BackEnd.Models.LocationModels
+namespace BackEnd.Models.CityModels
 {
-    public class LocationCreateModel
+    public class CityUpdateModel
     {
+        public int Id { get; set; }
+        
         [Required]
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
         
         [Required]
-        public int CityId { get; set; }
+        public int ProvinceId { get; set; }
     }
 } 
