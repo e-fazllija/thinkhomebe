@@ -27,6 +27,7 @@ namespace BackEnd.Services.BusinessServices
                 {
                     Name = dto.Name,
                     City = dto.City,
+                    Province = dto.Province,
                     IsActive = dto.IsActive,
                     OrderIndex = dto.OrderIndex,
                     CreationDate = DateTime.Now,
@@ -41,6 +42,7 @@ namespace BackEnd.Services.BusinessServices
                     Id = location.Id,
                     Name = location.Name,
                     City = location.City,
+                    Province = location.Province,
                     IsActive = location.IsActive,
                     OrderIndex = location.OrderIndex,
                     CreationDate = location.CreationDate,
@@ -64,6 +66,7 @@ namespace BackEnd.Services.BusinessServices
 
                 location.Name = dto.Name;
                 location.City = dto.City;
+                location.Province = dto.Province;
                 location.IsActive = dto.IsActive;
                 location.OrderIndex = dto.OrderIndex;
                 location.UpdateDate = DateTime.Now;
@@ -75,6 +78,7 @@ namespace BackEnd.Services.BusinessServices
                     Id = location.Id,
                     Name = location.Name,
                     City = location.City,
+                    Province = location.Province,
                     IsActive = location.IsActive,
                     OrderIndex = location.OrderIndex,
                     CreationDate = location.CreationDate,
@@ -101,6 +105,7 @@ namespace BackEnd.Services.BusinessServices
                     Id = location.Id,
                     Name = location.Name,
                     City = location.City,
+                    Province = location.Province,
                     IsActive = location.IsActive,
                     OrderIndex = location.OrderIndex,
                     CreationDate = location.CreationDate,
@@ -122,7 +127,7 @@ namespace BackEnd.Services.BusinessServices
 
                 if (!string.IsNullOrEmpty(filterRequest))
                 {
-                    query = query.Where(l => l.Name.Contains(filterRequest) || l.City.Contains(filterRequest));
+                    query = query.Where(l => l.Name.Contains(filterRequest) || l.City.Contains(filterRequest) || l.Province.Contains(filterRequest));
                 }
 
                 if (!string.IsNullOrEmpty(city))
@@ -144,6 +149,7 @@ namespace BackEnd.Services.BusinessServices
                         Id = l.Id,
                         Name = l.Name,
                         City = l.City,
+                        Province = l.Province,
                         IsActive = l.IsActive,
                         OrderIndex = l.OrderIndex,
                         CreationDate = l.CreationDate,
@@ -178,6 +184,7 @@ namespace BackEnd.Services.BusinessServices
                         Id = l.Id,
                         Name = l.Name,
                         City = l.City,
+                        Province = l.Province,
                         IsActive = l.IsActive,
                         OrderIndex = l.OrderIndex,
                         CreationDate = l.CreationDate,
