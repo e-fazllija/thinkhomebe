@@ -203,6 +203,65 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
+        public async Task<ListViewModel<RequestListModel>> GetList(int currentPage, string? agencyId, string? filterRequest, char? fromName, char? toName, string? userId)
+        {
+            try
+            {
+                IQueryable<Request> query = _unitOfWork.dbContext.Requests
+                    .Include(x => x.Customer)
+                    .OrderByDescending(x => x.Id);
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    query = query.Where(x => x.AgencyId == agencyId);
+
+                if (!string.IsNullOrEmpty(filterRequest))
+                    query = query.Where(x => x.Customer.Name.Contains(filterRequest) || x.Customer.LastName.Contains(filterRequest));
+
+                ListViewModel<RequestListModel> result = new ListViewModel<RequestListModel>();
+
+                result.Total = await query.CountAsync();
+
+                if (currentPage > 0)
+                {
+                    query = query
+                    .Skip((currentPage * options.CurrentValue.AnagraficItemPerPage) - options.CurrentValue.AnagraficItemPerPage)
+                            .Take(options.CurrentValue.AnagraficItemPerPage);
+                }
+
+                // Proiezione ottimizzata per la lista
+                var queryList = await query
+                    .Select(x => new RequestListModel
+                    {
+                        Id = x.Id,
+                        CustomerName = x.Customer.Name,
+                        CustomerLastName = x.Customer.LastName,
+                        CustomerEmail = x.Customer.Email,
+                        CustomerPhone = x.Customer.Phone.ToString(),
+                        Contract = x.Contract,
+                        CreationDate = x.CreationDate,
+                        Location = x.Location,
+                        Town = x.Town,
+                        PriceTo = x.PriceTo,
+                        PriceFrom = x.PriceFrom,
+                        PropertyType = x.PropertyType,
+                        Archived = x.Archived,
+                        Closed = x.Closed
+                    })
+                    .ToListAsync();
+
+                result.Data = queryList;
+
+                _logger.LogInformation(nameof(GetList));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
         public async Task<RequestSelectModel> GetById(int id)
         {
             try

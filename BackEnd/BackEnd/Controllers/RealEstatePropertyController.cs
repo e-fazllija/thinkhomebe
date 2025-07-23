@@ -136,6 +136,24 @@ namespace BackEnd.Controllers
         }
 
         [HttpGet]
+        [Route(nameof(GetList))]
+        public async Task<IActionResult> GetList(int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
+        {
+            try
+            {
+                ListViewModel<RealEstatePropertyListModel> res = await _realEstatePropertyServices.GetList(
+                    currentPage, agencyId, filterRequest, contract, priceFrom, priceTo, category, typologie, town);
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route(nameof(GetPropertyCount))]
         public IActionResult GetPropertyCount()
         {

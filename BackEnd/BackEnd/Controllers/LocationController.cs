@@ -132,5 +132,21 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route(nameof(SeedLocations))]
+        public async Task<IActionResult> SeedLocations()
+        {
+            try
+            {
+                bool result = await _locationServices.SeedLocations();
+                return Ok(new { Status = "Success", Message = "Locations seeded successfully", Result = result });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
     }
 } 

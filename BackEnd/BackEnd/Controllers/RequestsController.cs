@@ -76,6 +76,23 @@ namespace BackEnd.Controllers
         }
 
         [HttpGet]
+        [Route(nameof(GetList))]
+        public async Task<IActionResult> GetList(int currentPage, string? agencyId, string? filterRequest, string? userId)
+        {
+            try
+            {
+                ListViewModel<RequestListModel> res = await _requestServices.GetList(currentPage, agencyId, filterRequest, null, null, userId);
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route(nameof(GetCustomerRequests))]
         public async Task<IActionResult> GetCustomerRequests(int customerId)
         {
