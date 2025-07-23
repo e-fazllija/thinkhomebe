@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250722121435_location")]
-    partial class location
+    [Migration("20250723082712_Location")]
+    partial class Location
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -618,6 +618,11 @@ namespace BackEnd.Migrations
 
                     b.Property<int>("OrderIndex")
                         .HasColumnType("int");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");

@@ -53,10 +53,10 @@ app.UseCors(
 );
 
 // Seed locations data
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await LocationDataSeeder.SeedLocations(context);
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//    await LocationDataSeeder.SeedLocations(context);
+//}
 
 app.Run();
