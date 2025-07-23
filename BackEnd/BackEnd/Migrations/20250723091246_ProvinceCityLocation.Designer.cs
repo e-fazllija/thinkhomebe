@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250723082712_Location")]
-    partial class Location
+    [Migration("20250723091246_ProvinceCityLocation")]
+    partial class ProvinceCityLocation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -194,6 +194,29 @@ namespace BackEnd.Migrations
                     b.HasIndex("RequestId");
 
                     b.ToTable("Calendars");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ProvinceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("BackEnd.Entities.Customer", b =>
@@ -600,26 +623,13 @@ namespace BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Province")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -629,7 +639,27 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CityId");
+
                     b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Province", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Provinces");
                 });
 
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
@@ -1181,6 +1211,17 @@ namespace BackEnd.Migrations
                     b.Navigation("Request");
                 });
 
+            modelBuilder.Entity("BackEnd.Entities.City", b =>
+                {
+                    b.HasOne("BackEnd.Entities.Province", "Province")
+                        .WithMany("Cities")
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Province");
+                });
+
             modelBuilder.Entity("BackEnd.Entities.Customer", b =>
                 {
                     b.HasOne("BackEnd.Entities.ApplicationUser", "Agency")
@@ -1206,6 +1247,17 @@ namespace BackEnd.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Location", b =>
+                {
+                    b.HasOne("BackEnd.Entities.City", "City")
+                        .WithMany("Locations")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
@@ -1348,11 +1400,21 @@ namespace BackEnd.Migrations
                     b.Navigation("RealEstateProperties");
                 });
 
+            modelBuilder.Entity("BackEnd.Entities.City", b =>
+                {
+                    b.Navigation("Locations");
+                });
+
             modelBuilder.Entity("BackEnd.Entities.Customer", b =>
                 {
                     b.Navigation("CustomerNotes");
 
                     b.Navigation("RealEstateProperties");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Province", b =>
+                {
+                    b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>

@@ -132,37 +132,5 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
-
-        [HttpPost]
-        [Route(nameof(ToggleActive))]
-        public async Task<IActionResult> ToggleActive(int id)
-        {
-            try
-            {
-                await _locationServices.ToggleActive(id);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route(nameof(UpdateOrder))]
-        public async Task<IActionResult> UpdateOrder(List<LocationUpdateModel> locations)
-        {
-            try
-            {
-                await _locationServices.UpdateOrder(locations);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
-            }
-        }
     }
 } 
