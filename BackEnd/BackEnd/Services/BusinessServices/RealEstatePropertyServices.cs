@@ -165,7 +165,7 @@ namespace BackEnd.Services.BusinessServices
         }
 
         public async Task<ListViewModel<RealEstatePropertySelectModel>> Get(
-             int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, string? agencyId, char? fromName, char? toName)
+             int currentPage, string? filterRequest, string? status, string? typologie, string? location, int? code, int? from, int? to, string? agencyId, string? city, char? toName)
         {
             try
             {
@@ -186,8 +186,24 @@ namespace BackEnd.Services.BusinessServices
                 if (!string.IsNullOrEmpty(typologie) && typologie != "Qualsiasi")
                     query = query.Where(x => x.Typology!.ToLower().Contains(typologie.ToLower()));
 
-                if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
+                if (!string.IsNullOrEmpty(city) && city != "Qualsiasi")
+                {
+                    if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
+                    {
+                        // Se abbiamo sia city che location, cerchiamo per location specifica nella città
+                        query = query.Where(x => x.Town.ToLower() == city.ToLower() && x.Location.ToLower().Contains(location.ToLower()));
+                    }
+                    else
+                    {
+                        // Se abbiamo solo city, cerchiamo per città
+                        query = query.Where(x => x.Town.ToLower() == city.ToLower());
+                    }
+                }
+                else if (!string.IsNullOrEmpty(location) && location != "Qualsiasi")
+                {
+                    // Se abbiamo solo location senza city, cerchiamo per località generica
                     query = query.Where(x => x.Town.ToLower()!.Contains(location.ToLower()) || x.Location.ToLower().Contains(location.ToLower()));
+                }
 
                 if (code > 0)
                     query = query.Where(x => x.Id == code);
@@ -197,11 +213,6 @@ namespace BackEnd.Services.BusinessServices
                     query = query.Where(x => x.Price <= to);
                 if (!string.IsNullOrEmpty(agencyId))
                     query = query.Where(x => x.Agent.AgencyId == agencyId);
-                if (fromName != null)
-                {
-                    string fromNameString = fromName.ToString();
-                    query = query.Where(x => string.Compare(x.Category.Substring(0, 1), fromNameString) >= 0);
-                }
                 if (toName != null)
                 {
                     string toNameString = toName.ToString();
