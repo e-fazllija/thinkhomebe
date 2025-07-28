@@ -41,7 +41,7 @@ namespace BackEnd.Services
             try
             {
                 HomeDetailsModel result = new HomeDetailsModel();
-                List<RealEstateProperty> propertiesInHome = await _unitOfWork.dbContext.RealEstateProperties.Where(x => x.InHome).Include(x => x.Photos).OrderByDescending(x => x.Id).ToListAsync();
+                List<RealEstateProperty> propertiesInHome = await _unitOfWork.dbContext.RealEstateProperties.Where(x => x.InHome).Include(x => x.Photos.OrderBy(x => x.Position)).OrderByDescending(x => x.Id).ToListAsync();
 
                 RealEstateProperty? propertyHighlighted =
                     await _unitOfWork.dbContext.RealEstateProperties.Include(x => x.Photos).FirstOrDefaultAsync(x => x.Highlighted) ?? propertiesInHome.FirstOrDefault();
