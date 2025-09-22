@@ -153,12 +153,18 @@ namespace BackEnd.Services.BusinessServices
 
                 foreach (var item in requests)
                 {
+                    var towns = item.Town.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                         .Select(t => t.Trim().ToLower())
+                                         .ToList();
+
                     var realEstatePropertiesQuery = _unitOfWork.dbContext.RealEstateProperties
-                        .Where(x => 
-                        !x.Sold &&
-                        x.Status == item.Contract &&
-                        x.Price <= item.PriceTo && x.Price >= item.PriceFrom &&
-                        x.Town.ToLower().Contains(item.Town.ToLower()));
+                        .Where(x =>
+                            !x.Sold &&
+                            x.Status == item.Contract &&
+                            x.Price <= item.PriceTo &&
+                            x.Price >= item.PriceFrom &&
+                            towns.Any(t => x.Town.ToLower().Contains(t)));
+
 
                     if (!string.IsNullOrEmpty(item.PropertyType))
                     {
@@ -273,12 +279,18 @@ namespace BackEnd.Services.BusinessServices
                     //.Include(x => x.RequestType)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
+                var towns = request.Town.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                         .Select(t => t.Trim().ToLower())
+                         .ToList();
+
                 var realEstatePropertiesQuery = _unitOfWork.dbContext.RealEstateProperties
-                        .Where(x =>
+                    .Where(x =>
                         !x.Sold &&
                         x.Status == request.Contract &&
-                        x.Price <= request.PriceTo && x.Price >= request.PriceFrom &&
-                        x.Town.ToLower().Contains(request.Town.ToLower()));
+                        x.Price <= request.PriceTo &&
+                        x.Price >= request.PriceFrom &&
+                        towns.Any(t => x.Town.ToLower().Contains(t)));
+
 
                 if (!string.IsNullOrEmpty(request.PropertyType))
                 {
