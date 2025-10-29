@@ -129,6 +129,22 @@ namespace BackEnd.Controllers
             }
         }
 
+        [HttpPost]
+        [Route(nameof(SendComplaint))]
+        public async Task<IActionResult> SendComplaint([FromBody] SendRequestModel request)
+        {
+            try
+            {
+                await _mailService.SendComplaintAsync(request);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Route(nameof(GetLocations))]
         public async Task<IActionResult> GetLocations()
