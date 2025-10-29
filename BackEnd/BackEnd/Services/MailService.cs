@@ -75,7 +75,7 @@ public class MailService : IMailService
                 $"<strong>Contratto:</strong> {mailRequest.RequestType}<br>" +
                 $"<strong>Tipologia:</strong> {mailRequest.PropertyType}<br>" +
                 $"<strong>Provincia:</strong> {mailRequest.Province}<br>" +
-                $"<strong>Località:</strong> {mailRequest.Location}<br>" +
+                $"<strong>Localitï¿½:</strong> {mailRequest.Location}<br>" +
                 $"<strong>Indirizzo:</strong> {mailRequest.Address ?? "Non specificato"}<br>" +
                 $"<strong>Numero vani:</strong> {mailRequest.NumberRooms}<br>" +
                 $"<strong>Numero camere:</strong> {mailRequest.NumberBedRooms}<br>" +
@@ -152,7 +152,7 @@ public class MailService : IMailService
                 $"<strong>Contratto:</strong> {mailRequest.RequestType}<br>" +
                 $"<strong>Tipologia:</strong> {mailRequest.PropertyType}<br>" +
                 $"<strong>Provincia:</strong> {mailRequest.Province}<br>" +
-                $"<strong>Località:</strong> {mailRequest.Location}<br>" +
+                $"<strong>Localitï¿½:</strong> {mailRequest.Location}<br>" +
                 $"<strong>Indirizzo:</strong> {mailRequest.Address ?? "Non specificato"}<br>" +
                 $"<strong>Numero vani:</strong> {mailRequest.NumberRooms}<br>" +
                 $"<strong>Numero camere:</strong> {mailRequest.NumberBedRooms}<br>" +
@@ -195,6 +195,40 @@ public class MailService : IMailService
 
             string body =
                 $"<strong>Nome:</strong> {mailRequest.Name}, <strong>Cognome:</strong> {mailRequest.LastName}, <strong>Email:</strong> {mailRequest.FromEmail}, <strong>Tel - Cell:</strong> {mailRequest.Phone} - {mailRequest.MobilePhone} <br><br>" +
+                $"<strong>Messaggio:</strong><br><br>";
+            builder.HtmlBody = body += mailRequest.Body;
+            email.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.SslOnConnect);
+            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.SendAsync(email);
+            smtp.Disconnect(true);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task SendComplaintAsync(SendRequestModel mailRequest)
+    {
+        try
+        {
+            var email = new MimeMessage();
+            email.Sender = MailboxAddress.Parse("info@thinkhome.it");
+            email.From.Add(InternetAddress.Parse("info@thinkhome.it"));
+            email.To.Add(MailboxAddress.Parse("info@thinkhome.it"));
+
+            email.Subject = $"RECLAMO - Richiesta di {mailRequest.Name} {mailRequest.LastName}";
+            var builder = new BodyBuilder();
+
+            string body = $"<strong>RECLAMO</strong><br><br>" +
+                $"Invio di un reclamo da:<br>" +
+                $"<strong>Nome:</strong> {mailRequest.Name}<br>" +
+                $"<strong>Cognome:</strong> {mailRequest.LastName}<br>" +
+                $"<strong>Email:</strong> {mailRequest.FromEmail}<br>" +
+                $"<strong>Telefono:</strong> {mailRequest.Phone ?? "Non specificato"}<br>" +
+                $"<strong>Cellulare:</strong> {mailRequest.MobilePhone ?? "Non specificato"}<br><br>" +
                 $"<strong>Messaggio:</strong><br><br>";
             builder.HtmlBody = body += mailRequest.Body;
             email.Body = builder.ToMessageBody();
