@@ -12,12 +12,14 @@ using BackEnd.Models.DocumentsTabModels;
 using BackEnd.Interfaces;
 using BackEnd.Models.InputModels;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace BackEnd.Controllers
 {
     [ApiController]
     [Route("/api/[controller]/")]
+    [Authorize]
     public class DocumentsTabsController : ControllerBase
     {
         private readonly IConfiguration _configuration;

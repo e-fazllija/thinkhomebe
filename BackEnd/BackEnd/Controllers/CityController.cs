@@ -7,7 +7,7 @@ namespace BackEnd.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class CityController : ControllerBase
     {
         private readonly CityServices _cityServices;

@@ -6,6 +6,7 @@ using BackEnd.Models.UserModel;
 using BackEnd.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System.Data;
 
 namespace BackEnd.Controllers
@@ -36,6 +37,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(Update))]
+        [Authorize]
         public async Task<IActionResult> Update(UserUpdateModel request)
         {
             try
@@ -59,6 +61,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(Get))]
+        [Authorize]
         public async Task<IActionResult> Get(int currentPage, string? filterRequest)
         {
             try
@@ -129,6 +132,7 @@ namespace BackEnd.Controllers
 
         [HttpDelete]
         [Route(nameof(Delete))]
+        [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
             try

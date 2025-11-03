@@ -3,11 +3,13 @@ using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.ResponseModel;
 using BackEnd.Models.LocationModels;
 using BackEnd.Models.OutputModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.Controllers
 {
     [ApiController]
     [Route("/api/[controller]/")]
+    [Authorize]
     public class LocationController : ControllerBase
     {
         private readonly ILocationServices _locationServices;
