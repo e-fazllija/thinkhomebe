@@ -6,6 +6,7 @@ using BackEnd.Models.OutputModels;
 using BackEnd.Models.ResponseModel;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.Controllers
 {
@@ -51,6 +52,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(GetAdminHomeDetails))]
+        [Authorize]
         public async Task<IActionResult> GetAdminHomeDetails(string agencyId)
         {
             try

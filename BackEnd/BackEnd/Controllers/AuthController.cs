@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using BackEnd.Entities;
 using BackEnd.Interfaces;
 using BackEnd.Models.AuthModels;
 using BackEnd.Models.MailModels;
 using BackEnd.Models.ResponseModel;
 using BackEnd.Models.UserModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -24,21 +23,21 @@ namespace BackEnd.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
-        private SecretClient secretClient;
         private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly IKeyVaultService _keyVaultService;
         private string SecretForKey;
-        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMailService mailService, IConfiguration configuration, IMapper mapper)
+        
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMailService mailService, IConfiguration configuration, IMapper mapper, IKeyVaultService keyVaultService)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             _mailService = mailService;
             _configuration = configuration;
             this._mapper = mapper;
-            secretClient = new SecretClient(new Uri(_configuration.GetValue<string>("KeyVault:Url")), new DefaultAzureCredential());
-            KeyVaultSecret secret = secretClient.GetSecret(_configuration.GetValue<string>("KeyVault:Secrets:AuthKey"));
-            SecretForKey = secret.Value;
+            _keyVaultService = keyVaultService;
+            SecretForKey = _keyVaultService.AuthKey;
         }
 
         [HttpPost]
@@ -260,6 +259,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(CreateRole))]
+        [Authorize]
         public async Task<IActionResult> CreateRole(string role)
         {
             try
@@ -281,6 +281,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(GetUser))]
+        [Authorize]
         public async Task<IActionResult> GetUser(string id)
         {
             try

@@ -5,6 +5,7 @@ using BackEnd.Models.OutputModels;
 using BackEnd.Models.ResponseModel;
 using BackEnd.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -13,6 +14,7 @@ namespace BackEnd.Controllers
 {
     [ApiController]
     [Route("/api/[controller]/")]
+    [Authorize]
     public class BlobStorageController : ControllerBase
     {
         private readonly IStorageServices _storageServices;

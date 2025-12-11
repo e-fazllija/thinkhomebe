@@ -1,6 +1,5 @@
 ﻿using System.Text;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
+using BackEnd.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -8,11 +7,8 @@ namespace BackEnd.Services
 {
     public static class JwtStartup
     {
-        public static void ConfigureJwt(this WebApplicationBuilder builder, string keyVaultUrl, string secretName)
+        public static void ConfigureJwt(this WebApplicationBuilder builder)
         {
-
-            SecretClient client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-            KeyVaultSecret secret = client.GetSecret(secretName);
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -30,9 +26,22 @@ namespace BackEnd.Services
                     ValidIssuer = builder.Configuration["Authentication:Issuer"],
                     ValidAudience = builder.Configuration["Authentication:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.ASCII.GetBytes(secret.Value))
+                        Encoding.ASCII.GetBytes(GetAuthKeyFromService(builder.Services)))
                 };
             });
+        }
+
+        /// <summary>
+        /// Helper method to get the auth key from the KeyVault service
+        /// </summary>
+        /// <param name="services">Service collection</param>
+        /// <returns>Auth key string</returns>
+        private static string GetAuthKeyFromService(IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var keyVaultService = serviceProvider.GetRequiredService<IKeyVaultService>();
+            return keyVaultService.AuthKey;
+        }
 
             //builder.Services.AddAuthentication("Bearer")
             //    .AddJwtBearer(options =>
@@ -51,6 +60,6 @@ namespace BackEnd.Services
             //            };
             //        }
             //    );
-        }
+        
     }
 }

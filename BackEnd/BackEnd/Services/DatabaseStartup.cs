@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BackEnd.Data;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
+using BackEnd.Interfaces;
 
 namespace BackEnd.Services
 {
@@ -11,19 +10,17 @@ namespace BackEnd.Services
         public static readonly ILoggerFactory ConsoleLogFactory
                         = LoggerFactory.Create(builder => { builder.AddConsole(); });
         /// <summary>
-        /// It is used to configure the connection properties for the database
+        /// It is used to configure the connection properties for the database using centralized KeyVault service
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configuration"></param>
-        public static void ConfigureDatabase(this WebApplicationBuilder builder, string keyVaultUrl, string secretName)
+        public static void ConfigureDatabase(this WebApplicationBuilder builder)
         {
-            SecretClient client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-            KeyVaultSecret secret = client.GetSecret(secretName);
-
-            builder.Services.AddDbContext<AppDbContext>(options =>
+            builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
             {
+                var keyVaultService = serviceProvider.GetRequiredService<IKeyVaultService>();
+                
                 options.UseSqlServer(
-                    secret.Value,
+                    keyVaultService.DbConnectionString,
                     sqlServerOptionsAction: sqlOptions =>
                     {
                         sqlOptions.EnableRetryOnFailure(
@@ -36,9 +33,7 @@ namespace BackEnd.Services
                 options.UseLoggerFactory(ConsoleLogFactory);
                 options.EnableSensitiveDataLogging();
                 #endif
-            }
-
-        );
+            });
         }
     }
 }

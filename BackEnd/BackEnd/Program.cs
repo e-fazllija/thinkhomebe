@@ -2,6 +2,7 @@ using BackEnd.Data;
 using BackEnd.Entities;
 using BackEnd.Models.Options;
 using BackEnd.Services;
+using BackEnd.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +20,11 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.ConfigureDatabase(builder.Configuration.GetSection("KeyVault:Url").Value!, builder.Configuration.GetSection("KeyVault:Secrets:DbConnectionString").Value!);
+// Register KeyVault service as singleton for better performance
+builder.Services.AddSingleton<IKeyVaultService, KeyVaultService>();
+
+// Configure services using the centralized KeyVault service
+builder.ConfigureDatabase();
 builder.ConfigureServices();
 builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("PaginationOptions"));
 builder.Services.Configure<MailOptions>(builder.Configuration.GetSection("MailOptions"));
@@ -31,7 +36,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-builder.ConfigureJwt(builder.Configuration.GetSection("KeyVault:Url").Value!, builder.Configuration.GetSection("KeyVault:Secrets:AuthKey").Value!);
+builder.ConfigureJwt();
 
 var app = builder.Build();
 

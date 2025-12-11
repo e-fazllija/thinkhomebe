@@ -5,6 +5,7 @@ using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
 using BackEnd.Models.RealEstatePropertyPhotoModels;
 using BackEnd.Models.CalendarModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.Controllers
 {
@@ -31,6 +32,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(Create))]
+        [Authorize]
         public async Task<IActionResult> Create(RealEstatePropertyCreateModel request)
         {
             try
@@ -47,6 +49,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(UploadFiles))]
+        [Authorize]
         public async Task<IActionResult> UploadFiles(UploadFilesModel request)
         {
             try
@@ -63,6 +66,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(Update))]
+        [Authorize]
         public async Task<IActionResult> Update(RealEstatePropertyUpdateModel request)
         {
             try
@@ -80,6 +84,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(UpdatePhotosOrder))]
+        [Authorize]
         public async Task<IActionResult> UpdatePhotosOrder(List<RealEstatePropertyPhotoUpdateModel> request)
         {
             try
@@ -119,6 +124,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(Get))]
+        [Authorize]
         public async Task<IActionResult> Get(int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
         {
             try
@@ -137,6 +143,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(GetList))]
+        [Authorize]
         public async Task<IActionResult> GetList(int currentPage, string? agencyId, string? filterRequest, string? contract, int? priceFrom, int? priceTo, string? category, string? typologie, string? town)
         {
             try
@@ -172,6 +179,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(GetToInsert))]
+        [Authorize]
         public async Task<IActionResult> GetToInsert(string? agencyId)
         {
             try
@@ -205,6 +213,7 @@ namespace BackEnd.Controllers
         }
         [HttpDelete]
         [Route(nameof(Delete))]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -221,6 +230,7 @@ namespace BackEnd.Controllers
 
         [HttpDelete]
         [Route(nameof(DeletePhoto))]
+        [Authorize]
         public async Task<IActionResult> DeletePhoto(int id)
         {
             try
@@ -237,6 +247,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(SetHighlighted))]
+        [Authorize]
         public async Task<IActionResult> SetHighlighted(int realEstatePropertyId)
         {
             try
@@ -254,6 +265,7 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(SetRealEstatePropertyPhotoHighlighted))]
+        [Authorize]
         public async Task<IActionResult> SetRealEstatePropertyPhotoHighlighted([FromForm] int realEstatePropertyPhotoId)
         {
             try
@@ -271,6 +283,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(SetInHome))]
+        [Authorize]
         public async Task<IActionResult> SetInHome(int realEstatePropertyId)
         {
             try
@@ -288,6 +301,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Route(nameof(GetSearchItems))]
+        [Authorize]
         public async Task<IActionResult> GetSearchItems(string userId, string? agencyId)
         {
             try
