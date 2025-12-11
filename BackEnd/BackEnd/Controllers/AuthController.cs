@@ -176,24 +176,46 @@ namespace BackEnd.Controllers
                 var validationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidIssuer = _configuration["Authentication:Issuer"],
                     ValidAudience = _configuration["Authentication:Audience"],
-
                     ClockSkew = TimeSpan.Zero // Imposta lo skew dell'orologio a zero per evitare eventuali problemi di sincronizzazione
                 };
 
                 SecurityToken validatedToken;
                 var principal = tokenHandler.ValidateToken(api_token.api_token, validationParameters, out validatedToken);
-                string? email;
+                
                 if (principal.Identity.IsAuthenticated)
                 {
-                    email = principal.Claims.First().Value;
-                    string role = principal.Claims.ElementAt(2).Value;
+                    // Recupera l'email dal claim specifico invece di usare First()
+                    var emailClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == JwtRegisteredClaimNames.Email);
+                    if (emailClaim == null)
+                    {
+                        return Unauthorized();
+                    }
+
+                    string email = emailClaim.Value;
                     var user = await userManager.FindByEmailAsync(email);
+                    
+                    // Verifica che l'utente esista ancora nel database
+                    if (user == null)
+                    {
+                        return Unauthorized();
+                    }
+
+                    // Recupera il ruolo dal claim invece di usare ElementAt
+                    var roleClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                    string role = roleClaim?.Value ?? "";
+
+                    // Verifica che il ruolo nel token corrisponda ancora ai ruoli dell'utente nel database
                     var userRoles = await userManager.GetRolesAsync(user);
+                    string verifiedRole = userRoles.Contains("Admin") ? "Admin" 
+                        : userRoles.Contains("Agency") ? "Agenzia" 
+                        : userRoles.Contains("Agent") ? "Agente" 
+                        : userRoles.FirstOrDefault() ?? "";
+
                     LoginResponse result = new LoginResponse()
                     {
                         Id = user.Id,
@@ -202,7 +224,7 @@ namespace BackEnd.Controllers
                         LastName = user.LastName,
                         Email = user.Email,
                         Password = "",
-                        Role = role,
+                        Role = verifiedRole, // Usa il ruolo verificato dal database invece di quello del token
                         Token = api_token.api_token,
                         Color = user.Color
                     };
@@ -215,6 +237,10 @@ namespace BackEnd.Controllers
             catch (SecurityTokenException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = "Errore durante la verifica del token" });
             }
         }
 
