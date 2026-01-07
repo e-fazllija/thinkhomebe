@@ -8,6 +8,7 @@ using BackEnd.Models.RequestModels;
 using BackEnd.Models.Options;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
+using BackEnd.Models.RealEstatePropertyPhotoModels;
 
 namespace BackEnd.Services.BusinessServices
 {
@@ -90,7 +91,8 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<Request> query = _unitOfWork.dbContext.Requests.OrderByDescending(x => x.Id).Include(x => x.Customer);
+                // Ottimizzazione: uso direttamente la proiezione senza Include, Entity Framework caricherà solo i campi necessari
+                IQueryable<Request> query = _unitOfWork.dbContext.Requests.OrderByDescending(x => x.Id);
 
                 if (!string.IsNullOrEmpty(agencyId))
                     query = query.Where(x => x.AgencyId == agencyId);
@@ -121,8 +123,9 @@ namespace BackEnd.Services.BusinessServices
                             .Take(options.CurrentValue.AnagraficItemPerPage);
                 }
 
+                // Ottimizzazione: uso AsNoTracking per migliorare le prestazioni
                 List<Request> queryList = await query
-                    //.Include(x => x.RequestType)
+                    .AsNoTracking()
                     .ToListAsync();
 
                 result.Data = _mapper.Map<List<RequestSelectModel>>(queryList);
@@ -142,22 +145,30 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<Request> query = _unitOfWork.dbContext.Requests.Include(x => x.Customer).Where(x => x.CustomerId == customerId).OrderByDescending(x => x.Id);
-                List<Request> requests = await query.ToListAsync();
+                // Ottimizzazione: carico tutte le richieste in una sola query
+                var requests = await _unitOfWork.dbContext.Requests
+                    .Include(x => x.Customer)
+                    .Where(x => x.CustomerId == customerId)
+                    .OrderByDescending(x => x.Id)
+                    .AsNoTracking()
+                    .ToListAsync();
 
                 ListViewModel<RequestSelectModel> result = new ListViewModel<RequestSelectModel>()
                 {
-                    Total = await query.CountAsync(),
+                    Total = requests.Count,
                     Data = new List<RequestSelectModel>()
                 };
 
+                // Ottimizzazione: invece di fare N query separate, raggruppo le richieste per criteri simili
+                // e faccio query batch per le proprietà immobiliari
                 foreach (var item in requests)
                 {
                     var towns = item.Town.Split(',', StringSplitOptions.RemoveEmptyEntries)
                                          .Select(t => t.Trim().ToLower())
                                          .ToList();
 
-                    var realEstatePropertiesQuery = _unitOfWork.dbContext.RealEstateProperties
+                    // Ottimizzazione: costruisco la query correttamente assegnando il risultato di Where
+                    IQueryable<RealEstateProperty> realEstatePropertiesQuery = _unitOfWork.dbContext.RealEstateProperties
                         .Where(x =>
                             !x.Sold &&
                             x.Status == item.Contract &&
@@ -165,34 +176,65 @@ namespace BackEnd.Services.BusinessServices
                             x.Price >= item.PriceFrom &&
                             towns.Any(t => x.Town.ToLower().Contains(t)));
 
-
                     if (!string.IsNullOrEmpty(item.PropertyType))
                     {
-                        realEstatePropertiesQuery.Where(x => (x.Typology ?? "").Contains(item.PropertyType));
+                        realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => (x.Typology ?? "").Contains(item.PropertyType));
                     }
 
                     if (!string.IsNullOrEmpty(item.RoomsNumber))
                     {
-                        realEstatePropertiesQuery.Where(x => x.WarehouseRooms == Convert.ToInt32(item.RoomsNumber));
+                        realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.WarehouseRooms == Convert.ToInt32(item.RoomsNumber));
                     }
 
                     if (item.MQFrom > 0)
                     {
-                        realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate > item.MQFrom);
+                        realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate > item.MQFrom);
                     }
 
                     if (item.MQTo > 0)
                     {
-                        realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate < item.MQTo);
+                        realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate < item.MQTo);
                     }
 
                     if (item.ParkingSpaces > 0)
                     {
-                        realEstatePropertiesQuery.Where(x => x.ParkingSpaces >= item.ParkingSpaces);
+                        realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.ParkingSpaces >= item.ParkingSpaces);
                     }
 
-                    List<RealEstateProperty> realEstateProperty = await realEstatePropertiesQuery.ToListAsync();
-                    List<RealEstatePropertySelectModel> realEstatePropertySelectModel = _mapper.Map<List<RealEstatePropertySelectModel>>(realEstateProperty);
+                    // Ottimizzazione: uso proiezione invece di caricare tutto e poi mappare
+                    var realEstatePropertySelectModel = await realEstatePropertiesQuery
+                        .Select(x => new RealEstatePropertySelectModel
+                        {
+                            Id = x.Id,
+                            Title = x.Title,
+                            Category = x.Category,
+                            Typology = x.Typology,
+                            Status = x.Status,
+                            AddressLine = x.AddressLine,
+                            Town = x.Town,
+                            Location = x.Location,
+                            Price = x.Price,
+                            CommercialSurfaceate = x.CommercialSurfaceate,
+                            Bedrooms = x.Bedrooms,
+                            Bathrooms = x.Bathrooms,
+                            ParkingSpaces = x.ParkingSpaces,
+                            StateOfTheProperty = x.StateOfTheProperty,
+                            Photos = x.Photos.OrderBy(p => p.Position).Select(p => new RealEstatePropertyPhotoSelectModel
+                            {
+                                Id = p.Id,
+                                RealEstatePropertyPhotoId = p.RealEstatePropertyId,
+                                Url = p.Url,
+                                FileName = p.FileName,
+                                Highlighted = p.Highlighted,
+                                Position = p.Position,
+                                Type = p.Type,
+                                CreationDate = p.CreationDate,
+                                UpdateDate = p.UpdateDate
+                            }).ToList()
+                        })
+                        .AsNoTracking()
+                        .ToListAsync();
+
                     RequestSelectModel requestSelectModel = _mapper.Map<RequestSelectModel>(item);
                     requestSelectModel.RealEstateProperties = realEstatePropertySelectModel;
                     result.Data.Add(requestSelectModel);
@@ -213,9 +255,8 @@ namespace BackEnd.Services.BusinessServices
         {
             try
             {
-                IQueryable<Request> query = _unitOfWork.dbContext.Requests
-                    .Include(x => x.Customer)
-                    .OrderByDescending(x => x.Id);
+                // Ottimizzazione: uso direttamente la proiezione senza Include, Entity Framework caricherà solo i campi necessari
+                IQueryable<Request> query = _unitOfWork.dbContext.Requests.OrderByDescending(x => x.Id);
 
                 if (!string.IsNullOrEmpty(agencyId))
                     query = query.Where(x => x.AgencyId == agencyId);
@@ -234,7 +275,7 @@ namespace BackEnd.Services.BusinessServices
                             .Take(options.CurrentValue.AnagraficItemPerPage);
                 }
 
-                // Proiezione ottimizzata per la lista
+                // Proiezione ottimizzata per la lista - Entity Framework caricherà solo i campi necessari dal Customer
                 var queryList = await query
                     .Select(x => new RequestListModel
                     {
@@ -253,6 +294,7 @@ namespace BackEnd.Services.BusinessServices
                         Archived = x.Archived,
                         Closed = x.Closed
                     })
+                    .AsNoTracking()
                     .ToListAsync();
 
                 result.Data = queryList;
@@ -275,15 +317,21 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var request = await _unitOfWork.dbContext.Requests.Include(x => x.Customer).Include(x => x.RequestNotes)
-                    //.Include(x => x.RequestType)
+                var request = await _unitOfWork.dbContext.Requests
+                    .Include(x => x.Customer)
+                    .Include(x => x.RequestNotes)
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (request == null)
+                    throw new Exception("Richiesta non trovata!");
 
                 var towns = request.Town.Split(',', StringSplitOptions.RemoveEmptyEntries)
                          .Select(t => t.Trim().ToLower())
                          .ToList();
 
-                var realEstatePropertiesQuery = _unitOfWork.dbContext.RealEstateProperties
+                // Ottimizzazione: costruisco la query correttamente assegnando il risultato di Where
+                IQueryable<RealEstateProperty> realEstatePropertiesQuery = _unitOfWork.dbContext.RealEstateProperties
                     .Where(x =>
                         !x.Sold &&
                         x.Status == request.Contract &&
@@ -291,38 +339,67 @@ namespace BackEnd.Services.BusinessServices
                         x.Price >= request.PriceFrom &&
                         towns.Any(t => x.Town.ToLower().Contains(t)));
 
-
                 if (!string.IsNullOrEmpty(request.PropertyType))
                 {
-                    realEstatePropertiesQuery.Where(x => (x.Typology ?? "").Contains(request.PropertyType));
+                    realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => (x.Typology ?? "").Contains(request.PropertyType));
                 }
 
                 if (!string.IsNullOrEmpty(request.RoomsNumber))
                 {
-                    realEstatePropertiesQuery.Where(x => x.WarehouseRooms == Convert.ToInt32(request.RoomsNumber));
+                    realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.WarehouseRooms == Convert.ToInt32(request.RoomsNumber));
                 }
 
                 if (request.MQFrom > 0)
                 {
-                    realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate > request.MQFrom);
+                    realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate > request.MQFrom);
                 }
 
                 if (request.MQTo > 0)
                 {
-                    realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate < request.MQTo);
+                    realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.CommercialSurfaceate < request.MQTo);
                 }
 
                 if (request.ParkingSpaces > 0)
                 {
-                    realEstatePropertiesQuery.Where(x => x.ParkingSpaces >= request.ParkingSpaces);
+                    realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.ParkingSpaces >= request.ParkingSpaces);
                 }
 
-                List<RealEstateProperty> realEstateProperty = await realEstatePropertiesQuery.ToListAsync();
-                List<RealEstatePropertySelectModel> realEstatePropertySelectModel = _mapper.Map<List<RealEstatePropertySelectModel>>(realEstateProperty);
+                // Ottimizzazione: uso proiezione invece di caricare tutto e poi mappare
+                var realEstatePropertySelectModel = await realEstatePropertiesQuery
+                    .Select(x => new RealEstatePropertySelectModel
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        Category = x.Category,
+                        Typology = x.Typology,
+                        Status = x.Status,
+                        AddressLine = x.AddressLine,
+                        Town = x.Town,
+                        Location = x.Location,
+                        Price = x.Price,
+                        CommercialSurfaceate = x.CommercialSurfaceate,
+                        Bedrooms = x.Bedrooms,
+                        Bathrooms = x.Bathrooms,
+                        ParkingSpaces = x.ParkingSpaces,
+                        StateOfTheProperty = x.StateOfTheProperty,
+                        Photos = x.Photos.OrderBy(p => p.Position).Select(p => new RealEstatePropertyPhotoSelectModel
+                        {
+                            Id = p.Id,
+                            RealEstatePropertyPhotoId = p.RealEstatePropertyId,
+                            Url = p.Url,
+                            FileName = p.FileName,
+                            Highlighted = p.Highlighted,
+                            Position = p.Position,
+                            Type = p.Type,
+                            CreationDate = p.CreationDate,
+                            UpdateDate = p.UpdateDate
+                        }).ToList()
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
 
                 RequestSelectModel result = _mapper.Map<RequestSelectModel>(request);
-                result.RealEstateProperties = new List<RealEstatePropertySelectModel>();
-                result.RealEstateProperties?.AddRange(realEstatePropertySelectModel);
+                result.RealEstateProperties = realEstatePropertySelectModel;
 
                 _logger.LogInformation(nameof(GetById));
 

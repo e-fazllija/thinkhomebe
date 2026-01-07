@@ -224,18 +224,128 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
+        public async Task<ListViewModel<CalendarListModel>> GetList(string agencyId, string? agentId, char? fromName, char? toName)
+        {
+            try
+            {
+                IQueryable<Calendar> query = _unitOfWork.dbContext.Calendars
+                    .OrderByDescending(x => x.DataInizioEvento)
+                    .Where(x => x.ApplicationUser.AgencyId == agencyId);
+                    
+                if(!string.IsNullOrEmpty(agentId))
+                    query = query.Where(x => x.ApplicationUserId == agentId);
+
+                if (fromName != null)
+                {
+                    string fromNameString = fromName.ToString();
+                    query = query.Where(x => string.Compare(x.NomeEvento.Substring(0, 1), fromNameString) >= 0);
+                }
+
+                if (toName != null)
+                {
+                    string toNameString = toName.ToString();
+                    query = query.Where(x => string.Compare(x.NomeEvento.Substring(0, 1), toNameString) <= 0);
+                }
+
+                ListViewModel<CalendarListModel> result = new ListViewModel<CalendarListModel>();
+                result.Total = await query.CountAsync();
+
+                // Proiezione ottimizzata per la lista - solo i campi necessari
+                var queryList = await query
+                    .Select(x => new CalendarListModel
+                    {
+                        Id = x.Id,
+                        ApplicationUserId = x.ApplicationUserId,
+                        AgentName = x.ApplicationUser.Name ?? string.Empty,
+                        AgentLastName = x.ApplicationUser.LastName ?? string.Empty,
+                        AgentColor = x.ApplicationUser.Color ?? "#ffffff",
+                        NomeEvento = x.NomeEvento,
+                        Type = x.Type,
+                        CustomerId = x.CustomerId,
+                        RealEstatePropertyId = x.RealEstatePropertyId,
+                        RequestId = x.RequestId,
+                        DescrizioneEvento = x.DescrizioneEvento,
+                        LuogoEvento = x.LuogoEvento,
+                        Color = x.Color,
+                        DataInizioEvento = x.DataInizioEvento,
+                        DataFineEvento = x.DataFineEvento,
+                        CreationDate = x.CreationDate,
+                        UpdateDate = x.UpdateDate,
+                        Confirmed = x.Confirmed,
+                        Cancelled = x.Cancelled,
+                        Postponed = x.Postponed
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                result.Data = queryList;
+
+                _logger.LogInformation(nameof(GetList));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
         public async Task<CalendarCreateViewModel> GetToInsert(string agencyId)
         {
             try
             {
-                List<Customer> customers = await _unitOfWork.dbContext.Customers.Where(x => x.AgencyId == agencyId).ToListAsync();
-                List<RealEstateProperty> properties = await _unitOfWork.dbContext.RealEstateProperties.Where(x => x.Agent.AgencyId == agencyId).ToListAsync();
-                List<Request> requests = await _unitOfWork.dbContext.Requests.Where(x => x.AgencyId == agencyId).ToListAsync();
-
                 CalendarCreateViewModel result = new CalendarCreateViewModel();
-                result.Customers = _mapper.Map<List<CustomerSelectModel>>(customers);
-                result.RealEstateProperties = _mapper.Map<List<RealEstatePropertySelectModel>>(properties);
-                result.Requests = _mapper.Map<List<RequestSelectModel>>(requests);
+
+                // Ottimizzazione: solo i campi necessari per i dropdown (Name, LastName per label)
+                result.Customers = await _unitOfWork.dbContext.Customers
+                    .Where(x => x.AgencyId == agencyId)
+                    .Select(x => new CustomerSelectModel
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        LastName = x.LastName
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                // Ottimizzazione: solo i campi necessari (Town, AddressLine, Id, Price per label)
+                result.RealEstateProperties = await _unitOfWork.dbContext.RealEstateProperties
+                    .Where(x => x.Agent.AgencyId == agencyId)
+                    .Select(x => new RealEstatePropertySelectModel
+                    {
+                        Id = x.Id,
+                        Town = x.Town,
+                        AddressLine = x.AddressLine,
+                        Price = x.Price
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                // Ottimizzazione: solo i campi necessari (Customer.Name e LastName per label)
+                var requestsData = await _unitOfWork.dbContext.Requests
+                    .Where(x => x.AgencyId == agencyId)
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.CustomerId,
+                        CustomerName = x.Customer.Name,
+                        CustomerLastName = x.Customer.LastName
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                result.Requests = requestsData.Select(x => new RequestSelectModel
+                {
+                    Id = x.Id,
+                    CustomerId = x.CustomerId,
+                    Customer = new Customer
+                    {
+                        Id = x.CustomerId,
+                        Name = x.CustomerName,
+                        LastName = x.CustomerLastName
+                    }
+                }).ToList();
 
                 _logger.LogInformation(nameof(GetToInsert));
 

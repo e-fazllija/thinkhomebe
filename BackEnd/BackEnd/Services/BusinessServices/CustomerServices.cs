@@ -132,6 +132,67 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
+        public async Task<ListViewModel<CustomerListModel>> GetList(int currentPage, string? agencyId, string? filterRequest, char? fromName, char? toName)
+        {
+            try
+            {
+                IQueryable<Customer> query = _unitOfWork.dbContext.Customers.OrderByDescending(x => x.Id);
+
+                if (!string.IsNullOrEmpty(agencyId))
+                    query = query.Where(x => x.AgencyId == agencyId);
+
+                if (!string.IsNullOrEmpty(filterRequest))
+                    query = query.Where(x => x.Name.Contains(filterRequest) || x.LastName.Contains(filterRequest) || x.Email.Contains(filterRequest));
+
+                if (fromName != null)
+                {
+                    string fromNameString = fromName.ToString();
+                    query = query.Where(x => string.Compare(x.Name.Substring(0, 1), fromNameString) >= 0);
+                }
+
+                if (toName != null)
+                {
+                    string toNameString = toName.ToString();
+                    query = query.Where(x => string.Compare(x.Name.Substring(0, 1), toNameString) <= 0);
+                }
+
+                ListViewModel<CustomerListModel> result = new ListViewModel<CustomerListModel>();
+
+                result.Total = await query.CountAsync();
+
+                if (currentPage > 0)
+                {
+                    query = query
+                        .Skip((currentPage * options.CurrentValue.AnagraficItemPerPage) - options.CurrentValue.AnagraficItemPerPage)
+                        .Take(options.CurrentValue.AnagraficItemPerPage);
+                }
+
+                // Proiezione ottimizzata per la lista - solo i campi necessari
+                var queryList = await query
+                    .Select(x => new CustomerListModel
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        LastName = x.LastName,
+                        Email = x.Email,
+                        Phone = x.Phone.ToString(),
+                        Type = x.Buyer ? "Compratore" : x.Seller ? "Venditore" : x.Builder ? "Costruttore" : x.GoldCustomer ? "Cliente gold" : ""
+                    })
+                    .ToListAsync();
+
+                result.Data = queryList;
+
+                _logger.LogInformation(nameof(GetList));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
         public async Task<CustomerSelectModel> GetById(int id)
         {
             try

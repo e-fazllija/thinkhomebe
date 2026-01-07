@@ -72,13 +72,50 @@ namespace BackEnd.Controllers
                 usersList = usersList.Where(x => x.AgencyId == agencyId).ToList();
 
                 if (!string.IsNullOrEmpty(filterRequest))
-                    usersList = usersList.Where(x => x.Email.Contains(filterRequest)).ToList();
+                    usersList = usersList.Where(x => x.Email.Contains(filterRequest) || x.Name.Contains(filterRequest) || x.LastName.Contains(filterRequest) || x.UserName.Contains(filterRequest)).ToList();
 
                 List<ApplicationUser> users = usersList.ToList();
                 ListViewModel<UserSelectModel> result = new ListViewModel<UserSelectModel>();
 
                 result.Total = users.Count();
                 result.Data = _mapper.Map<List<UserSelectModel>>(users);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route(nameof(GetList))]
+        public async Task<IActionResult> GetList(int currentPage, string agencyId, string? filterRequest)
+        {
+            try
+            {
+                var usersList = await userManager.GetUsersInRoleAsync("Agent");
+                usersList = usersList.Where(x => x.AgencyId == agencyId).ToList();
+
+                if (!string.IsNullOrEmpty(filterRequest))
+                    usersList = usersList.Where(x => x.Email.Contains(filterRequest) || x.Name.Contains(filterRequest) || x.LastName.Contains(filterRequest) || x.UserName.Contains(filterRequest)).ToList();
+
+                ListViewModel<UserListModel> result = new ListViewModel<UserListModel>();
+                result.Total = usersList.Count();
+
+                // Proiezione ottimizzata per la lista - solo i campi necessari
+                result.Data = usersList
+                    .Select(x => new UserListModel
+                    {
+                        Id = x.Id,
+                        UserName = x.UserName ?? string.Empty,
+                        Name = x.Name ?? string.Empty,
+                        LastName = x.LastName ?? string.Empty,
+                        Email = x.Email ?? string.Empty,
+                        PhoneNumber = x.PhoneNumber ?? string.Empty
+                    })
+                    .ToList();
 
                 return Ok(result);
             }
