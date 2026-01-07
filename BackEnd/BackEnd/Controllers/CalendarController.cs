@@ -76,6 +76,23 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route(nameof(GetList))]
+        public async Task<IActionResult> GetList(string agencyId, string? agentId)
+        {
+            try
+            {
+                ListViewModel<CalendarListModel> res = await _calendarServices.GetList(agencyId, agentId, null, null);
+
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
         
         [HttpGet]
         [Route(nameof(GetToInsert))]

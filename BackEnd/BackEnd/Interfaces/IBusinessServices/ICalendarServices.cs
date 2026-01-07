@@ -8,6 +8,7 @@ namespace BackEnd.Interfaces.IBusinessServices
     {
         Task<CalendarSelectModel> Create(CalendarCreateModel dto);
         Task<ListViewModel<CalendarSelectModel>> Get(string agencyId, string? agentId, char? fromName, char? toName);
+        Task<ListViewModel<CalendarListModel>> GetList(string agencyId, string? agentId, char? fromName, char? toName);
         Task<CalendarCreateViewModel> GetToInsert(string agencyId);
         Task<CalendarSearchModel> GetSearchItems(string userId, string? agencyId);
         Task<CalendarSelectModel> Update(CalendarUpdateModel dto);

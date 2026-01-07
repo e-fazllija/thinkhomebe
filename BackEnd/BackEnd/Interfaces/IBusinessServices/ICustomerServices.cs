@@ -8,6 +8,7 @@ namespace BackEnd.Interfaces.IBusinessServices
     {
         Task<CustomerSelectModel> Create(CustomerCreateModel dto);
         Task<ListViewModel<CustomerSelectModel>> Get(int currentPage, string? agencyId, string? filterRequest, char? fromName, char? toName);
+        Task<ListViewModel<CustomerListModel>> GetList(int currentPage, string? agencyId, string? filterRequest, char? fromName, char? toName);
         Task<CustomerSelectModel> Update(CustomerUpdateModel dto);
         Task<CustomerSelectModel> GetById(int id);
         Task<Customer> Delete(int id);
