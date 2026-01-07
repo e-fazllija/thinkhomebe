@@ -210,32 +210,32 @@ public class MailService : IMailService
         }
     }
 
-    public async Task SendComplaintAsync(SendRequestModel mailRequest)
+    public async Task SendComplaintAsync(string message, string name, string lastName, string email, string? phone, string? mobilePhone)
     {
         try
         {
-            var email = new MimeMessage();
-            email.Sender = MailboxAddress.Parse("info@thinkhome.it");
-            email.From.Add(InternetAddress.Parse("info@thinkhome.it"));
-            email.To.Add(MailboxAddress.Parse("info@thinkhome.it"));
+            var emailMessage = new MimeMessage();
+            emailMessage.Sender = MailboxAddress.Parse("info@thinkhome.it");
+            emailMessage.From.Add(InternetAddress.Parse("info@thinkhome.it"));
+            emailMessage.To.Add(MailboxAddress.Parse("info@thinkhome.it"));
 
-            email.Subject = $"RECLAMO - Richiesta di {mailRequest.Name} {mailRequest.LastName}";
+            emailMessage.Subject = $"Segnalazione di {name} {lastName}";
             var builder = new BodyBuilder();
 
-            string body = $"<strong>RECLAMO</strong><br><br>" +
-                $"Invio di un reclamo da:<br>" +
-                $"<strong>Nome:</strong> {mailRequest.Name}<br>" +
-                $"<strong>Cognome:</strong> {mailRequest.LastName}<br>" +
-                $"<strong>Email:</strong> {mailRequest.FromEmail}<br>" +
-                $"<strong>Telefono:</strong> {mailRequest.Phone ?? "Non specificato"}<br>" +
-                $"<strong>Cellulare:</strong> {mailRequest.MobilePhone ?? "Non specificato"}<br><br>" +
+            string body = $"<strong>SEGNALAZIONE</strong><br><br>" +
+                $"Invio di una segnalazione da:<br>" +
+                $"<strong>Nome:</strong> {name}<br>" +
+                $"<strong>Cognome:</strong> {lastName}<br>" +
+                $"<strong>Email:</strong> {email}<br>" +
+                $"<strong>Telefono:</strong> {phone ?? "Non specificato"}<br>" +
+                $"<strong>Cellulare:</strong> {mobilePhone ?? "Non specificato"}<br><br>" +
                 $"<strong>Messaggio:</strong><br><br>";
-            builder.HtmlBody = body += mailRequest.Body;
-            email.Body = builder.ToMessageBody();
+            builder.HtmlBody = body + message;
+            emailMessage.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.SslOnConnect);
             smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
-            await smtp.SendAsync(email);
+            await smtp.SendAsync(emailMessage);
             smtp.Disconnect(true);
         }
         catch (Exception ex)

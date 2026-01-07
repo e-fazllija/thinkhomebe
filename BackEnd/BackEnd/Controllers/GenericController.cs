@@ -236,11 +236,24 @@ namespace BackEnd.Controllers
 
         [HttpPost]
         [Route(nameof(SendComplaint))]
-        public async Task<IActionResult> SendComplaint([FromBody] SendRequestModel request)
+        [Authorize]
+        public async Task<IActionResult> SendComplaint([FromBody] SegnalazioneRequest request)
         {
             try
             {
-                await _mailService.SendComplaintAsync(request);
+                var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == JwtRegisteredClaimNames.Email);
+                if (emailClaim == null)
+                {
+                    return Unauthorized();
+                }
+
+                var user = await _userManager.FindByEmailAsync(emailClaim.Value);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                await _mailService.SendComplaintAsync(request.Message, user.Name, user.LastName, user.Email, user.PhoneNumber?.ToString(), user.MobilePhone?.ToString());
                 return Ok();
             }
             catch (Exception ex)
