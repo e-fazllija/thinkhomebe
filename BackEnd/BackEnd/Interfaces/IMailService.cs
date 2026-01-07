@@ -10,5 +10,5 @@ public interface IMailService
     Task SendWorkWithUsRequestAsync(SendRequestModel mailRequest);
     Task SendRequestAsync(SendRequestModel mailRequest);
     Task InformationRequestAsync(SendRequestModel mailRequest);
-    Task SendComplaintAsync(SendRequestModel mailRequest);
+    Task SendComplaintAsync(string message, string name, string lastName, string email, string? phone, string? mobilePhone);
 }
