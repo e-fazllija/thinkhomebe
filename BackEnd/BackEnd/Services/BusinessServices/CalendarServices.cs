@@ -297,7 +297,8 @@ namespace BackEnd.Services.BusinessServices
             {
                 CalendarCreateViewModel result = new CalendarCreateViewModel();
 
-                // Ottimizzazione: solo i campi necessari per i dropdown (Name, LastName per label)
+                // Query sequenziali ottimizzate con AsNoTracking e Select per ridurre il carico
+                // Nota: Entity Framework Core non supporta operazioni concorrenti sullo stesso DbContext
                 result.Customers = await _unitOfWork.dbContext.Customers
                     .Where(x => x.AgencyId == agencyId)
                     .Select(x => new CustomerSelectModel
@@ -307,9 +308,9 @@ namespace BackEnd.Services.BusinessServices
                         LastName = x.LastName
                     })
                     .AsNoTracking()
-                    .ToListAsync();
+                    .ToListAsync()
+                    .ConfigureAwait(false);
 
-                // Ottimizzazione: solo i campi necessari (Town, AddressLine, Id, Price per label)
                 result.RealEstateProperties = await _unitOfWork.dbContext.RealEstateProperties
                     .Where(x => x.Agent.AgencyId == agencyId)
                     .Select(x => new RealEstatePropertySelectModel
@@ -320,9 +321,9 @@ namespace BackEnd.Services.BusinessServices
                         Price = x.Price
                     })
                     .AsNoTracking()
-                    .ToListAsync();
+                    .ToListAsync()
+                    .ConfigureAwait(false);
 
-                // Ottimizzazione: solo i campi necessari (Customer.Name e LastName per label)
                 var requestsData = await _unitOfWork.dbContext.Requests
                     .Where(x => x.AgencyId == agencyId)
                     .Select(x => new
@@ -333,7 +334,8 @@ namespace BackEnd.Services.BusinessServices
                         CustomerLastName = x.Customer.LastName
                     })
                     .AsNoTracking()
-                    .ToListAsync();
+                    .ToListAsync()
+                    .ConfigureAwait(false);
 
                 result.Requests = requestsData.Select(x => new RequestSelectModel
                 {
