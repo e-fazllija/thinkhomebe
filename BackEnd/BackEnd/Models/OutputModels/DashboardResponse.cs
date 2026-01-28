@@ -72,7 +72,6 @@ namespace BackEnd.Models.OutputModels
         public string Name { get; set; } = string.Empty;
         public int PropertiesManaged { get; set; }
         public int Acquisitions { get; set; }
-        public int AppointmentsEvasi { get; set; }
         public int AppointmentsDisdetti { get; set; }
         public int AppointmentsConfermati { get; set; }
         public int AppointmentsEffettuati { get; set; }
@@ -99,7 +98,6 @@ namespace BackEnd.Models.OutputModels
         public int TotalAcquisitions { get; set; }
         public int AcquisitionsThisMonth { get; set; }
         public int TotalAppointments { get; set; }
-        public int AppointmentsEvasi { get; set; }
         public int AppointmentsDisdetti { get; set; }
         public int AppointmentsConfermati { get; set; }
     }
