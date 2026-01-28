@@ -1,4 +1,4 @@
-﻿using BackEnd.Interfaces;
+using BackEnd.Interfaces;
 using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.InputModels;
 using BackEnd.Models.MailModels;
@@ -92,7 +92,7 @@ namespace BackEnd.Controllers
         [HttpGet]
         [Route(nameof(GetDashboardData))]
         [Authorize]
-        public async Task<IActionResult> GetDashboardData(string? agencyId = null)
+        public async Task<IActionResult> GetDashboardData(string? agencyId = null, string? period = null)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace BackEnd.Controllers
                 var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                 string role = roleClaim?.Value ?? string.Empty;
 
-                var result = await _genericService.GetDashboardData(user, role, agencyId);
+                var result = await _genericService.GetDashboardData(user, role, agencyId, period);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -124,7 +124,7 @@ namespace BackEnd.Controllers
         [HttpGet]
         [Route(nameof(GetDashboardAppointments))]
         [Authorize]
-        public async Task<IActionResult> GetDashboardAppointments(string? agencyId = null)
+        public async Task<IActionResult> GetDashboardAppointments(string? agencyId = null, string? period = null)
         {
             try
             {
@@ -143,7 +143,7 @@ namespace BackEnd.Controllers
                 var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                 string role = roleClaim?.Value ?? string.Empty;
 
-                var result = await _genericService.GetDashboardAppointments(user, role, agencyId);
+                var result = await _genericService.GetDashboardAppointments(user, role, agencyId, period);
                 return Ok(result);
             }
             catch (Exception ex)
