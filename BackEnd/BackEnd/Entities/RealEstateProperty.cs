@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Entities
 {
@@ -55,6 +55,7 @@ namespace BackEnd.Entities
         [Required]
         public string Description { get; set; } = string.Empty;
         public string? VideoUrl { get; set; }
+        public string? DocumentaryNotes { get; set; }
         public int AgreedCommission { get; set; }
         public int FlatRateCommission { get; set; }
         public int StornoProvvigione { get; set; }

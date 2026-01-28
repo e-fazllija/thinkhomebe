@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Models.RealEstatePropertyModels
 {
@@ -56,6 +56,7 @@ namespace BackEnd.Models.RealEstatePropertyModels
         [Required]
         public string Description { get; set; } = string.Empty;
         public string? VideoUrl { get; set; }
+        public string? DocumentaryNotes { get; set; }
         public DateTime AssignmentEnd { get; set; }
         public DateTime UpdateDate { get; set; } = DateTime.Now;
         public int CustomerId { get; set; }

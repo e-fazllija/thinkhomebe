@@ -1,4 +1,4 @@
-﻿using BackEnd.Entities;
+using BackEnd.Entities;
 using BackEnd.Models.CustomerModels;
 using BackEnd.Models.RealEstatePropertyPhotoModels;
 using System.ComponentModel.DataAnnotations;
@@ -64,6 +64,7 @@ namespace BackEnd.Models.RealEstatePropertyModels
         public string? TypeOfAssignment { get; set; }
 
         public string? VideoUrl { get; set; }
+        public string? DocumentaryNotes { get; set; }
         public DateTime AssignmentEnd { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
