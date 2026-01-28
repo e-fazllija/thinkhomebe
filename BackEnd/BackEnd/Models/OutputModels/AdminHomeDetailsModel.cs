@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Vml;
+using DocumentFormat.OpenXml.Vml;
 
 namespace BackEnd.Models.OutputModels
 {

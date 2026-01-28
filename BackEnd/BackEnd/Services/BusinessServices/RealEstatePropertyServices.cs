@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BackEnd.Entities;
@@ -269,6 +269,10 @@ namespace BackEnd.Services.BusinessServices
                     {
                         query = query.Where(x => x.Status == "Vendita" && x.Auction);
                     }
+                    else if (contract == "MLS")
+                    {
+                        query = query.Where(x => x.TypeOfAssignment == "Immobile MLS");
+                    }
                     else
                     {
                         query = query.Where(x => x.Status == contract && !x.Auction);
@@ -364,6 +368,10 @@ namespace BackEnd.Services.BusinessServices
                     if (contract == "Aste")
                     {
                         query = query.Where(x => x.Status == "Vendita" && x.Auction);
+                    }
+                    else if (contract == "MLS")
+                    {
+                        query = query.Where(x => x.TypeOfAssignment == "Immobile MLS");
                     }
                     else
                     {

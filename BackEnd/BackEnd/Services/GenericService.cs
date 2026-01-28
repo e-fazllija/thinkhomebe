@@ -782,10 +782,26 @@ namespace BackEnd.Services
             // Esegui query sequenzialmente per evitare problemi di concorrenza con DbContext
             result.TotalPropertiesManaged = await agentPropertiesQuery.CountAsync();
             result.ActivePropertiesManaged = await agentPropertiesQuery.Where(x => !x.Archived && !x.Sold).CountAsync();
-            result.TotalAcquisitions = await requests.CountAsync();
-            result.AcquisitionsThisMonth = await requests.Where(x => x.CreationDate >= monthStart && !x.Closed && !x.Archived).CountAsync();
+            
+            // Calcola acquisizioni dagli eventi del calendario con tipo "Acquisizione"
+            // Acquisizioni valide: eventi passati con tipo "Acquisizione" che NON sono disdetti o rimandati
+            result.TotalAcquisitions = await calendarsForStats
+                .Where(x => x.Type == "Acquisizione" 
+                    && x.DataInizioEvento < now 
+                    && !x.Cancelled 
+                    && !x.Postponed)
+                .CountAsync();
+            
+            // Acquisizioni di questo mese: eventi passati con tipo "Acquisizione" che NON sono disdetti o rimandati e che sono nel mese corrente
+            result.AcquisitionsThisMonth = await calendarsForStats
+                .Where(x => x.Type == "Acquisizione" 
+                    && x.DataInizioEvento < now 
+                    && x.DataInizioEvento >= monthStart
+                    && !x.Cancelled 
+                    && !x.Postponed)
+                .CountAsync();
+            
             result.TotalAppointments = await calendarsForStats.CountAsync();
-            result.AppointmentsEvasi = await calendarsForStats.Where(x => x.DataInizioEvento < now && !x.Confirmed && !x.Cancelled && !x.Postponed).CountAsync();
             result.AppointmentsDisdetti = await calendarsForStats.Where(x => x.Cancelled).CountAsync();
             result.AppointmentsConfermati = await calendarsForStats.Where(x => x.Confirmed && !x.Cancelled).CountAsync();
 
@@ -807,11 +823,15 @@ namespace BackEnd.Services
                 .Select(g => new AgentDetail
                 {
                     Name = g.Key,
-                    AppointmentsEvasi = g.Count(x => x.DataInizioEvento < now && !x.Confirmed && !x.Cancelled && !x.Postponed),
                     AppointmentsDisdetti = g.Count(x => x.Cancelled),
                     AppointmentsConfermati = g.Count(x => x.Confirmed && !x.Cancelled),
                     AppointmentsEffettuati = g.Count(x => x.DataInizioEvento < now && !x.Cancelled && !x.Postponed),
-                    TotalAppointments = g.Count()
+                    TotalAppointments = g.Count(),
+                    // Calcola acquisizioni per questo agente: eventi passati con tipo "Acquisizione" che NON sono disdetti o rimandati
+                    Acquisitions = g.Count(x => x.Type == "Acquisizione" 
+                        && x.DataInizioEvento < now 
+                        && !x.Cancelled 
+                        && !x.Postponed)
                 })
                 .ToList();
 
@@ -822,16 +842,13 @@ namespace BackEnd.Services
                 agentDetailsMap.Add(new AgentDetail
                 {
                     Name = currentAgentName,
-                    AppointmentsEvasi = 0,
                     AppointmentsDisdetti = 0,
                     AppointmentsConfermati = 0,
                     AppointmentsEffettuati = 0,
-                    TotalAppointments = 0
+                    TotalAppointments = 0,
+                    Acquisitions = 0
                 });
             }
-
-            var totalRequests = await requests.CountAsync();
-            var agentsCount = agentsList.Count > 0 ? agentsList.Count : 1;
 
             // Calcola immobili gestiti per ogni agente sequenzialmente per evitare problemi di concorrenza con DbContext
             var filteredAgentDetails = new List<AgentDetail>();
@@ -845,17 +862,17 @@ namespace BackEnd.Services
                     agentDetail = new AgentDetail
                     {
                         Name = agentName,
-                        AppointmentsEvasi = 0,
                         AppointmentsDisdetti = 0,
                         AppointmentsConfermati = 0,
                         AppointmentsEffettuati = 0,
-                        TotalAppointments = 0
+                        TotalAppointments = 0,
+                        Acquisitions = 0
                     };
                 }
 
                 var agentProperties = _unitOfWork.dbContext.RealEstateProperties.Where(x => x.AgentId == agent.Id);
                 agentDetail.PropertiesManaged = await agentProperties.CountAsync();
-                agentDetail.Acquisitions = agentsCount > 0 ? totalRequests / agentsCount : 0;
+                // Le acquisizioni sono già calcolate nel GroupBy sopra, quindi non serve ricalcolarle
 
                 filteredAgentDetails.Add(agentDetail);
             }
