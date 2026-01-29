@@ -371,7 +371,7 @@ namespace BackEnd.Services.BusinessServices
                     }
                     else if (contract == "MLS")
                     {
-                        query = query.Where(x => x.TypeOfAssignment == "Immobile MLS");
+                        query = query.Where(x => x.TypeOfAssignment == "Immobile MLS");
                     }
                     else
                     {
