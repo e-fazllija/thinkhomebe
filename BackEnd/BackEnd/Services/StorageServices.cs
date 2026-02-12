@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.IO.Compression;
 using BackEnd.Interfaces;
@@ -13,6 +13,7 @@ namespace BackEnd.Services
         private CloudStorageAccount cloudStorageAccount;
         private CloudBlobClient blobClient;
         private CloudBlobContainer container;
+        private CloudBlobContainer privateContainer;
 
         public StorageServices(IConfiguration configuration, IKeyVaultService keyVaultService)
         {
@@ -21,6 +22,7 @@ namespace BackEnd.Services
             cloudStorageAccount = CloudStorageAccount.Parse(blobstorageconnection);
             blobClient = cloudStorageAccount.CreateCloudBlobClient();
             container = blobClient.GetContainerReference(_configuration.GetValue<string>("Storage:BlobContainerName"));
+            privateContainer = blobClient.GetContainerReference(_configuration.GetValue<string>("Storage:DocumentContainerName"));
         }
         public async Task<string> UploadFile(Stream file, string fileName)
         {
@@ -112,6 +114,57 @@ namespace BackEnd.Services
             string urlBlob = _configuration.GetValue<string>("Storage:Url");
             var substring = url.Replace(urlBlob + container + "/", "");
             return substring;
+        }
+
+        public async Task<string> UploadFileToPrivateContainer(Stream file, string fileName)
+        {
+            try
+            {
+                CloudBlockBlob blockBlob = privateContainer.GetBlockBlobReference(fileName);
+                await blockBlob.UploadFromStreamAsync(file);
+
+                return blockBlob.Uri.AbsoluteUri;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> DeleteFileFromPrivateContainer(string fileName)
+        {
+            try
+            {
+                var blob = privateContainer.GetBlobReference(fileName);
+                await blob.DeleteIfExistsAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public string GenerateSasToken(string fileName)
+        {
+            try
+            {
+                CloudBlockBlob blob = privateContainer.GetBlockBlobReference(fileName);
+                
+                SharedAccessBlobPolicy sasConstraints = new SharedAccessBlobPolicy
+                {
+                    SharedAccessStartTime = DateTimeOffset.UtcNow.AddMinutes(-5),
+                    SharedAccessExpiryTime = DateTimeOffset.UtcNow.AddHours(1),
+                    Permissions = SharedAccessBlobPermissions.Read
+                };
+
+                string sasToken = blob.GetSharedAccessSignature(sasConstraints);
+                return blob.Uri.AbsoluteUri + sasToken;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
     }

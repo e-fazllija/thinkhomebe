@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BackEnd.Entities;
@@ -31,8 +31,16 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 Stream stream = dto.File.OpenReadStream();
-                string fileName = $"{dto.FolderName}/{dto.File.FileName.Replace(" ", "-")}";
-                string fileUrl = await _storageServices.UploadFile(stream, fileName);
+                
+                // Genera un nome file univoco con timestamp per evitare sovrascritture
+                string timestamp = DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss");
+                string guid = Guid.NewGuid().ToString("N").Substring(0, 8);
+                string sanitizedFileName = dto.File.FileName.Replace(" ", "-");
+                string uniqueFileName = $"{timestamp}_{guid}_{sanitizedFileName}";
+                string fileName = $"{dto.FolderName}/{uniqueFileName}";
+                
+                // Carica nel container privato "documents"
+                string fileUrl = await _storageServices.UploadFileToPrivateContainer(stream, fileName);
 
                 Documentation document = new Documentation()
                 {
@@ -56,7 +64,8 @@ namespace BackEnd.Services.BusinessServices
             try
             {
                 Documentation document = await _unitOfWork.dbContext.Documentation.FirstAsync(x => x.Id == id);
-                await _storageServices.DeleteFile(document.FileName);
+                // Usa DeleteFileFromPrivateContainer per eliminare dal container privato
+                await _storageServices.DeleteFileFromPrivateContainer(document.FileName);
                 _unitOfWork.dbContext.Documentation.Remove(document);
                 await _unitOfWork.SaveAsync();
 

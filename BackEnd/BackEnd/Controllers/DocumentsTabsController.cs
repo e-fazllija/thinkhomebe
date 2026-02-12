@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using BackEnd.Entities;
 using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.CustomerModels;
@@ -51,6 +51,9 @@ namespace BackEnd.Controllers
                 DocumentsTabUpdateModel documentToUpdate = new DocumentsTabUpdateModel();
                 DocumentsTabSelectModel documentSelected = await _documentsTabServices.GetById(documentsTabId);
                 _mapper.Map(documentSelected, documentToUpdate);
+                
+                // Se esiste già un documento, non eliminarlo automaticamente - l'utente lo eliminerà manualmente
+                // Il nuovo documento sostituisce il riferimento ma il vecchio rimane nel database
                 documentToUpdate.IdentificationDocumentDocumentId = Document.Id;
 
                 DocumentsTabSelectModel Result = await _documentsTabServices.Update(documentToUpdate);
@@ -912,11 +915,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.IdentificationDocumentDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    IdentificationDocumentDocumentId = null 
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.IdentificationDocumentDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -938,11 +942,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.TaxCodeOrHealthCardDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    TaxCodeOrHealthCardDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.TaxCodeOrHealthCardDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -964,11 +969,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.MarriageCertificateSummaryDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    MarriageCertificateSummaryDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.MarriageCertificateSummaryDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -990,11 +996,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.DeedOfOriginDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    DeedOfOriginDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.DeedOfOriginDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1016,11 +1023,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.SystemsComplianceDeclarationDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    SystemsComplianceDeclarationDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.SystemsComplianceDeclarationDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1042,11 +1050,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.ElectricalElectronicSystemDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    ElectricalElectronicSystemDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.ElectricalElectronicSystemDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1068,11 +1077,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.PlumbingSanitarySystemDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    PlumbingSanitarySystemDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.PlumbingSanitarySystemDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1094,11 +1104,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.GasSystemDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    GasSystemDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.GasSystemDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1120,11 +1131,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.HeatingAirConditioningSystemDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    HeatingAirConditioningSystemDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.HeatingAirConditioningSystemDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1146,11 +1158,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.LiftingSystemDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    LiftingSystemDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.LiftingSystemDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1172,11 +1185,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.FireSafetySystemDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    FireSafetySystemDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.FireSafetySystemDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1198,11 +1212,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.BoilerMaintenanceLogDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    BoilerMaintenanceLogDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.BoilerMaintenanceLogDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1224,11 +1239,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.HabitabilityCertificateDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    HabitabilityCertificateDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.HabitabilityCertificateDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1250,11 +1266,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.StructuralIntegrityCertificateDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    StructuralIntegrityCertificateDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.StructuralIntegrityCertificateDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1276,11 +1293,12 @@ namespace BackEnd.Controllers
                     return BadRequest("Nessun documento di identificazione associato");
                 }
                 await _documentServices.DeleteDocument(documentTab.BuildingCadastralComplianceReportDocumentId.Value);
-                var updateModel = new DocumentsTabUpdateModel
-                {
-                    Id = id,
-                    BuildingCadastralComplianceReportDocumentId = null
-                };
+                
+                // Carica l'entità completa e aggiorna solo il campo specifico
+                var updateModel = new DocumentsTabUpdateModel();
+                _mapper.Map(documentTab, updateModel);
+                updateModel.BuildingCadastralComplianceReportDocumentId = null;
+                
                 await _documentsTabServices.Update(updateModel);
                 return Ok();
             }
@@ -1926,6 +1944,22 @@ namespace BackEnd.Controllers
                 DocumentsTabSelectModel result = new DocumentsTabSelectModel();
                 result = await _documentsTabServices.GetById(id);
 
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route(nameof(GetOrCreateByRealEstatePropertyId))]
+        public async Task<IActionResult> GetOrCreateByRealEstatePropertyId(int realEstatePropertyId)
+        {
+            try
+            {
+                DocumentsTabSelectModel result = await _documentsTabServices.GetOrCreateByRealEstatePropertyId(realEstatePropertyId);
                 return Ok(result);
             }
             catch (Exception ex)
