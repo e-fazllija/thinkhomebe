@@ -1,4 +1,4 @@
-﻿using BackEnd.Entities;
+using BackEnd.Entities;
 using BackEnd.Models.DocumentsTabModels;
 using BackEnd.Models.DocumentsTabModelModels;
 using BackEnd.Models.OutputModels;
@@ -10,6 +10,7 @@ namespace BackEnd.Interfaces.IBusinessServices
         Task<DocumentsTabSelectModel> Create(DocumentsTabCreateModel dto);
         Task<DocumentsTabSelectModel> Update(DocumentsTabUpdateModel dto);
         Task<DocumentsTabSelectModel> GetById(int id);
+        Task<DocumentsTabSelectModel> GetOrCreateByRealEstatePropertyId(int realEstatePropertyId);
         Task<DocumentsTab> Delete(int id);
     }
 }

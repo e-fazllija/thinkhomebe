@@ -1,4 +1,4 @@
-﻿using BackEnd.Models.OutputModels;
+using BackEnd.Models.OutputModels;
 
 namespace BackEnd.Interfaces
 {
@@ -9,5 +9,8 @@ namespace BackEnd.Interfaces
         Task<FileResponse> DownloadFile(string filename);
         Task<string> CreateAuthZip(string operaId);
         string GetFileNameFromUrl(string url);
+        Task<string> UploadFileToPrivateContainer(Stream file, string fileName);
+        Task<bool> DeleteFileFromPrivateContainer(string fileName);
+        string GenerateSasToken(string fileName);
     }
 }

@@ -1,4 +1,4 @@
-﻿using BackEnd.Interfaces;
+using BackEnd.Interfaces;
 using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Services.BusinessServices;
 
@@ -21,6 +21,7 @@ namespace BackEnd.Services
             builder.Services.AddTransient<IRequestServices, RequestServices>();
             builder.Services.AddTransient<ICalendarServices, CalendarServices>();
             builder.Services.AddTransient<IDocumentsTabServices, DocumentsTabServices>();
+            builder.Services.AddTransient<IDocumentServices, DocumentServices>();
             builder.Services.AddTransient<ILocationServices, LocationServices>();
             builder.Services.AddTransient<ProvinceServices, ProvinceServices>();
             builder.Services.AddTransient<CityServices, CityServices>();

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BackEnd.Entities;
@@ -92,9 +92,11 @@ namespace BackEnd.Services.BusinessServices
                 if (id is not > 0)
                     throw new Exception("Si è verificato un errore!");
 
-                var query = await _unitOfWork.dbContext.Customers
-                    .Include(x => x.CustomerNotes)
+                var query = await _unitOfWork.dbContext.DocumentsTabs
                     .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (query == null)
+                    throw new NullReferenceException("Record non trovato!");
 
                 DocumentsTabSelectModel result = _mapper.Map<DocumentsTabSelectModel>(query);
 
@@ -105,7 +107,41 @@ namespace BackEnd.Services.BusinessServices
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+                if (ex is NullReferenceException)
+                {
+                    throw new Exception(ex.Message);
+                }
                 throw new Exception("Si è verificato un errore");
+            }
+        }
+
+        public async Task<DocumentsTabSelectModel> GetOrCreateByRealEstatePropertyId(int realEstatePropertyId)
+        {
+            try
+            {
+                var existingTab = await _unitOfWork.dbContext.DocumentsTabs
+                    .FirstOrDefaultAsync(x => x.RealEstatePropertyDocumentId == realEstatePropertyId);
+
+                if (existingTab != null)
+                {
+                    return _mapper.Map<DocumentsTabSelectModel>(existingTab);
+                }
+
+                // Crea nuovo DocumentsTab se non esiste
+                var newTab = new DocumentsTab
+                {
+                    RealEstatePropertyDocumentId = realEstatePropertyId
+                };
+
+                await _unitOfWork.DocumentsTabRepository.InsertAsync(newTab);
+                _unitOfWork.Save();
+
+                return _mapper.Map<DocumentsTabSelectModel>(newTab);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore nel recupero/creazione di DocumentsTab");
             }
         }
 
@@ -119,7 +155,9 @@ namespace BackEnd.Services.BusinessServices
                 if (EntityClass == null)
                     throw new NullReferenceException("Record non trovato!");
 
-                EntityClass = _mapper.Map(dto, EntityClass);
+                // Mappa il DTO sull'entità tracciata
+                // AutoMapper aggiornerà solo i campi che sono stati impostati nel DTO
+                _mapper.Map(dto, EntityClass);
 
                 _unitOfWork.DocumentsTabRepository.Update(EntityClass);
                 await _unitOfWork.SaveAsync();
