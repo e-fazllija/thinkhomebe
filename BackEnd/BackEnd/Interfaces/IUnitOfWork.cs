@@ -13,6 +13,7 @@ namespace BackEnd.Interfaces
         IRequestRepository RequestRepository { get; }
         ICalendarRepository CalendarRepository { get; }
         IDocumentsTabRepository DocumentsTabRepository { get; }
+        ISpecificDocumentationRepository SpecificDocumentationRepository { get; }
         
         Task<int> SaveAsync();
         int Save();

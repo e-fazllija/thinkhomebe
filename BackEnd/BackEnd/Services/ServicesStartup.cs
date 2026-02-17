@@ -22,6 +22,7 @@ namespace BackEnd.Services
             builder.Services.AddTransient<ICalendarServices, CalendarServices>();
             builder.Services.AddTransient<IDocumentsTabServices, DocumentsTabServices>();
             builder.Services.AddTransient<IDocumentServices, DocumentServices>();
+            builder.Services.AddTransient<ISpecificDocumentationServices, SpecificDocumentationServices>();
             builder.Services.AddTransient<ILocationServices, LocationServices>();
             builder.Services.AddTransient<ProvinceServices, ProvinceServices>();
             builder.Services.AddTransient<CityServices, CityServices>();
