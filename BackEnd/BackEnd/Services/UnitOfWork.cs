@@ -20,6 +20,7 @@ namespace BackEnd.Services
             RequestRepository = new RequestRepository(this._context);
             CalendarRepository = new CalendarRepository(this._context);
             DocumentsTabRepository = new DocumentsTabRepository(this._context);
+            SpecificDocumentationRepository = new SpecificDocumentationRepository(this._context);
         }
 
       
@@ -49,6 +50,11 @@ namespace BackEnd.Services
             private set;
         }
         public IDocumentsTabRepository DocumentsTabRepository
+        {
+            get;
+            private set;
+        }
+        public ISpecificDocumentationRepository SpecificDocumentationRepository
         {
             get;
             private set;
