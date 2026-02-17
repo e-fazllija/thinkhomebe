@@ -20,7 +20,6 @@ namespace BackEnd.Services
             builder.Services.AddTransient<IRealEstatePropertyPhotoServices, RealEstatePropertyPhotoServices>();
             builder.Services.AddTransient<IRequestServices, RequestServices>();
             builder.Services.AddTransient<ICalendarServices, CalendarServices>();
-            builder.Services.AddTransient<IDocumentsTabServices, DocumentsTabServices>();
             builder.Services.AddTransient<IDocumentServices, DocumentServices>();
             builder.Services.AddTransient<ISpecificDocumentationServices, SpecificDocumentationServices>();
             builder.Services.AddTransient<ILocationServices, LocationServices>();
