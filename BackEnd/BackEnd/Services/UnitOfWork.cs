@@ -19,7 +19,6 @@ namespace BackEnd.Services
             RealEstatePropertyPhotoRepository = new RealEstatePropertyPhotoRepository(this._context);
             RequestRepository = new RequestRepository(this._context);
             CalendarRepository = new CalendarRepository(this._context);
-            DocumentsTabRepository = new DocumentsTabRepository(this._context);
             SpecificDocumentationRepository = new SpecificDocumentationRepository(this._context);
         }
 
@@ -45,11 +44,6 @@ namespace BackEnd.Services
             private set;
         }
         public IRequestRepository RequestRepository
-        {
-            get;
-            private set;
-        }
-        public IDocumentsTabRepository DocumentsTabRepository
         {
             get;
             private set;

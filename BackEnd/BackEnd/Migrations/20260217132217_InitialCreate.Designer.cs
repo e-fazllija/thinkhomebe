@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250131114610_Notes")]
-    partial class Notes
+    [Migration("20260217132217_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,6 +39,10 @@ namespace BackEnd.Migrations
 
                     b.Property<string>("AgencyId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -132,6 +136,15 @@ namespace BackEnd.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("Cancelled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Color")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Confirmed")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -153,6 +166,9 @@ namespace BackEnd.Migrations
                     b.Property<string>("NomeEvento")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Postponed")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("RealEstatePropertyId")
                         .HasColumnType("int");
@@ -180,6 +196,29 @@ namespace BackEnd.Migrations
                     b.ToTable("Calendars");
                 });
 
+            modelBuilder.Entity("BackEnd.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ProvinceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.ToTable("Cities");
+                });
+
             modelBuilder.Entity("BackEnd.Entities.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -193,6 +232,9 @@ namespace BackEnd.Migrations
 
                     b.Property<string>("AdressLine")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AgencyId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("Builder")
                         .HasColumnType("bit");
@@ -248,6 +290,8 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AgencyId");
+
                     b.ToTable("Customers");
                 });
 
@@ -262,6 +306,9 @@ namespace BackEnd.Migrations
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("CalendarId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -285,6 +332,83 @@ namespace BackEnd.Migrations
                     b.ToTable("CustomerNotes");
                 });
 
+            modelBuilder.Entity("BackEnd.Entities.Documentation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RealEstatePropertyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Documentation");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Location", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Province", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Provinces");
+                });
+
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
                 {
                     b.Property<int>("Id")
@@ -300,6 +424,12 @@ namespace BackEnd.Migrations
                     b.Property<string>("AgentId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AgreedCommission")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("AssignmentEnd")
                         .HasColumnType("datetime2");
@@ -336,6 +466,9 @@ namespace BackEnd.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DocumentaryNotes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Elevators")
                         .HasColumnType("int");
 
@@ -344,6 +477,9 @@ namespace BackEnd.Migrations
 
                     b.Property<string>("Exposure")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FlatRateCommission")
+                        .HasColumnType("int");
 
                     b.Property<string>("Floor")
                         .HasColumnType("nvarchar(max)");
@@ -363,8 +499,17 @@ namespace BackEnd.Migrations
                     b.Property<int>("Kitchens")
                         .HasColumnType("int");
 
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MQGarden")
+                        .HasColumnType("int");
+
                     b.Property<string>("MoreDetails")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Negotiation")
+                        .HasColumnType("bit");
 
                     b.Property<string>("OtherFeatures")
                         .HasColumnType("nvarchar(max)");
@@ -377,6 +522,9 @@ namespace BackEnd.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<double>("PriceReduced")
                         .HasColumnType("float");
 
                     b.Property<bool>("Sold")
@@ -393,6 +541,9 @@ namespace BackEnd.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("StornoProvvigione")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -402,6 +553,9 @@ namespace BackEnd.Migrations
 
                     b.Property<string>("Town")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TypeOfAssignment")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TypeOfProperty")
@@ -442,6 +596,9 @@ namespace BackEnd.Migrations
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("CalendarId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -514,6 +671,9 @@ namespace BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AgencyId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<bool>("Archived")
                         .HasColumnType("bit");
 
@@ -528,6 +688,12 @@ namespace BackEnd.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GardenFrom")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GardenTo")
                         .HasColumnType("int");
 
                     b.Property<string>("Heating")
@@ -551,7 +717,10 @@ namespace BackEnd.Migrations
                     b.Property<int>("ParkingSpaces")
                         .HasColumnType("int");
 
-                    b.Property<double>("Price")
+                    b.Property<double>("PriceFrom")
+                        .HasColumnType("float");
+
+                    b.Property<double>("PriceTo")
                         .HasColumnType("float");
 
                     b.Property<string>("PropertyState")
@@ -577,6 +746,8 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AgencyId");
+
                     b.HasIndex("CustomerId");
 
                     b.ToTable("Requests");
@@ -593,6 +764,9 @@ namespace BackEnd.Migrations
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("CalendarId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -614,6 +788,40 @@ namespace BackEnd.Migrations
                     b.HasIndex("RequestId");
 
                     b.ToTable("RequestNotes");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.SpecificDocumentation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RealEstatePropertyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SpecificDocumentations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -787,6 +995,27 @@ namespace BackEnd.Migrations
                     b.Navigation("Request");
                 });
 
+            modelBuilder.Entity("BackEnd.Entities.City", b =>
+                {
+                    b.HasOne("BackEnd.Entities.Province", "Province")
+                        .WithMany("Cities")
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Province");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Customer", b =>
+                {
+                    b.HasOne("BackEnd.Entities.ApplicationUser", "Agency")
+                        .WithMany()
+                        .HasForeignKey("AgencyId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Agency");
+                });
+
             modelBuilder.Entity("BackEnd.Entities.CustomerNotes", b =>
                 {
                     b.HasOne("BackEnd.Entities.ApplicationUser", "ApplicationUser")
@@ -795,15 +1024,24 @@ namespace BackEnd.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BackEnd.Entities.Customer", "Customer")
+                    b.HasOne("BackEnd.Entities.Customer", null)
                         .WithMany("CustomerNotes")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+                });
 
-                    b.Navigation("Customer");
+            modelBuilder.Entity("BackEnd.Entities.Location", b =>
+                {
+                    b.HasOne("BackEnd.Entities.City", "City")
+                        .WithMany("Locations")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
@@ -857,11 +1095,18 @@ namespace BackEnd.Migrations
 
             modelBuilder.Entity("BackEnd.Entities.Request", b =>
                 {
+                    b.HasOne("BackEnd.Entities.ApplicationUser", "Agency")
+                        .WithMany()
+                        .HasForeignKey("AgencyId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("BackEnd.Entities.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Agency");
 
                     b.Navigation("Customer");
                 });
@@ -874,15 +1119,13 @@ namespace BackEnd.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BackEnd.Entities.Request", "Request")
+                    b.HasOne("BackEnd.Entities.Request", null)
                         .WithMany("RequestNotes")
                         .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-
-                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -941,11 +1184,21 @@ namespace BackEnd.Migrations
                     b.Navigation("RealEstateProperties");
                 });
 
+            modelBuilder.Entity("BackEnd.Entities.City", b =>
+                {
+                    b.Navigation("Locations");
+                });
+
             modelBuilder.Entity("BackEnd.Entities.Customer", b =>
                 {
                     b.Navigation("CustomerNotes");
 
                     b.Navigation("RealEstateProperties");
+                });
+
+            modelBuilder.Entity("BackEnd.Entities.Province", b =>
+                {
+                    b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("BackEnd.Entities.RealEstateProperty", b =>
