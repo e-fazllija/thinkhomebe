@@ -275,7 +275,7 @@ namespace BackEnd.Services.BusinessServices
                     }
                     else
                     {
-                        query = query.Where(x => x.Status == contract && !x.Auction);
+                        query = query.Where(x => x.Status == contract && !x.Auction && x.TypeOfAssignment != "Immobile MLS");
                     }
                 }
 
