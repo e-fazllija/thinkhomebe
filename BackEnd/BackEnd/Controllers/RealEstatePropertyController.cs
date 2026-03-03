@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using BackEnd.Interfaces.IBusinessServices;
 using BackEnd.Models.ResponseModel;
 using BackEnd.Models.OutputModels;
@@ -203,6 +203,22 @@ namespace BackEnd.Controllers
                 RealEstatePropertySelectModel result = new RealEstatePropertySelectModel();
                 result = await _realEstatePropertyServices.GetById(id);
 
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new AuthResponseModel() { Status = "Error", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route(nameof(GetDetailsById))]
+        public async Task<IActionResult> GetDetailsById(int id)
+        {
+            try
+            {
+                var result = await _realEstatePropertyServices.GetDetailsById(id);
                 return Ok(result);
             }
             catch (Exception ex)

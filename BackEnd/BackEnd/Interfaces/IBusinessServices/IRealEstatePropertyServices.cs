@@ -1,4 +1,4 @@
-﻿using BackEnd.Models.CalendarModels;
+using BackEnd.Models.CalendarModels;
 using BackEnd.Models.OutputModels;
 using BackEnd.Models.RealEstatePropertyModels;
 
@@ -15,6 +15,7 @@ namespace BackEnd.Interfaces.IBusinessServices
         Task<RealEstatePropertyCreateViewModel> GetToInsert(string? agencyId);
         Task<RealEstatePropertySelectModel> Update(RealEstatePropertyUpdateModel dto);
         Task<RealEstatePropertySelectModel> GetById(int id);
+        Task<RealEstatePropertyDetailsModel> GetDetailsById(int id);
         Task Delete(int id);
         Task SetHighlighted(int realEstatePropertyId);
         Task SetInHome(int realEstatePropertyId);
