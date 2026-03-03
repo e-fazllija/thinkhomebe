@@ -546,6 +546,73 @@ namespace BackEnd.Services.BusinessServices
             }
         }
 
+        public async Task<RealEstatePropertyDetailsModel> GetDetailsById(int id)
+        {
+            try
+            {
+                if (id is not > 0)
+                    throw new Exception("Id non valido");
+
+                var result = await _unitOfWork.dbContext.RealEstateProperties
+                    .Where(x => x.Id == id)
+                    .Select(x => new RealEstatePropertyDetailsModel
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        Sold = x.Sold,
+                        Negotiation = x.Negotiation,
+                        AddressLine = x.AddressLine,
+                        Town = x.Town,
+                        State = x.State,
+                        PostCode = x.PostCode,
+                        CommercialSurfaceate = x.CommercialSurfaceate,
+                        Bedrooms = x.Bedrooms,
+                        Bathrooms = x.Bathrooms,
+                        ParkingSpaces = x.ParkingSpaces,
+                        Heating = x.Heating,
+                        EnergyClass = x.EnergyClass,
+                        Price = x.Price,
+                        PriceReduced = x.PriceReduced,
+                        MQGarden = x.MQGarden,
+                        Description = x.Description,
+                        Typology = x.Typology,
+                        VideoUrl = x.VideoUrl,
+                        Photos = x.Photos
+                            .OrderBy(p => p.Position)
+                            .Select(p => new RealEstatePropertyPhotoDetailsModel { Url = p.Url })
+                            .ToList(),
+                        Agent = x.Agent != null ? new RealEstatePropertyDetailsAgentModel
+                        {
+                            Name = x.Agent.Name,
+                            LastName = x.Agent.LastName,
+                            Email = x.Agent.Email,
+                            PhoneNumber = x.Agent.PhoneNumber,
+                            Agency = x.Agent.Agency != null ? new RealEstatePropertyDetailsAgencyModel
+                            {
+                                Name = x.Agent.Agency.Name,
+                                Email = x.Agent.Agency.Email,
+                                PhoneNumber = x.Agent.Agency.PhoneNumber,
+                                Address = x.Agent.Agency.Address,
+                                Town = x.Agent.Agency.Town
+                            } : null
+                        } : null
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (result == null)
+                    throw new Exception("Immobile non trovato");
+
+                _logger.LogInformation(nameof(GetDetailsById));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new Exception("Si è verificato un errore");
+            }
+        }
+
         public async Task<RealEstatePropertySelectModel> Update(RealEstatePropertyUpdateModel dto)
         {
             try
