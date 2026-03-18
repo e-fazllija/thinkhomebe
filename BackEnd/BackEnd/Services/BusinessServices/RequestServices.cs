@@ -346,7 +346,8 @@ namespace BackEnd.Services.BusinessServices
 
                 if (!string.IsNullOrEmpty(request.RoomsNumber))
                 {
-                    realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.WarehouseRooms == Convert.ToInt32(request.RoomsNumber));
+                    int.TryParse(request.RoomsNumber, out int resRoomsNumber);
+                    realEstatePropertiesQuery = realEstatePropertiesQuery.Where(x => x.WarehouseRooms == resRoomsNumber);
                 }
 
                 if (request.MQFrom > 0)
